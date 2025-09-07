@@ -15,7 +15,7 @@ To set up, build, and test the environment:
 
 ```bash
 # Setup the environment
-pixi setup-colcon
+pixi run setup-colcon
 
 # Build everything
 pixi run build

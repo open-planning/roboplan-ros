@@ -10,6 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>roboplan</depend>
+
   <build_depend>trajectory_msgs</build_depend>
 
   <export>
