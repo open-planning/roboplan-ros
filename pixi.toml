@@ -17,10 +17,17 @@ test = { cmd = "colcon test", depends-on = ["build"] }
 # Build deps
 colcon-common-extensions = ">=0.3.0,<0.4"
 colcon-mixin = ">=0.2.3,<0.3"
-cmake = ">=4.1.1,<5"
+cmake = ">=3.30.5,<4"
+clangxx = ">=19.1.7,<20"
+lld = ">=19.1.2,<20"
 ninja = ">=1.13.1,<2"
 mold = ">=2.40.2,<3"
 sccache = ">=0.10.0,<0.11"
+
+# roboplan base deps
+eigen = ">=3.4.0,<4"
+pinocchio = ">=3.7.0,<4"
+gtest = ">=1.17.0,<2"
 
 # ROS deps
 ros-jazzy-ros-core = ">=0.11.0,<0.12"
