@@ -15,9 +15,7 @@ TEST(ConversionTest, TestEmptyConversions) {
 
 TEST(ConversionTest, TestConvertToJointTrajectory) {
   // Shorthand helper function
-  auto make_vector = [](double a, double b) {
-    return (Eigen::VectorXd(2) << a, b).finished();
-  };
+  auto make_vector = [](double a, double b) { return (Eigen::VectorXd(2) << a, b).finished(); };
 
   // Create a roboplan trajectory with two joints and two points
   roboplan::JointTrajectory roboplan_traj;
@@ -41,4 +39,4 @@ TEST(ConversionTest, TestConvertToJointTrajectory) {
   ASSERT_EQ(new_roboplan_traj.accelerations, roboplan_traj.accelerations);
 }
 
-} // namespace roboplan_ros
+}  // namespace roboplan_ros
