@@ -31,3 +31,4 @@ gtest = ">=1.17.0,<2"
 
 # ROS deps
 ros-jazzy-ros-core = ">=0.11.0,<0.12"
+ros-jazzy-trajectory-msgs = ">=5.3.6,<6"
