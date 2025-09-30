@@ -6,11 +6,10 @@
 
 namespace roboplan_ros {
 
-/// @brief Converts a doube timestamp to an equivalent ROS Duration.
+/// @brief Converts a double timestamp to an equivalent ROS Duration.
 /// @param time Timestamp in seconds.
 /// @return ROS 2 Duration with seconds and nanoseconds.
-inline builtin_interfaces::msg::Duration
-toDuration(const double time_sec) {
+inline builtin_interfaces::msg::Duration toDuration(const double time_sec) {
   builtin_interfaces::msg::Duration duration;
   duration.sec = static_cast<int32_t>(time_sec);
   duration.nanosec = static_cast<uint32_t>((time_sec - duration.sec) * 1e9);
@@ -20,8 +19,7 @@ toDuration(const double time_sec) {
 /// @brief Converts a ROS 2 Duration with seconds and nanoseconds to an equivalent double timestamp.
 /// @param duration ROS 2 Duration with seconds and nanoseconds.
 /// @return An equivalent double timestamp.
-inline double
-fromDuration(const builtin_interfaces::msg::Duration& duration) {
+inline double fromDuration(const builtin_interfaces::msg::Duration& duration) {
   return duration.sec + duration.nanosec * 1e-9;
 }
 
