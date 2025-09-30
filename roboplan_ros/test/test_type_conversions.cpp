@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <roboplan_ros/types.hpp>
+#include <roboplan_ros/type_conversions.hpp>
 
 namespace roboplan_ros {
 
@@ -9,8 +9,8 @@ TEST(ConversionTest, TestEmptyConversions) {
   const auto ros_traj = toJointTrajectory(roboplan_traj);
   EXPECT_TRUE(ros_traj.joint_names.empty());
 
-  const auto og_roboplan_traj = fromJointTrajectory(ros_traj);
-  EXPECT_TRUE(og_roboplan_traj.joint_names.empty());
+  const auto orig_roboplan_traj = fromJointTrajectory(ros_traj);
+  EXPECT_TRUE(orig_roboplan_traj.joint_names.empty());
 }
 
 TEST(ConversionTest, TestConvertToJointTrajectory) {

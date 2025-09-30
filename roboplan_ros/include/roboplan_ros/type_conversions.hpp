@@ -6,7 +6,26 @@
 
 namespace roboplan_ros {
 
-/// @brief Conversta a roboplan::JointTrajectory object to a ROS 2 JointTrajectory message.
+/// @brief Converts a doube timestamp to an equivalent ROS Duration.
+/// @param time Timestamp in seconds.
+/// @return ROS 2 Duration with seconds and nanoseconds.
+inline builtin_interfaces::msg::Duration
+toDuration(const double time_sec) {
+  builtin_interfaces::msg::Duration duration;
+  duration.sec = static_cast<int32_t>(time_sec);
+  duration.nanosec = static_cast<uint32_t>((time_sec - duration.sec) * 1e9);
+  return duration;
+}
+
+/// @brief Converts a ROS 2 Duration with seconds and nanoseconds to an equivalent double timestamp.
+/// @param duration ROS 2 Duration with seconds and nanoseconds.
+/// @return An equivalent double timestamp.
+inline double
+fromDuration(const builtin_interfaces::msg::Duration& duration) {
+  return duration.sec + duration.nanosec * 1e-9;
+}
+
+/// @brief Converts a roboplan::JointTrajectory object to a ROS 2 JointTrajectory message.
 /// @details This function will convert joint names and joint trajectory points. The caller
 /// is responsible for any additional configuration that is required in the message.
 /// @param roboplan_trajectory The roboplan JointTrajectory to convert
@@ -21,9 +40,7 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory) {
   for (size_t i = 0; i < roboplan_trajectory.times.size(); ++i) {
     auto& point = ros_traj.points[i];
     double time_sec = roboplan_trajectory.times[i];
-    point.time_from_start.sec = static_cast<int32_t>(time_sec);
-    point.time_from_start.nanosec =
-        static_cast<uint32_t>((time_sec - point.time_from_start.sec) * 1e9);
+    point.time_from_start = toDuration(time_sec);
 
     if (i < roboplan_trajectory.positions.size()) {
       point.positions.resize(roboplan_trajectory.positions[i].size());
@@ -67,8 +84,7 @@ fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory)
   joint_traj.accelerations.reserve(ros_trajectory.points.size());
 
   for (const auto& point : ros_trajectory.points) {
-    double time_sec = point.time_from_start.sec + point.time_from_start.nanosec * 1e-9;
-    joint_traj.times.push_back(time_sec);
+    joint_traj.times.push_back(fromDuration(point.time_from_start));
 
     Eigen::VectorXd positions =
         Eigen::VectorXd::Map(point.positions.data(), point.positions.size());
