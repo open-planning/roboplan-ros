@@ -60,6 +60,5 @@ jobs:
           pixi-bin-path: ~/actions-runner/.pixi/bin/pixi
       - name: Build and test
         run: |
-          pixi run install
           pixi run build
           pixi run test
