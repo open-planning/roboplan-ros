@@ -28,6 +28,8 @@ sccache = ">=0.10.0,<0.11"
 eigen = ">=3.4.0,<4"
 pinocchio = ">=3.7.0,<4"
 gtest = ">=1.17.0,<2"
+viser = ">=1.0.11,<2"
+tyro = ">=0.9.32,<0.10"
 
 # ROS deps
 ros-jazzy-ros-core = ">=0.11.0,<0.12"
