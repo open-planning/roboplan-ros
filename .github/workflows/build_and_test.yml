@@ -60,5 +60,6 @@ jobs:
           pixi-bin-path: ~/actions-runner/.pixi/bin/pixi
       - name: Build and test
         run: |
+          pixi run setup-colcon
           pixi run build
           pixi run test
