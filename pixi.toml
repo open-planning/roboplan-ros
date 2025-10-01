@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [tasks]
 setup-colcon = { cmd = """
-colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml && \
+colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
 build = "colcon build"
