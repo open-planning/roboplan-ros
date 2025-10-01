@@ -9,3 +9,8 @@ target_link_libraries(
   GTest::gtest_main
 )
 ament_add_gtest_test(test_type_conversions)
+
+find_package(ament_cmake_pytest REQUIRED)
+ament_add_pytest_test(test_bindings test_bindings.py
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
