@@ -34,3 +34,9 @@ colcon build
 # Or test,
 colcon test
 ```
+
+The examples from the upstream repository should now be available, as well,
+
+```bash
+python3 roboplan/bindings/examples/example_scene.py
+```
