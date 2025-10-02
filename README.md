@@ -29,8 +29,8 @@ That is, the workspace can be sourced and used as expected.
 
 ```bash
 # Can also build with colcon
-colcon build --packages-select roboplan_ros
+colcon build
 
 # Or test,
-colcon test --packages-select roboplan_ros
+colcon test
 ```
