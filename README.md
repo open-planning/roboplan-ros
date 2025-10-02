@@ -21,7 +21,7 @@ pixi run setup-colcon
 pixi run build
 
 # Run tests
-pixi run tests
+pixi run test
 ```
 
 Once the workspace is built, it can be used as a "normal" ROS 2 workspace.
