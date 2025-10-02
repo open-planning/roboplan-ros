@@ -33,7 +33,9 @@ def from_duration(duration: Duration) -> float:
     return duration.sec + duration.nanosec * 1e-9
 
 
-def to_joint_trajectory(roboplan_trajectory: roboplan.JointTrajectory) -> JointTrajectory:
+def to_joint_trajectory(
+    roboplan_trajectory: roboplan.JointTrajectory,
+) -> JointTrajectory:
     """
     Converts a roboplan.JointTrajectory object to a ROS 2 JointTrajectory message.
 
