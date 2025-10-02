@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>roboplan_roscpp</name>
+  <name>roboplan_rospy</name>
   <version>0.0.0</version>
-  <description>ROS 2 C++ bindings for the roboplan motion planning library.</description>
+  <description>ROS 2 Python bindings for the roboplan motion planning library.</description>
   <maintainer email="sebas.a.castro@gmail.com">Sebastian Castro</maintainer>
   <maintainer email="eholum@gmail.com">Erik Holum</maintainer>
   <license>MIT</license>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>builtin_interfaces</depend>
 
-  <depend>roboplan</depend>
-
-  <build_depend>trajectory_msgs</build_depend>
+  <test_depend>python3-pytest</test_depend>
 
   <export>
-    <build_type>ament_cmake</build_type>
+    <build_type>ament_python</build_type>
   </export>
 </package>
