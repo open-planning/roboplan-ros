@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(roboplan_roscpp)
+project(roboplan_ros_cpp)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -9,23 +9,23 @@ find_package(ament_cmake REQUIRED)
 find_package(roboplan REQUIRED)
 find_package(trajectory_msgs)
 
-add_library(roboplan_roscpp SHARED
-    include/roboplan_roscpp/type_conversions.hpp
+add_library(roboplan_ros_cpp SHARED
+    include/roboplan_ros_cpp/type_conversions.hpp
 )
-target_include_directories(roboplan_roscpp PUBLIC
+target_include_directories(roboplan_ros_cpp PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(roboplan_roscpp
+target_link_libraries(roboplan_ros_cpp
     roboplan::roboplan
 )
-ament_target_dependencies(roboplan_roscpp trajectory_msgs)
-set_property(TARGET roboplan_roscpp PROPERTY CXX_STANDARD 20)
+ament_target_dependencies(roboplan_ros_cpp trajectory_msgs)
+set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
 
 install(
   TARGETS
-  roboplan_roscpp
-  EXPORT roboplan_roscpp-targets
+  roboplan_ros_cpp
+  EXPORT roboplan_ros_cpp-targets
   LIBRARY DESTINATION lib
   INCLUDES DESTINATION include
 )

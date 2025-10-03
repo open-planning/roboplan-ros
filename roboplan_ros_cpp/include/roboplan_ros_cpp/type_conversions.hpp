@@ -4,7 +4,7 @@
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
 
-namespace roboplan_roscpp {
+namespace roboplan_ros_cpp {
 
 /// @brief Converts a double timestamp to an equivalent ROS Duration.
 /// @param time Timestamp in seconds.
@@ -100,4 +100,4 @@ fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory)
   return joint_traj;
 }
 
-}  // namespace roboplan_roscpp
+}  // namespace roboplan_ros_cpp

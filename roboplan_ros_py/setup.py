@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = "roboplan_rospy"
+package_name = "roboplan_ros_py"
 
 setup(
     name=package_name,

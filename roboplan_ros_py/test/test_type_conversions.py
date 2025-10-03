@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import roboplan
-from roboplan_rospy.type_conversions import (
+from roboplan_ros_py.type_conversions import (
     to_joint_trajectory,
     from_joint_trajectory,
 )

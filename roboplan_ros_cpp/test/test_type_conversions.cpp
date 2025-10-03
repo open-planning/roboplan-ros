@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <roboplan_roscpp/type_conversions.hpp>
+#include <roboplan_ros_cpp/type_conversions.hpp>
 
-namespace roboplan_roscpp {
+namespace roboplan_ros_cpp {
 
 TEST(ConversionTest, TestEmptyConversions) {
   roboplan::JointTrajectory roboplan_traj;
@@ -39,4 +39,4 @@ TEST(ConversionTest, TestConvertToJointTrajectory) {
   ASSERT_EQ(new_roboplan_traj.accelerations, roboplan_traj.accelerations);
 }
 
-}  // namespace roboplan_roscpp
+}  // namespace roboplan_ros_cpp
