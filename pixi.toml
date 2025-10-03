@@ -10,9 +10,27 @@ setup-colcon = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = "colcon build --build-base build/$ROS_DISTRO --install-base install/$ROS_DISTRO"
+build = { cmd = ["colcon", "build", "--build-base", "build_$ROS_DISTRO", "--install-base", "install_$ROS_DISTRO"] }
 # TOPP-RA has failures in colcon, so ignoring for now.
-test = "bash -c 'source install/${ROS_DISTRO}/setup.bash && colcon test --packages-ignore toppra && colcon test-result --verbose'"
+test = { cmd = [
+  "colcon",
+  "test",
+  "--packages-ignore",
+  "toppra",
+  "--build-base",
+  "build_$ROS_DISTRO",
+  "--install-base",
+  "install_$ROS_DISTRO",
+], depends-on = "build" }
+test-result = {cmd = [
+  "colcon",
+  "test-result",
+  "--verbose",
+  "--build-base",
+  "build_$ROS_DISTRO",
+  "--install-base",
+  "install_$ROS_DISTRO",
+]}
 
 [dependencies]
 # Build deps
