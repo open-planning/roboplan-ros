@@ -28,11 +28,10 @@ jobs:
       SCCACHE_DIR: ${{ github.workspace }}/.sccache
     strategy:
       fail-fast: false
-      # TODO: Re-enable when we do not have self-hosted runners in the public repo
-      # matrix:
-      #   ubuntu_version: [22.04, 24.04]
+      matrix:
+        ros_distro: [kilted, jazzy, humble]
 
-    runs-on: self-hosted  #ubuntu-${{ matrix.ubuntu_version }}
+    runs-on: self-hosted
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -60,6 +59,7 @@ jobs:
           pixi-bin-path: ~/actions-runner/.pixi/bin/pixi
       - name: Build and test
         run: |
-          pixi run setup-colcon
-          pixi run build
-          pixi run test
+          pixi run -e ${{ matrix.ros_distro }} setup-colcon
+          pixi run -e ${{ matrix.ros_distro }} build
+          pixi run -e ${{ matrix.ros_distro }} test
+          pixi run -e ${{ matrix.ros_distro }} test-result
