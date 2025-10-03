@@ -25,7 +25,7 @@ pixi run -e kilted setup-colcon
 # Build
 pixi run -e kilted build
 
-# Run tests
+# Run tests, must manually run build prior to executing
 pixi run -e kilted test
 
 # Show tests results

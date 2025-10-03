@@ -15,21 +15,19 @@ build = { cmd = ["colcon", "build", "--build-base", "build_$ROS_DISTRO", "--inst
 test = { cmd = [
   "colcon",
   "test",
-  "--packages-ignore",
+  "--packages-skip",
   "toppra",
   "--build-base",
   "build_$ROS_DISTRO",
   "--install-base",
   "install_$ROS_DISTRO",
-], depends-on = "build" }
+]}
 test-result = {cmd = [
   "colcon",
   "test-result",
   "--verbose",
-  "--build-base",
+  "--test-result-base",
   "build_$ROS_DISTRO",
-  "--install-base",
-  "install_$ROS_DISTRO",
 ]}
 
 [dependencies]
