@@ -1,0 +1,20 @@
+name: format
+
+on:
+  # Run action on certain pull request events
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# Ensures that only one workflow runs at a time for this branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: pre-commit
+    runs-on: self-hosted  #ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - uses: pre-commit/action@v3.0.1

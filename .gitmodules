@@ -1,0 +1,3 @@
+[submodule "roboplan"]
+	path = roboplan
+	url = git@github.com:open-planning/roboplan.git
