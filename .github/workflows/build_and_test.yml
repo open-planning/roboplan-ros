@@ -96,7 +96,7 @@ jobs:
           docker run --rm \
             roboplan_ros_wrapper:${{ github.head_ref || github.ref_name }} \
             bash -c "
-              colcon test --packages-skip toppra && \
+              colcon test && \
               colcon test-result --verbose
             "
       # Always remove images to save disk space, may not be necessary when using GH runners.
