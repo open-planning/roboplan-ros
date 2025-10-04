@@ -12,6 +12,7 @@ colcon mixin update default
 """ }
 build = { cmd = ["colcon", "build", "--build-base", "build_$ROS_DISTRO", "--install-base", "install_$ROS_DISTRO"] }
 # TOPP-RA has failures in colcon, so ignoring for now.
+# https://github.com/sea-bass/toppra/pull/1
 test = { cmd = [
   "colcon",
   "test",
