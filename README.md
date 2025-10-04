@@ -10,12 +10,11 @@ The upstream `roboplan` package is included as a submodule, be sure to clone it 
 git clone --recursive https://github.com/open-planning/roboplan-ros
 ```
 
+### Pixi Development
+
 ROS and the required dependencies are bundled together with [pixi](https://pixi.sh/latest/) and [robostack](https://robostack.github.io).
-Ensure `pixi` is installed with latest version.
-
-### ROS Version Support
-
 Different versions of ROS (humble, jazzy, and kilted) are supported with pixi environments.
+
 For instance, to build for kilted:
 
 ```bash
@@ -55,3 +54,22 @@ The examples from the upstream repository should now be available, as well,
 ```bash
 python3 roboplan/bindings/examples/example_scene.py
 ```
+
+### Docker Development
+
+A [Docker Compose](https://docs.docker.com/compose/) workflow is also provided by the [compose specification](./docker-compose.yaml).
+
+To build and run,
+
+```bash
+# Build the image, defaults to jazzy but can be overridden by setting $ROS_DISTRO
+docker compose build ros
+
+# Start the container
+docker compose up ros
+
+# Attach to the running container
+docker compose exec ros bash
+```
+
+This will drop the user into a pre-compiled colcon workspace with the source mounted in the image.
