@@ -77,6 +77,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
+          # TODO: Remove this either with an org actions runner or public repos.
+          token: ${{ secrets.DEPLOY_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build and push
