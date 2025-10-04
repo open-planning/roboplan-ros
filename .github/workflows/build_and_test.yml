@@ -71,7 +71,7 @@ jobs:
       matrix:
         ros_distro: [humble, jazzy, kilted, rolling]
 
-    runs-on: self-hosted  #ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -85,7 +85,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           file: .docker/Dockerfile
-          tags: roboplan_ros:${{ github.head_ref || github.ref_name }}
+          tags: roboplan_ros_wrapper:${{ github.head_ref || github.ref_name }}
           build-args: |
             ROS_DISTRO=${{ matrix.ros_distro }}
           push: false
@@ -93,6 +93,8 @@ jobs:
       - name: Run tests
         run: |
           docker run \
-            roboplan_ros:${{ github.head_ref || github.ref_name }} \
-            colcon test --packages-skip toppra && \
-            colcon test-result --verbose
+            roboplan_ros_wrapper:${{ github.head_ref || github.ref_name }} \
+            bash -c "
+              colcon test --packages-skip toppra && \
+              colcon test-result --verbose
+            "
