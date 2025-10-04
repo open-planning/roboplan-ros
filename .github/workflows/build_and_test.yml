@@ -84,6 +84,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
+          context: .
           file: .docker/Dockerfile
           tags: roboplan_ros_wrapper:${{ github.head_ref || github.ref_name }}
           build-args: |
