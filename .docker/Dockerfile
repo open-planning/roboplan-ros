@@ -37,18 +37,16 @@ WORKDIR /workspace/roboplan_ws
 
 # Copy package manifests for installing rosdeps
 COPY --from=package-manifests /roboplan_ros ./src/roboplan_ros
-
-# Install dependencies
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
     && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
 
-# Copy in remaining src and build
+# Copy in remaining source and build
 COPY . src/roboplan_ros
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
     && colcon build --cmake-args -DBUILD_TESTING=ON
 
 # Set up entrypoint and working folder.
 WORKDIR /workspace/roboplan_ws
-COPY ./docker/entrypoint.sh /entrypoint.sh
+COPY ./.docker/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 RUN echo "source /entrypoint.sh" >> ~/.bashrc

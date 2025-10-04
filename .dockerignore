@@ -6,3 +6,5 @@
 **/build*
 **/install*
 **/Dockerfile
+
+docker-compose.yaml
