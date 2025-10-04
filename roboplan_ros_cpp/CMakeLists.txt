@@ -10,7 +10,7 @@ find_package(roboplan REQUIRED)
 find_package(trajectory_msgs)
 
 add_library(roboplan_ros_cpp SHARED
-    include/roboplan_ros_cpp/type_conversions.hpp
+    src/type_conversions.cpp
 )
 target_include_directories(roboplan_ros_cpp PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
