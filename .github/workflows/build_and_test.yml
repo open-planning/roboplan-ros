@@ -63,3 +63,43 @@ jobs:
           pixi run -e ${{ matrix.ros_distro }} build
           pixi run -e ${{ matrix.ros_distro }} test
           pixi run -e ${{ matrix.ros_distro }} test-result
+
+  # Build ROS docker images and run tests.
+  ros_build_and_test:
+    strategy:
+      fail-fast: false
+      matrix:
+        ros_distro: [humble, jazzy, kilted, rolling]
+
+    runs-on: self-hosted
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          # TODO: Remove this either with an org actions runner or public repos.
+          token: ${{ secrets.DEPLOY_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: .docker/Dockerfile
+          tags: roboplan_ros_wrapper:${{ github.head_ref || github.ref_name }}
+          build-args: |
+            ROS_DISTRO=${{ matrix.ros_distro }}
+          push: false
+          load: true
+      - name: Run tests
+        run: |
+          docker run --rm \
+            roboplan_ros_wrapper:${{ github.head_ref || github.ref_name }} \
+            bash -c "
+              colcon test && \
+              colcon test-result --verbose
+            "
+      # Always remove images to save disk space, may not be necessary when using GH runners.
+      - name: Clean up Docker image
+        if: always()
+        run: docker rmi roboplan_ros:${{ github.head_ref || github.ref_name }} || true
