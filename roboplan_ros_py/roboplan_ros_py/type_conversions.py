@@ -1,6 +1,10 @@
 import numpy as np
+import pinocchio as pin
+
 from builtin_interfaces.msg import Duration
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from geometry_msgs.msg import Pose
+
 import roboplan
 
 
@@ -106,3 +110,43 @@ def from_joint_trajectory(ros_trajectory: JointTrajectory) -> roboplan.JointTraj
     joint_traj.accelerations = accelerations
 
     return joint_traj
+
+
+def pose_to_se3(pose: Pose) -> np.ndarray:
+    """
+    Convert ROS Pose to a pin.SE3 4x4 transformation matrix.
+
+    Args:
+        pose: ROS Pose message
+
+    Returns:
+        4x4 numpy array
+    """
+    position = np.array([pose.position.x, pose.position.y, pose.position.z])
+    quaternion = pin.Quaternion(
+        pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z
+    )
+    return pin.SE3(quaternion, position).homogeneous
+
+
+def se3_to_pose(transform: np.ndarray) -> Pose:
+    """
+    Convert a pin.SE3 4x4 transformation matrix to ROS Pose.
+
+    Args:
+        transform: 4x4 numpy array
+
+    Returns:
+        An equivalent ROS Pose message
+    """
+    pose = Pose()
+    pose.position.x = float(transform[0, 3])
+    pose.position.y = float(transform[1, 3])
+    pose.position.z = float(transform[2, 3])
+    rotation = transform[:3, :3]
+    quat = pin.Quaternion(rotation)
+    pose.orientation.w = float(quat.w)
+    pose.orientation.x = float(quat.x)
+    pose.orientation.y = float(quat.y)
+    pose.orientation.z = float(quat.z)
+    return pose
