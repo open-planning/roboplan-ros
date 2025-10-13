@@ -47,6 +47,7 @@ gtest = ">=1.17.0,<2"
 viser = ">=1.0.11,<2"
 tyro = ">=0.9.32,<0.10"
 matplotlib = ">=3.10.6,<4"
+filelock = ">=3.20.0,<4"
 
 # TODO: Usually installable in ROS dep but unavailable in robostack.
 # We could fix that: https://robostack.github.io/Contributing.html
@@ -69,6 +70,11 @@ ros-kilted-ros-core = "*"
 ros-kilted-trajectory-msgs = "*"
 ros-kilted-yaml-cpp-vendor = "*"
 ros-kilted-tinyxml2-vendor = "*"
+ros-kilted-controller-manager = "*"
+ros-kilted-ros2-controllers = "*"
+ros-kilted-robot-state-publisher = "*"
+ros-kilted-geometry-msgs = "*"
+ros-kilted-rviz2 = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
@@ -81,6 +87,11 @@ ros-jazzy-ros-core = "*"
 ros-jazzy-trajectory-msgs = "*"
 ros-jazzy-yaml-cpp-vendor = "*"
 ros-jazzy-tinyxml2-vendor = "*"
+ros-jazzy-controller-manager = "*"
+ros-jazzy-ros2-controllers = "*"
+ros-jazzy-robot-state-publisher = "*"
+ros-jazzy-geometry-msgs = "*"
+ros-jazzy-rviz2 = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
@@ -93,6 +104,11 @@ ros-humble-ros-core = "*"
 ros-humble-trajectory-msgs = "*"
 ros-humble-yaml-cpp-vendor = "*"
 ros-humble-tinyxml2-vendor = "*"
+ros-humble-controller-manager = "*"
+ros-humble-ros2-controllers = "*"
+ros-humble-robot-state-publisher = "*"
+ros-humble-geometry-msgs = "*"
+ros-humble-rviz2 = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
