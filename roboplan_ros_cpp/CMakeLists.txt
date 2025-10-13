@@ -19,7 +19,7 @@ target_include_directories(roboplan_ros_cpp PUBLIC
 target_link_libraries(roboplan_ros_cpp
     roboplan::roboplan
 )
-ament_target_dependencies(roboplan_ros_cpp trajectory_msgs)
+target_link_libraries(roboplan_ros_cpp ${trajectory_msgs_TARGETS})
 set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
 
 install(

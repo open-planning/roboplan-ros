@@ -6,8 +6,15 @@
       fr3_arm_controller:
         type: joint_trajectory_controller/JointTrajectoryController
 
+      left_fr3_arm_controller:
+        type: joint_trajectory_controller/JointTrajectoryController
+
+      right_fr3_arm_controller:
+        type: joint_trajectory_controller/JointTrajectoryController
+
       joint_state_broadcaster:
         type: joint_state_broadcaster/JointStateBroadcaster
+
 
   fr3_arm_controller:
     ros__parameters:
@@ -24,3 +31,35 @@
         - fr3_joint5
         - fr3_joint6
         - fr3_joint7
+
+  left_fr3_arm_controller:
+    ros__parameters:
+      command_interfaces:
+        - position
+      state_interfaces:
+        - position
+        - velocity
+      joints:
+        - left_fr3_joint1
+        - left_fr3_joint2
+        - left_fr3_joint3
+        - left_fr3_joint4
+        - left_fr3_joint5
+        - left_fr3_joint6
+        - left_fr3_joint7
+
+  right_fr3_arm_controller:
+    ros__parameters:
+      command_interfaces:
+        - position
+      state_interfaces:
+        - position
+        - velocity
+      joints:
+        - right_fr3_joint1
+        - right_fr3_joint2
+        - right_fr3_joint3
+        - right_fr3_joint4
+        - right_fr3_joint5
+        - right_fr3_joint6
+        - right_fr3_joint7
