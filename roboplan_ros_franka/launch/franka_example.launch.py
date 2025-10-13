@@ -19,7 +19,8 @@ def generate_launch_description():
         "fr3.urdf",
     )
     robot_description = xacro.process_file(
-        franka_xacro_filepath, mappings={},
+        franka_xacro_filepath,
+        mappings={},
     ).toprettyxml(indent="  ")
 
     controllers_yaml_filepath = os.path.join(
@@ -68,6 +69,6 @@ def generate_launch_description():
             name="rviz2",
             output="log",
             arguments=["-d", rviz_config_filepath],
-        )
+        ),
     ]
     return LaunchDescription(nodes)

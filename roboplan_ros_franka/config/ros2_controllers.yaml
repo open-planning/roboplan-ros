@@ -9,7 +9,6 @@
       joint_state_broadcaster:
         type: joint_state_broadcaster/JointStateBroadcaster
 
-/**:
   fr3_arm_controller:
     ros__parameters:
       command_interfaces:

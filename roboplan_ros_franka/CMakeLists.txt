@@ -9,7 +9,7 @@ find_package(ament_cmake REQUIRED)
 find_package(roboplan REQUIRED)
 find_package(roboplan_example_models REQUIRED)
 
-install(DIRECTORY config launch 
+install(DIRECTORY config launch
         DESTINATION share/${PROJECT_NAME})
 
 ament_package()

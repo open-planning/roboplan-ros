@@ -14,7 +14,6 @@
   <depend>roboplan_example_models</depend>
 
   <exec_depend>controller_manager</exec_depend>
-  <exec_depend>joint_state_publisher</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
 
   <export>
