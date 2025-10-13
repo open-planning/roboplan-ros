@@ -35,17 +35,17 @@ test-result = {cmd = [
 # Build deps
 colcon-common-extensions = ">=0.3.0,<0.4"
 colcon-mixin = ">=0.2.3,<0.3"
-cmake = ">=3.30.5,<4"
-clangxx = ">=19.1.7,<20"
-lld = ">=19.1.2,<20"
+cmake = ">=4.1.2,<5"
+clangxx = ">=21.1.0,<22"
+lld = ">=21.1.0,<22"
 ninja = ">=1.13.1,<2"
 mold = ">=2.40.2,<3"
-sccache = ">=0.10.0,<0.11"
+sccache = ">=0.11.0,<0.12"
 
 # Common roboplan base deps
 gtest = ">=1.17.0,<2"
-viser = ">=1.0.11,<2"
-tyro = ">=0.9.32,<0.10"
+viser = ">=0.2.23,<2"
+tyro = ">=0.9.35,<0.10"
 matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
 
