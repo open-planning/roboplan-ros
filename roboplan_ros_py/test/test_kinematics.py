@@ -44,9 +44,9 @@ def ik_solver(test_scene: Scene) -> RoboPlanIK:
 
 def test_ik_solver_initialization(ik_solver: RoboPlanIK) -> None:
     """Test that IK solver initializes correctly."""
-    assert ik_solver.group_name_ == "arm"
-    assert ik_solver.base_frame_ == "base_link"
-    assert ik_solver.tip_frame_ == "tool0"
+    assert ik_solver.group_name == "arm"
+    assert ik_solver.base_frame == "base_link"
+    assert ik_solver.tip_frame == "tool0"
     assert len(ik_solver.q_indices_) == 6
     assert ik_solver.ik_solver_ is not None
 

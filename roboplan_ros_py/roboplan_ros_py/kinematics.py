@@ -40,14 +40,14 @@ class RoboPlanIK:
             tip_frame: End effector/tip frame for IK.
             options: Options for the IK solver.
         """
-        self.scene_ = scene
-        self.group_name_ = group_name
-        self.base_frame_ = base_frame
-        self.tip_frame_ = tip_frame
-        self.options_ = options
+        self.scene = scene
+        self.group_name = group_name
+        self.base_frame = base_frame
+        self.tip_frame = tip_frame
+        self.options = options
 
         # Initialize the IK solver
-        self.ik_solver_ = SimpleIk(self.scene_, self.options_)
+        self.ik_solver_ = SimpleIk(self.scene, self.options)
 
         # Get joint group information
         self.joint_group_info_ = scene.getJointGroupInfo(group_name)
@@ -68,7 +68,7 @@ class RoboPlanIK:
         Returns:
             A set of joint positions for the desired pose, or else None.
         """
-        cur_pos_full = np.array(self.scene_.getCurrentJointPositions())
+        cur_pos_full = np.array(self.scene.getCurrentJointPositions())
         if seed_state is None:
             seed_state = cur_pos_full[self.q_indices_]
         else:
@@ -82,8 +82,8 @@ class RoboPlanIK:
         start.positions = seed_state
 
         goal = CartesianConfiguration()
-        goal.base_frame = self.base_frame_
-        goal.tip_frame = self.tip_frame_
+        goal.base_frame = self.base_frame
+        goal.tip_frame = self.tip_frame
         goal.tform = target_transform
 
         # Solve
