@@ -64,7 +64,7 @@ class InteractiveMarkerIK:
         Constructs a new interactive marker at the specified pose.
         """
         int_marker = InteractiveMarker()
-        int_marker.header.frame_id = self.ik_solver_.tip_frame
+        int_marker.header.frame_id = self.ik_solver_.base_frame
         int_marker.name = "ik_target"
         int_marker.description = f"IK Target Pose for {self.namespace_}"
         int_marker.pose = pose
@@ -169,12 +169,9 @@ class InteractiveMarkerIK:
 
         if joint_positions is not None:
             self.last_joint_positions_ = joint_positions
-            if self.on_ik_solved_callback_:
-                self.on_ik_solved_callback_(joint_positions, target_pose)
-            print(joint_positions)
-        else:
-            if self.on_ik_solved_callback_:
-                self.on_ik_solved_callback_(None, target_pose)
+
+        if self.on_ik_solved_callback_:
+            self.on_ik_solved_callback_(joint_positions, target_pose)
 
     def get_current_pose(self):
         """Get the current pose of the interactive marker."""
