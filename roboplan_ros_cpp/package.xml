@@ -11,8 +11,14 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>roboplan</depend>
+  <depend>roboplan_simple_ik</depend>
 
-  <build_depend>trajectory_msgs</build_depend>
+  <depend>Eigen3</depend>
+  <depend>geometry_msgs</depend>
+  <depend>pinocchio</depend>
+  <depend>trajectory_msgs</depend>
+
+  <test_depend>roboplan_example_models</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

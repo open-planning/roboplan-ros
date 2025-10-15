@@ -9,3 +9,12 @@ target_link_libraries(
   GTest::gtest_main
 )
 ament_add_gtest_test(test_type_conversions)
+
+add_executable(test_kinematics test_kinematics.cpp)
+set_property(TARGET test_kinematics PROPERTY CXX_STANDARD 20)
+target_link_libraries(
+  test_kinematics
+  roboplan_ros_cpp
+  GTest::gtest_main
+)
+ament_add_gtest_test(test_kinematics)
