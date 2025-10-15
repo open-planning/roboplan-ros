@@ -90,7 +90,6 @@ class RoboPlanIK:
         solution = JointConfiguration()
         result = self.ik_solver_.solveIk(goal, start, solution)
         if result:
-            self.seed_state_ = solution.positions
             return solution.positions
         else:
             return None

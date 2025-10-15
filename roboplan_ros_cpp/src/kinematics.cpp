@@ -24,14 +24,16 @@ std::optional<Eigen::VectorXd>
 RoboPlanIK::solveIK(const geometry_msgs::msg::Pose& target_pose,
                     const std::optional<Eigen::VectorXd>& seed_state) {
 
+  // Convert pose to a transform
   Eigen::Matrix4d target_transform = poseToSE3(target_pose);
 
-  // Setup start configuration using the seed if provided.
+  // Determine a reasonable start pose using the seed provided, or else
+  // use the current pose.
   roboplan::JointConfiguration start;
   if (seed_state.has_value()) {
     start.positions = seed_state.value();
   } else {
-    start.positions = scene_->getCurrentJointPositions();
+    start.positions = scene_->getCurrentJointPositions()(q_indices_);
   }
 
   // Configure the goal pose and solve.
