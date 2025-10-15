@@ -44,6 +44,15 @@ def generate_launch_description():
             parameters=[{"robot_description": robot_description}],
             output="screen",
         ),
+        # Python version, can switch back and forth
+        # Node(
+        #     package="roboplan_ros_franka",
+        #     executable="example_ik_node",
+        #     name="example_ik_node",
+        #     output="screen",
+        # ),
+        # C++ version
+        # Sigh, this is so much faster :(
         Node(
             package="roboplan_ros_visualization",
             executable="interactive_marker_ik_node",

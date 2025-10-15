@@ -15,7 +15,7 @@ from geometry_msgs.msg import Pose
 
 from roboplan import Scene, SimpleIkOptions
 from roboplan_ros_py.kinematics import RoboPlanIK
-from roboplan_ros_py.interactive_marker_ik import InteractiveMarkerIK
+from roboplan_ros_visualization.interactive_marker_ik import InteractiveMarkerIK
 
 
 class InteractiveMarkerIKNode(Node):
