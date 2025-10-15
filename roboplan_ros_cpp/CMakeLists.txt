@@ -6,6 +6,9 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(geometry_msgs)
+find_package(pinocchio REQUIRED)
 find_package(roboplan REQUIRED)
 find_package(trajectory_msgs)
 
@@ -18,7 +21,10 @@ target_include_directories(roboplan_ros_cpp PUBLIC
 )
 target_link_libraries(roboplan_ros_cpp
     roboplan::roboplan
+    Eigen3::Eigen
+    pinocchio::pinocchio
     ${trajectory_msgs_TARGETS}
+    ${geometry_msgs_TARGETS}
 )
 set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
 

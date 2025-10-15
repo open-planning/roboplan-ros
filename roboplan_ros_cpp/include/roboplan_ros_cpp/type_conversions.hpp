@@ -1,5 +1,8 @@
 #pragma once
 
+#include <Eigen/Dense>
+#include <geometry_msgs/msg/pose.hpp>
+#include <pinocchio/spatial/se3.hpp>
 #include <roboplan/core/types.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
@@ -37,5 +40,15 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory);
 /// @return An equivalent roboplan::JointTrajectory.
 roboplan::JointTrajectory
 fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory);
+
+/// @brief Convert ROS Pose to a 4x4 SE3 transformation matrix.
+/// @param pose ROS Pose message
+/// @return 4x4 Eigen matrix representing the SE3 transformation
+Eigen::Matrix4d poseToSE3(const geometry_msgs::msg::Pose& pose);
+
+/// @brief Convert a 4x4 SE3 transformation matrix to ROS Pose.
+/// @param transform 4x4 Eigen matrix representing an SE3 transformation
+/// @return An equivalent ROS Pose message
+geometry_msgs::msg::Pose se3ToPose(const Eigen::Matrix4d& transform);
 
 }  // namespace roboplan_ros_cpp

@@ -70,4 +70,27 @@ fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory)
   return joint_traj;
 }
 
+Eigen::Matrix4d poseToSE3(const geometry_msgs::msg::Pose& pose) {
+  Eigen::Vector3d position(pose.position.x, pose.position.y, pose.position.z);
+  pinocchio::SE3::Quaternion quaternion(pose.orientation.w, pose.orientation.x, pose.orientation.y,
+                                        pose.orientation.z);
+
+  pinocchio::SE3 se3(quaternion, position);
+  return se3.toHomogeneousMatrix();
+}
+
+geometry_msgs::msg::Pose se3ToPose(const Eigen::Matrix4d& transform) {
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = transform(0, 3);
+  pose.position.y = transform(1, 3);
+  pose.position.z = transform(2, 3);
+  Eigen::Matrix3d rotation = transform.block<3, 3>(0, 0);
+  pinocchio::SE3::Quaternion quat(rotation);
+  pose.orientation.w = quat.w();
+  pose.orientation.x = quat.x();
+  pose.orientation.y = quat.y();
+  pose.orientation.z = quat.z();
+  return pose;
+}
+
 }  // namespace roboplan_ros_cpp

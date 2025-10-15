@@ -39,4 +39,30 @@ TEST(ConversionTest, TestConvertToJointTrajectory) {
   ASSERT_EQ(new_roboplan_traj.accelerations, roboplan_traj.accelerations);
 }
 
+TEST(ConversionTest, TestPoseToSE3) {
+  // Convert a random pose to SE3 then convert it back and make sure it is the same.
+  geometry_msgs::msg::Pose original_pose;
+  original_pose.position.x = 1.2;
+  original_pose.position.y = -0.5;
+  original_pose.position.z = 3.7;
+
+  // Normalized quaternion (pi/2, -pi/2, pi/4)
+  original_pose.orientation.x = 0.2705981;
+  original_pose.orientation.y = -0.6532815;
+  original_pose.orientation.z = -0.2705979;
+  original_pose.orientation.w = 0.6532815;
+
+  Eigen::Matrix4d transform = poseToSE3(original_pose);
+  geometry_msgs::msg::Pose converted_pose = se3ToPose(transform);
+
+  const auto tolerance = 1e-8;
+  EXPECT_NEAR(original_pose.position.x, converted_pose.position.x, tolerance);
+  EXPECT_NEAR(original_pose.position.y, converted_pose.position.y, tolerance);
+  EXPECT_NEAR(original_pose.position.z, converted_pose.position.z, tolerance);
+  EXPECT_NEAR(original_pose.orientation.w, converted_pose.orientation.w, tolerance);
+  EXPECT_NEAR(original_pose.orientation.x, converted_pose.orientation.x, tolerance);
+  EXPECT_NEAR(original_pose.orientation.y, converted_pose.orientation.y, tolerance);
+  EXPECT_NEAR(original_pose.orientation.z, converted_pose.orientation.z, tolerance);
+}
+
 }  // namespace roboplan_ros_cpp
