@@ -9,10 +9,9 @@ find_package(ament_cmake REQUIRED)
 find_package(roboplan REQUIRED)
 find_package(roboplan_simple_ik REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(geometry_msgs)
+find_package(geometry_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
-find_package(trajectory_msgs)
-find_package(roboplan_example_models REQUIRED)
+find_package(trajectory_msgs REQUIRED)
 
 add_library(roboplan_ros_cpp SHARED
     src/type_conversions.cpp
@@ -23,16 +22,23 @@ target_include_directories(roboplan_ros_cpp PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(roboplan_ros_cpp
+  PUBLIC
     roboplan::roboplan
     roboplan_simple_ik::roboplan_simple_ik
-    roboplan_example_models::roboplan_example_models
     Eigen3::Eigen
     pinocchio::pinocchio
     ${trajectory_msgs_TARGETS}
     ${geometry_msgs_TARGETS}
 )
 set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
-
+ament_export_dependencies(
+  roboplan
+  roboplan_simple_ik
+  Eigen3
+  pinocchio
+  trajectory_msgs
+  geometry_msgs
+)
 install(
   TARGETS
   roboplan_ros_cpp
@@ -48,5 +54,5 @@ if(BUILD_TESTING)
   enable_testing()
   add_subdirectory(test)
 endif()
-
+ament_export_targets(roboplan_ros_cpp-targets HAS_LIBRARY_TARGET)
 ament_package()
