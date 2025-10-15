@@ -49,6 +49,9 @@ tyro = ">=0.9.32,<0.10"
 matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
 
+# For ROS, should be available across distros
+lttng-ust = ">=2.13.9,<3"
+
 # TODO: Usually installable in ROS dep but unavailable in robostack.
 # We could fix that: https://robostack.github.io/Contributing.html
 pinocchio = ">=3.7.0,<4"
@@ -60,7 +63,10 @@ pycollada = ">=0.9.2, <0.10"
 
 [activation.env]
 # Ensures the linker knows where to look for conda managed packages
+LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LIBRARY_PATH}"
 LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
+LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
+CXXFLAGS = "-fuse-ld=mold"
 
 [feature.kilted]
 channels = ["https://prefix.dev/robostack-kilted"]
