@@ -13,7 +13,7 @@
   <depend>roboplan</depend>
   <depend>roboplan_simple_ik</depend>
 
-  <depend>Eigen3</depend>
+  <depend>eigen</depend>
   <depend>geometry_msgs</depend>
   <depend>pinocchio</depend>
   <depend>trajectory_msgs</depend>

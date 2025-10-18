@@ -81,7 +81,7 @@ InteractiveMarkerIKNode::InteractiveMarkerIKNode() : Node("interactive_marker_ik
   scene_ = std::make_shared<roboplan::Scene>("scene", urdf_xml, srdf_xml, package_paths,
                                              yaml_config_path);
 
-  // Set initial joint positions if the are provided
+  // Set initial joint positions if they are provided
   if (!initial_positions.empty()) {
     latest_joint_positions_ =
         Eigen::Map<Eigen::VectorXd>(initial_positions.data(), initial_positions.size());
