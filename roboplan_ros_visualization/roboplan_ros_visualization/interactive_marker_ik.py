@@ -1,15 +1,27 @@
+#!/usr/bin/env python3
+
+import os
 import numpy as np
-from typing import Callable, Optional
+
 from rclpy.node import Node
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+from rclpy.qos import (
+    QoSProfile,
+    QoSReliabilityPolicy,
+    QoSHistoryPolicy,
+    QoSDurabilityPolicy,
+)
+
 from geometry_msgs.msg import Pose
+from sensor_msgs.msg import JointState
 from interactive_markers import InteractiveMarkerServer
 from visualization_msgs.msg import (
     InteractiveMarker,
     InteractiveMarkerControl,
-    Marker,
     InteractiveMarkerFeedback,
 )
-from roboplan import Scene
+
+from roboplan import Scene, SimpleIkOptions
 from roboplan_ros_py.kinematics import RoboPlanIK
 from roboplan_ros_py.type_conversions import se3_to_pose
 
@@ -25,9 +37,12 @@ class InteractiveMarkerIK:
         self,
         node: Node,
         scene: Scene,
-        ik_solver: RoboPlanIK,
-        solved_callback: Optional[Callable[[Optional[np.ndarray], Pose], None]],
-        namespace: str = "roboplan_ik",
+        joint_group: str,
+        base_link: str,
+        tip_link: str,
+        options: SimpleIkOptions = SimpleIkOptions(),
+        update_rate: float = 10.0,
+        namespace: str = "/roboplan_ik",
     ):
         """
         Initialize the interactive marker IK controller.
@@ -35,50 +50,97 @@ class InteractiveMarkerIK:
         Args:
             node: ROS node instance to be passed to the InteractiveMarker server.
             scene: A fully configured RoboPlan scene.
-            ik_solver: RoboPlanIK instance for solving IK.
-            solved_callback: Function to be called each time an IK solution is found.
-                             Requires signature `callback(joint_positions, pose)`,
-                             where joint_positions is np.ndarray or None if IK failed.
-            namespace: Namespace for the InteractiveMarkerServer.
+            joint_group: The joint group for the IK solver
+            base_link: Base link of the IK chain.
+            tip_link: Tip link of the iK chain.
+            options: Options for the IK solver.
+            update_rate: Publish rate for IK solutions, in Hz.
+            namespace: Namespace for the InteractiveMarkerServer and JointStatePublisher
         """
-        self.node_ = node
-        self.scene_ = scene
-        self.ik_solver_ = ik_solver
-        self.on_ik_solved_callback_ = solved_callback
-        self.namespace_ = namespace
+        self.node = node
+        self.scene = scene
+        self.joint_group = joint_group
+        self.base_link = base_link
+        self.tip_link = tip_link
+        self.namespace = namespace
+
+        # Get joint group information
+        joint_group_info = self.scene.getJointGroupInfo(self.joint_group)
+        self._q_indices = joint_group_info.q_indices
+        joint_names = np.array(self.scene.getJointNames())
+        self._joint_names = joint_names[self._q_indices]
+
+        # Construct the IK solver
+        self._ik_solver = RoboPlanIK(
+            scene=self.scene,
+            group_name=self.joint_group,
+            base_frame=self.base_link,
+            tip_frame=self.tip_link,
+            options=options,
+        )
 
         # Set initial states based on the state of the scene
-        self.last_joint_positions_ = self.scene_.getCurrentJointPositions()
+        self._last_joint_positions = self.scene.getCurrentJointPositions()
         se3_pose = scene.forwardKinematics(
-            self.last_joint_positions_, self.ik_solver_.tip_frame
+            self._last_joint_positions, self._ik_solver.tip_frame
         )
-        self.current_pose_ = se3_to_pose(se3_pose)
+        self._current_pose = se3_to_pose(se3_pose)
+        self._target_pose = self._current_pose
 
         # Create the interactive marker server
-        self.ik_server_ = InteractiveMarkerServer(self.node_, self.namespace_)
-        self._create_interactive_marker(self.current_pose_)
-        self.ik_server_.applyChanges()
+        self._ik_server = InteractiveMarkerServer(self.node, self.namespace)
+        self._create_interactive_marker(self._current_pose)
+        self._ik_server.applyChanges()
+
+        # Create the namespaced joint state publisher and message
+        qos = QoSProfile(
+            depth=1,
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            durability=QoSDurabilityPolicy.VOLATILE,
+        )
+        self._joint_state_pub = self.node.create_publisher(
+            JointState, os.path.join(self.namespace, "joint_states"), qos
+        )
+
+        self._joint_state_msg = JointState()
+        self._joint_state_msg.name = self.scene.getJointNames()
+        self._joint_state_msg.header.frame_id = ""
+
+        # Create timer to solve IK and publish at fixed rate
+        self._timer_callback_group = MutuallyExclusiveCallbackGroup()
+        self._timer = self.node.create_timer(
+            1.0 / update_rate, self._solve_ik, self._timer_callback_group
+        )
+
+        self.node.get_logger().info("Constructed interactive marker controller")
+        self.node.get_logger().info(f"Joint group: {self.joint_group}")
+        self.node.get_logger().info(f"Joints: {self._joint_names}")
+        self.node.get_logger().info(f"Base link: {self.base_link}")
+        self.node.get_logger().info(f"End-effector: {self.tip_link}")
 
     def _create_interactive_marker(self, pose: Pose):
         """
         Constructs a new interactive marker at the specified pose.
         """
         int_marker = InteractiveMarker()
-        int_marker.header.frame_id = self.ik_solver_.base_frame
+        int_marker.header.frame_id = os.path.join(
+            self.namespace, self._ik_solver.base_frame
+        )
         int_marker.name = "ik_target"
-        int_marker.description = f"IK Target Pose for {self.namespace_}"
+        int_marker.description = f"IK Target Pose for {self.joint_group}"
         int_marker.pose = pose
         int_marker.scale = 0.2
 
-        sphere_marker = Marker()
-        sphere_marker.type = Marker.SPHERE
-        sphere_marker.scale.x = 0.025
-        sphere_marker.scale.y = 0.025
-        sphere_marker.scale.z = 0.025
-        sphere_marker.color.r = 0.0
-        sphere_marker.color.g = 0.5
-        sphere_marker.color.b = 1.0
-        sphere_marker.color.a = 1.0
+        # sphere_marker = Marker()
+        # sphere_marker.type = Marker.SPHERE
+        # sphere_marker.scale.x = 0.025
+        # sphere_marker.scale.y = 0.025
+        # sphere_marker.scale.z = 0.025
+        # sphere_marker.color.r = 0.0
+        # sphere_marker.color.g = 0.5
+        # sphere_marker.color.b = 1.0
+        # sphere_marker.color.a = 1.0
 
         sphere_control = InteractiveMarkerControl()
         sphere_control.always_visible = True
@@ -111,7 +173,6 @@ class InteractiveMarkerIK:
         control.interaction_mode = InteractiveMarkerControl.MOVE_AXIS
         int_marker.controls.append(control)
 
-        # Rotation controls
         control = InteractiveMarkerControl()
         control.orientation.w = 1.0
         control.orientation.x = 1.0
@@ -139,8 +200,7 @@ class InteractiveMarkerIK:
         control.interaction_mode = InteractiveMarkerControl.ROTATE_AXIS
         int_marker.controls.append(control)
 
-        # Add the marker to the server with the feedback callback
-        self.ik_server_.insert(
+        self._ik_server.insert(
             int_marker, feedback_callback=self._marker_feedback_callback
         )
 
@@ -151,43 +211,28 @@ class InteractiveMarkerIK:
         Args:
             feedback: InteractiveMarkerFeedback message
         """
-        # Solve IK continuously as the marker is dragged
+        # Record the iMarker state as it is dropped, this helps throttle IK solve rates
         if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
-            self.current_pose = feedback.pose
-            self._solve_ik(feedback.pose)
+            self._target_pose = feedback.pose
+            # self._solve_ik()
 
-    def _solve_ik(self, target_pose: Pose):
+    def _solve_ik(self):
         """
-        Solve IK for the target pose.
-
-        Args:
-            target_pose: The tarket pose for the IK solver.
+        Solve IK for the current target pose.
         """
-        joint_positions = self.ik_solver_.solve_ik(
-            target_pose, seed_state=self.last_joint_positions_
+        joint_positions = self._ik_solver.solve_ik(
+            self._target_pose, seed_state=self._last_joint_positions
         )
 
         if joint_positions is not None:
-            self.last_joint_positions_ = joint_positions
+            self._last_joint_positions = joint_positions
+            self._publish_joint_states()
+        else:
+            self.node.get_logger().warn(
+                "IK failed to find solution for target pose", throttle_duration_sec=1.0
+            )
 
-        if self.on_ik_solved_callback_:
-            self.on_ik_solved_callback_(joint_positions, target_pose)
-
-    def get_current_pose(self):
-        """Get the current pose of the interactive marker."""
-        return self.current_pose_
-
-    def get_last_joint_positions(self):
-        """Get the last computed joint positions."""
-        return self.last_joint_positions_
-
-    def update_marker_pose(self, pose: Pose):
-        """
-        Update the marker pose.
-
-        Args:
-            pose: New pose for the marker
-        """
-        self.ik_server_.setPose("ik_target", pose)
-        self.ik_server_.applyChanges()
-        self.current_pose_ = pose
+    def _publish_joint_states(self):
+        self._joint_state_msg.header.stamp = self.node.get_clock().now().to_msg()
+        self._joint_state_msg.position = self._last_joint_positions.tolist()
+        self._joint_state_pub.publish(self._joint_state_msg)

@@ -90,6 +90,7 @@ class RoboPlanIK:
         solution = JointConfiguration()
         result = self.ik_solver_.solveIk(goal, start, solution)
         if result:
-            return solution.positions
+            cur_pos_full[self.q_indices_] = solution.positions
+            return cur_pos_full
         else:
             return None

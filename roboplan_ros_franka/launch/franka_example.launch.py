@@ -7,11 +7,30 @@ import xacro
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import Shutdown
+from launch.actions import DeclareLaunchArgument, Shutdown
+from launch.substitutions import (
+    LaunchConfiguration,
+)
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    declared_arguments = []
+
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            "rviz_config",
+            default_value=os.path.join(
+                get_package_share_directory("roboplan_ros_franka"),
+                "config",
+                "franka_config.rviz",
+            ),
+            description="Specify an rviz configuration file.",
+        )
+    )
+
+    rviz_config = LaunchConfiguration("rviz_config")
+
     franka_xacro_filepath = os.path.join(
         get_package_share_directory("roboplan_example_models"),
         "models",
@@ -27,11 +46,6 @@ def generate_launch_description():
         get_package_share_directory("roboplan_ros_franka"),
         "config",
         "ros2_controllers.yaml",
-    )
-    rviz_config_filepath = os.path.join(
-        get_package_share_directory("roboplan_ros_franka"),
-        "config",
-        "franka_config.rviz",
     )
 
     nodes = [
@@ -68,7 +82,7 @@ def generate_launch_description():
             executable="rviz2",
             name="rviz2",
             output="log",
-            arguments=["-d", rviz_config_filepath],
+            arguments=["-d", rviz_config],
         ),
     ]
-    return LaunchDescription(nodes)
+    return LaunchDescription(declared_arguments + nodes)
