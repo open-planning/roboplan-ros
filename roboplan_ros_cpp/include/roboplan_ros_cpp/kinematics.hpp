@@ -34,7 +34,8 @@ public:
 
   /// @brief Solve IK for a target pose.
   /// @param target_pose ROS Pose message with target position and orientation.
-  /// @param seed_state Optional seed joint positions, defaults to current pose.
+  /// @param seed_state Optional seed joint positions, defaults to current pose. Users MUST pass
+  ///                   a full set of joint positions.
   /// @return A set of joint positions for the desired pose, or std::nullopt if IK failed.
   std::optional<Eigen::VectorXd>
   solveIK(const geometry_msgs::msg::Pose& target_pose,

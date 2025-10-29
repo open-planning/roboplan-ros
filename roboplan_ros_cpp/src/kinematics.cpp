@@ -28,12 +28,13 @@ RoboPlanIK::solveIK(const geometry_msgs::msg::Pose& target_pose,
   Eigen::Matrix4d target_transform = poseToSE3(target_pose);
 
   // Determine a reasonable start pose using the seed provided, or else
-  // use the current pose.
+  // use the current pose. Assume callers are ALWAYS passing full joint states.
+  auto current_positions = scene_->getCurrentJointPositions();
   roboplan::JointConfiguration start;
   if (seed_state.has_value()) {
-    start.positions = seed_state.value();
+    start.positions = seed_state.value()(q_indices_);
   } else {
-    start.positions = scene_->getCurrentJointPositions()(q_indices_);
+    start.positions = current_positions(q_indices_);
   }
 
   // Configure the goal pose and solve.
@@ -47,7 +48,8 @@ RoboPlanIK::solveIK(const geometry_msgs::msg::Pose& target_pose,
 
   // Return the solved position if present, or nothing.
   if (result) {
-    return solution.positions;
+    current_positions(q_indices_) = solution.positions;
+    return current_positions;
   } else {
     return std::nullopt;
   }
