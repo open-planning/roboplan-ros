@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
   node->declare_parameter("initial_joint_positions", std::vector<double>{});
   node->declare_parameter("max_ik_iterations", 100);
   node->declare_parameter("ik_step_size", 0.25);
+  node->declare_parameter("check_collisions", true);
 
   std::string urdf_xml = node->get_parameter("robot_description").as_string();
   std::string srdf_xml = node->get_parameter("robot_description_semantic").as_string();
@@ -37,6 +38,7 @@ int main(int argc, char** argv) {
   auto initial_positions = node->get_parameter("initial_joint_positions").as_double_array();
   int max_ik_iterations = node->get_parameter("max_ik_iterations").as_int();
   double ik_step_size = node->get_parameter("ik_step_size").as_double();
+  bool check_collisions = node->get_parameter("check_collisions").as_bool();
 
   // Initialize the RoboPlan scene
   RCLCPP_INFO(node->get_logger(), "Creating RoboPlan scene...");
@@ -57,6 +59,7 @@ int main(int argc, char** argv) {
   options.group_name = joint_group;
   options.max_iters = max_ik_iterations;
   options.step_size = ik_step_size;
+  options.check_collisions = check_collisions;
 
   // Create interactive marker controller and spin
   RCLCPP_INFO(node->get_logger(), "Creating interactive marker controller...");

@@ -110,6 +110,7 @@ def generate_launch_description():
                     "max_ik_iterations": 100,
                     "ik_step_size": 0.25,
                     "joint_state_publish_rate": 10.0,
+                    "check_collisions": True,
                 }
             ],
         ),
