@@ -92,7 +92,7 @@ class InteractiveMarkerIKNode(Node):
             namespace="roboplan_ik",
         )
 
-        # This needs work...
+        # Setup a visualize marker model for rendering IK solutions
         self.ik_viz = RoboplanVisualizer(
             node=self,
             scene=self.scene,
@@ -101,7 +101,7 @@ class InteractiveMarkerIKNode(Node):
             namespace="roboplan_ik",
         )
 
-        # Start a time to solve ik and publish the model poses at 20 Hz.
+        # Start a timer to solve ik and publish the model poses at 20 Hz.
         self._timer = self.create_timer(0.05, self.update)
 
         self.get_logger().info("Ready!")
