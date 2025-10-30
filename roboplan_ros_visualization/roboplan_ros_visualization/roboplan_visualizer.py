@@ -125,8 +125,6 @@ class RoboplanVisualizer:
             self.visual_data,
             q,
         )
-
-        # Create markers for each visual geometry object
         for idx, geom_obj in enumerate(self.visual_model.geometryObjects):
             try:
                 placement = self.visual_data.oMg[idx]
@@ -168,10 +166,8 @@ class RoboplanVisualizer:
         # Convert SE3 placement to pose
         marker.pose = se3_to_pose(placement.homogeneous)
 
-        # Get the geometry shape
-        geometry = geom_obj.geometry
-
         # Handle different geometry types
+        geometry = geom_obj.geometry
         if isinstance(geometry, pin.hppfcl.Box):
             marker.type = Marker.CUBE
             marker.scale.x = float(geometry.halfSide[0] * 2)
@@ -193,15 +189,13 @@ class RoboplanVisualizer:
             # For mesh geometries
             marker.type = Marker.MESH_RESOURCE
 
-            # Get mesh path from geometry object
+            # Ensure proper URI format because RViz gets angry at absolute paths
             if hasattr(geom_obj, "meshPath") and geom_obj.meshPath:
                 mesh_path = geom_obj.meshPath
 
-                # Ensure proper URI format
                 if not mesh_path.startswith("package://") and not mesh_path.startswith(
                     "file://"
                 ):
-                    # It's an absolute path, prepend file://
                     marker.mesh_resource = f"file://{mesh_path}"
                 else:
                     marker.mesh_resource = mesh_path

@@ -81,18 +81,6 @@ class InteractiveMarkerIKNode(Node):
         options.max_iters = 100
         options.step_size = 0.25
 
-        # Create the interactive marker controller
-        self.get_logger().info("Creating interactive marker controller...")
-        self.imarker_ik = InteractiveMarkerIK(
-            node=self,
-            scene=self.scene,
-            joint_group=self.joint_group,
-            base_link=self.base_link,
-            tip_link=self.tip_link,
-            options=options,
-            namespace="roboplan_ik",
-        )
-
         # Setup a visualize marker model for rendering IK solutions
         self.ik_viz = RoboplanVisualizer(
             node=self,
@@ -103,8 +91,18 @@ class InteractiveMarkerIKNode(Node):
             namespace="roboplan_ik",
         )
 
-        # Start a timer to solve ik and publish the model poses at 20 Hz.
-        self._timer = self.create_timer(0.05, self.update)
+        # Create the interactive marker controller
+        self.get_logger().info("Creating interactive marker controller...")
+        self.imarker_ik = InteractiveMarkerIK(
+            node=self,
+            scene=self.scene,
+            joint_group=self.joint_group,
+            base_link=self.base_link,
+            tip_link=self.tip_link,
+            options=options,
+            solve_callback=self.ik_viz.visualize_configuration,
+            namespace="roboplan_ik",
+        )
 
         self.get_logger().info("Ready!")
         self.get_logger().info(
@@ -134,6 +132,7 @@ def main(args=None):
         sys.exit(1)
     finally:
         executor.shutdown()
+        node.destroy_node()
         rclpy.try_shutdown()
 
 

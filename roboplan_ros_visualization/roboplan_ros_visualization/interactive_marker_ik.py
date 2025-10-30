@@ -3,9 +3,12 @@
 import os
 import numpy as np
 from typing import Optional
+from collections.abc import Callable
+import threading
 
 from rclpy.node import Node
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+from rclpy.executors import SingleThreadedExecutor
 from rclpy.qos import (
     QoSProfile,
     QoSReliabilityPolicy,
@@ -20,6 +23,7 @@ from visualization_msgs.msg import (
     InteractiveMarker,
     InteractiveMarkerControl,
     InteractiveMarkerFeedback,
+    Marker,
 )
 
 from roboplan import Scene, SimpleIkOptions
@@ -43,6 +47,7 @@ class InteractiveMarkerIK:
         tip_link: str,
         options: SimpleIkOptions = SimpleIkOptions(),
         update_rate: Optional[float] = None,
+        solve_callback: Optional[Callable] = None,
         namespace: str = "/roboplan_ik",
     ):
         """
@@ -64,6 +69,7 @@ class InteractiveMarkerIK:
         self.base_link = base_link
         self.tip_link = tip_link
         self.namespace = namespace
+        self.solve_callback = solve_callback
 
         # Get joint group information
         joint_group_info = self.scene.getJointGroupInfo(self.joint_group)
@@ -88,10 +94,19 @@ class InteractiveMarkerIK:
         self._current_pose = se3_to_pose(se3_pose)
         self._target_pose = self._current_pose
 
-        # Create the interactive marker server
-        self._ik_server = InteractiveMarkerServer(self.node, self.namespace)
+        # Create a separate node for the marker server with its own executor. There are likely
+        # better solutions.
+        self._marker_node = Node("interactive_marker_node")
+        self._ik_server = InteractiveMarkerServer(self._marker_node, self.namespace)
         self._create_interactive_marker(self._current_pose)
         self._ik_server.applyChanges()
+
+        self._marker_executor = SingleThreadedExecutor()
+        self._marker_executor.add_node(self._marker_node)
+        self._marker_thread = threading.Thread(
+            target=self._spin_marker_executor, daemon=True
+        )
+        self._marker_thread.start()
 
         # Create the namespaced joint state publisher and message
         qos = QoSProfile(
@@ -121,6 +136,22 @@ class InteractiveMarkerIK:
         self.node.get_logger().info(f"Base link: {self.base_link}")
         self.node.get_logger().info(f"End-effector: {self.tip_link}")
 
+    def _spin_marker_executor(self):
+        """Spin the marker executor, catching shutdown exceptions."""
+        try:
+            self._marker_executor.spin()
+        except Exception:
+            pass
+
+    def shutdown(self):
+        """Clean up resources."""
+        if hasattr(self, "_marker_executor"):
+            self._marker_executor.shutdown()
+        if hasattr(self, "_marker_thread"):
+            self._marker_thread.join(timeout=1.0)
+        if hasattr(self, "_marker_node"):
+            self._marker_node.destroy_node()
+
     def _create_interactive_marker(self, pose: Pose):
         """
         Constructs a new interactive marker at the specified pose.
@@ -132,15 +163,15 @@ class InteractiveMarkerIK:
         int_marker.pose = pose
         int_marker.scale = 0.2
 
-        # sphere_marker = Marker()
-        # sphere_marker.type = Marker.SPHERE
-        # sphere_marker.scale.x = 0.025
-        # sphere_marker.scale.y = 0.025
-        # sphere_marker.scale.z = 0.025
-        # sphere_marker.color.r = 0.0
-        # sphere_marker.color.g = 0.5
-        # sphere_marker.color.b = 1.0
-        # sphere_marker.color.a = 1.0
+        sphere_marker = Marker()
+        sphere_marker.type = Marker.SPHERE
+        sphere_marker.scale.x = 0.025
+        sphere_marker.scale.y = 0.025
+        sphere_marker.scale.z = 0.025
+        sphere_marker.color.r = 0.0
+        sphere_marker.color.g = 0.5
+        sphere_marker.color.b = 1.0
+        sphere_marker.color.a = 1.0
 
         sphere_control = InteractiveMarkerControl()
         sphere_control.always_visible = True
@@ -215,6 +246,7 @@ class InteractiveMarkerIK:
         # processing so there isn't really a limit here, and the server seems to be
         # slow.
         self._target_pose = feedback.pose
+        self.solve_ik()
 
     def solve_ik(self):
         """
@@ -226,10 +258,10 @@ class InteractiveMarkerIK:
 
         if joint_positions is not None:
             self.last_joint_positions = joint_positions
+            if self.solve_callback:
+                self.solve_callback(joint_positions)
         else:
-            self.node.get_logger().warn(
-                "IK failed to find solution for target pose", throttle_duration_sec=1.0
-            )
+            self.node.get_logger().warn("IK failed to find solution for target pose")
 
     def _solve_and_publish(self):
         """
