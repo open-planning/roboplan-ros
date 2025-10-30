@@ -156,7 +156,9 @@ class RoboplanVisualizer:
             Marker or None
         """
         marker = Marker()
-        marker.header.frame_id = "world"  # or your base frame
+
+        # TODO: Parameterize this...
+        marker.header.frame_id = "world"
         marker.header.stamp = self.node.get_clock().now().to_msg()
         marker.ns = f"{self.namespace}/{geom_obj.name}"
         marker.id = marker_id
