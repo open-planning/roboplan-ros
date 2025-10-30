@@ -61,20 +61,92 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /robot_description
-      Enabled: false
+      Enabled: true
       Links:
         All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        fr3_hand:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_hand_tcp:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        fr3_leftfinger:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        fr3_link8:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        fr3_rightfinger:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        test_box:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: false
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0
-      Value: false
+      Value: true
       Visual Enabled: true
     - Class: rviz_default_plugins/InteractiveMarkers
       Enable Transparency: true
@@ -89,7 +161,18 @@ Visualization Manager:
       Enabled: true
       Name: MarkerArray
       Namespaces:
-        {}
+        roboplan_ik/fr3_hand_0: true
+        roboplan_ik/fr3_leftfinger_0: true
+        roboplan_ik/fr3_link0_0: true
+        roboplan_ik/fr3_link1_0: true
+        roboplan_ik/fr3_link2_0: true
+        roboplan_ik/fr3_link3_0: true
+        roboplan_ik/fr3_link4_0: true
+        roboplan_ik/fr3_link5_0: true
+        roboplan_ik/fr3_link6_0: true
+        roboplan_ik/fr3_link7_0: true
+        roboplan_ik/fr3_rightfinger_0: true
+        roboplan_ik/test_box_0: true
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -143,7 +226,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.4508087635040283
+      Distance: 2.3297669887542725
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -158,10 +241,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.10539847612380981
+      Pitch: 0.3003985583782196
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.263583660125732
+      Yaw: 6.033585071563721
     Saved: ~
 Window Geometry:
   Displays:

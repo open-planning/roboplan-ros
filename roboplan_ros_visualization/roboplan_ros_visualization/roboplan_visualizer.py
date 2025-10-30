@@ -32,7 +32,7 @@ class RoboplanVisualizer:
         scene: Scene,
         urdf_xml: str,
         package_paths: list = [],
-        color: ColorRGBA = ColorRGBA(r=0.5, g=0.5, b=1.0, a=0.5),
+        color: Optional[ColorRGBA] = None,
         update_rate: Optional[float] = None,
         namespace: str = "/roboplan",
     ):
@@ -45,7 +45,7 @@ class RoboplanVisualizer:
             urdf_xml: URDF XML string (already processed with xacro if needed).
             package_paths: List of package paths for mesh resolution.
             namespace: Namespace for the marker publisher and joint state subscriber.
-            color: Default color for the robot visualization.
+            color: Default color for the robot visualization, if set will override defaults.
             update_rate: If provided, subscribes to joint_states and auto-updates.
                          If None, call visualize_configuration() manually.
         """
@@ -223,13 +223,17 @@ class RoboplanVisualizer:
             )
             return None
 
-        # Set color
+        # Use embedded colorings for meshes
+        if marker.type == Marker.MESH_RESOURCE:
+            marker.mesh_use_embedded_materials = True
+        # If the geometry has a color user it
         if hasattr(geom_obj, "meshColor") and len(geom_obj.meshColor) >= 4:
             marker.color.r = float(geom_obj.meshColor[0])
             marker.color.g = float(geom_obj.meshColor[1])
             marker.color.b = float(geom_obj.meshColor[2])
             marker.color.a = float(geom_obj.meshColor[3])
-        else:
+        # Apply colorings if set
+        if self.color:
             marker.color = self.color
 
         return marker

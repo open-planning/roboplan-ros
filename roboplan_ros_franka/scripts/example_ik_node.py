@@ -10,6 +10,7 @@ from ament_index_python.packages import get_package_share_directory
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
+from std_msgs.msg import ColorRGBA
 
 from roboplan import Scene, SimpleIkOptions
 from roboplan_ros_visualization.interactive_marker_ik import InteractiveMarkerIK
@@ -98,6 +99,7 @@ class InteractiveMarkerIKNode(Node):
             scene=self.scene,
             urdf_xml=urdf_xml,
             package_paths=package_paths,
+            color=ColorRGBA(r=0.5, g=0.5, b=1.0, a=0.5),
             namespace="roboplan_ik",
         )
 
