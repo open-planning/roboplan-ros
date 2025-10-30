@@ -2,6 +2,7 @@
 
 import os
 import numpy as np
+from typing import Optional
 
 from rclpy.node import Node
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
@@ -41,7 +42,7 @@ class InteractiveMarkerIK:
         base_link: str,
         tip_link: str,
         options: SimpleIkOptions = SimpleIkOptions(),
-        update_rate: float = 10.0,
+        update_rate: Optional[float] = None,
         namespace: str = "/roboplan_ik",
     ):
         """
@@ -80,9 +81,9 @@ class InteractiveMarkerIK:
         )
 
         # Set initial states based on the state of the scene
-        self._last_joint_positions = self.scene.getCurrentJointPositions()
+        self.last_joint_positions = self.scene.getCurrentJointPositions()
         se3_pose = scene.forwardKinematics(
-            self._last_joint_positions, self._ik_solver.tip_frame
+            self.last_joint_positions, self._ik_solver.tip_frame
         )
         self._current_pose = se3_to_pose(se3_pose)
         self._target_pose = self._current_pose
@@ -107,11 +108,12 @@ class InteractiveMarkerIK:
         self._joint_state_msg.name = self.scene.getJointNames()
         self._joint_state_msg.header.frame_id = ""
 
-        # Create timer to solve IK and publish at fixed rate
-        self._timer_callback_group = MutuallyExclusiveCallbackGroup()
-        self._timer = self.node.create_timer(
-            1.0 / update_rate, self._solve_ik, self._timer_callback_group
-        )
+        # Create timer to solve IK and publish at fixed rate if set
+        if update_rate is not None:
+            self._timer_callback_group = MutuallyExclusiveCallbackGroup()
+            self._timer = self.node.create_timer(
+                1.0 / update_rate, self._solve_and_publish, self._timer_callback_group
+            )
 
         self.node.get_logger().info("Constructed interactive marker controller")
         self.node.get_logger().info(f"Joint group: {self.joint_group}")
@@ -124,9 +126,7 @@ class InteractiveMarkerIK:
         Constructs a new interactive marker at the specified pose.
         """
         int_marker = InteractiveMarker()
-        int_marker.header.frame_id = os.path.join(
-            self.namespace, self._ik_solver.base_frame
-        )
+        int_marker.header.frame_id = self._ik_solver.base_frame
         int_marker.name = "ik_target"
         int_marker.description = f"IK Target Pose for {self.joint_group}"
         int_marker.pose = pose
@@ -211,28 +211,36 @@ class InteractiveMarkerIK:
         Args:
             feedback: InteractiveMarkerFeedback message
         """
-        # Record the iMarker state as it is dropped, this helps throttle IK solve rates
+        # Record the iMarker state as it is moved
         if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
             self._target_pose = feedback.pose
-            # self._solve_ik()
 
-    def _solve_ik(self):
+    def solve_ik(self):
         """
         Solve IK for the current target pose.
         """
         joint_positions = self._ik_solver.solve_ik(
-            self._target_pose, seed_state=self._last_joint_positions
+            self._target_pose, seed_state=self.last_joint_positions
         )
 
         if joint_positions is not None:
-            self._last_joint_positions = joint_positions
-            self._publish_joint_states()
+            self.last_joint_positions = joint_positions
         else:
             self.node.get_logger().warn(
                 "IK failed to find solution for target pose", throttle_duration_sec=1.0
             )
 
-    def _publish_joint_states(self):
+    def _solve_and_publish(self):
+        """
+        Solve IK for the latest imarker pose and publish the result.
+        """
+        self.solve_ik()
+        self._publish_joint_states()
+
+    def publish_joint_states(self):
+        """
+        Publish the latest solution's joint states.
+        """
         self._joint_state_msg.header.stamp = self.node.get_clock().now().to_msg()
-        self._joint_state_msg.position = self._last_joint_positions.tolist()
+        self._joint_state_msg.position = self.last_joint_positions.tolist()
         self._joint_state_pub.publish(self._joint_state_msg)

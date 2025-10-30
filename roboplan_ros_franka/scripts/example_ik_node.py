@@ -13,6 +13,7 @@ from rclpy.executors import MultiThreadedExecutor
 
 from roboplan import Scene, SimpleIkOptions
 from roboplan_ros_visualization.interactive_marker_ik import InteractiveMarkerIK
+from roboplan_ros_visualization.roboplan_visualizer import RoboplanVisualizer
 
 
 class InteractiveMarkerIKNode(Node):
@@ -90,10 +91,30 @@ class InteractiveMarkerIKNode(Node):
             options=options,
             namespace="roboplan_ik",
         )
+
+        # This needs work...
+        self.ik_viz = RoboplanVisualizer(
+            node=self,
+            scene=self.scene,
+            urdf_xml=urdf_xml,
+            package_paths=package_paths,
+            namespace="roboplan_ik",
+        )
+
+        # Start a time to solve ik and publish the model poses at 20 Hz.
+        self._timer = self.create_timer(0.05, self.update)
+
         self.get_logger().info("Ready!")
         self.get_logger().info(
             "Move the interactive marker in RViz to generate IK solutions"
         )
+
+    def update(self):
+        """
+        Solves IK based on the marker pose and publishes markers for the scene.
+        """
+        self.imarker_ik.solve_ik()
+        self.ik_viz.visualize_configuration(self.imarker_ik.last_joint_positions)
 
 
 def main(args=None):
