@@ -211,9 +211,10 @@ class InteractiveMarkerIK:
         Args:
             feedback: InteractiveMarkerFeedback message
         """
-        # Record the iMarker state as it is moved
-        if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
-            self._target_pose = feedback.pose
+        # Record the iMarker state as it is interacted with, we throttle on
+        # processing so there isn't really a limit here, and the server seems to be
+        # slow.
+        self._target_pose = feedback.pose
 
     def solve_ik(self):
         """
