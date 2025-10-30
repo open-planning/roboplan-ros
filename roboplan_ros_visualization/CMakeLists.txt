@@ -36,20 +36,9 @@ target_link_libraries(roboplan_ros_visualization PUBLIC
 )
 set_property(TARGET roboplan_ros_visualization PROPERTY CXX_STANDARD 20)
 
-# Executable nodes
-add_executable(interactive_marker_ik_node
-  src/interactive_marker_ik_node.cpp
-)
-target_link_libraries(interactive_marker_ik_node PRIVATE
-  ament_index_cpp::ament_index_cpp
-  roboplan_ros_visualization
-  ${sensor_msgs_TARGETS}
-)
-set_property(TARGET interactive_marker_ik_node PROPERTY CXX_STANDARD 20)
-
 # Install all libs and executables
 install(
-  TARGETS roboplan_ros_visualization interactive_marker_ik_node
+  TARGETS roboplan_ros_visualization
   EXPORT roboplan_ros_visualization-targets
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

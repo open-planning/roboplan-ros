@@ -59,7 +59,7 @@ class InteractiveMarkerIKNode(Node):
             yaml_config_path=yaml_config_path,
         )
 
-        # Start in a reasonable pose
+        # Start in a reasonable pose, this could come from hardware.
         self.latest_joint_positions = np.array(
             [
                 0.0,
@@ -91,7 +91,8 @@ class InteractiveMarkerIKNode(Node):
             namespace="roboplan_ik",
         )
 
-        # Create the interactive marker controller
+        # Create the interactive marker controller, which will call the viz to
+        # update anytime a solution is found.
         self.get_logger().info("Creating interactive marker controller...")
         self.imarker_ik = InteractiveMarkerIK(
             node=self,
@@ -104,17 +105,9 @@ class InteractiveMarkerIKNode(Node):
             namespace="roboplan_ik",
         )
 
-        self.get_logger().info("Ready!")
         self.get_logger().info(
-            "Move the interactive marker in RViz to generate IK solutions"
+            "Move the interactive marker in RViz to visualize IK solutions"
         )
-
-    def update(self):
-        """
-        Solves IK based on the marker pose and publishes markers for the scene.
-        """
-        self.imarker_ik.solve_ik()
-        self.ik_viz.visualize_configuration(self.imarker_ik.last_joint_positions)
 
 
 def main(args=None):
@@ -128,8 +121,6 @@ def main(args=None):
         executor.spin()
     except KeyboardInterrupt:
         pass
-    except rclpy.executors.ExternalShutdownException:
-        sys.exit(1)
     finally:
         executor.shutdown()
         node.destroy_node()

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
 import os
-import numpy as np
-from typing import Optional
-from collections.abc import Callable
 import threading
+import uuid
+from collections.abc import Callable
+from typing import Optional
+import numpy as np
 
 from rclpy.node import Node
-from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
-from rclpy.executors import SingleThreadedExecutor
+from rclpy.executors import SingleThreadedExecutor, ExternalShutdownException
 from rclpy.qos import (
     QoSProfile,
     QoSReliabilityPolicy,
@@ -46,7 +46,6 @@ class InteractiveMarkerIK:
         base_link: str,
         tip_link: str,
         options: SimpleIkOptions = SimpleIkOptions(),
-        update_rate: Optional[float] = None,
         solve_callback: Optional[Callable] = None,
         namespace: str = "/roboplan_ik",
     ):
@@ -60,7 +59,7 @@ class InteractiveMarkerIK:
             base_link: Base link of the IK chain.
             tip_link: Tip link of the iK chain.
             options: Options for the IK solver.
-            update_rate: Publish rate for IK solutions, in Hz.
+            solve_callback: Callback function to immediately handle IK solutions
             namespace: Namespace for the InteractiveMarkerServer and JointStatePublisher
         """
         self.node = node
@@ -95,8 +94,11 @@ class InteractiveMarkerIK:
         self._target_pose = self._current_pose
 
         # Create a separate node for the marker server with its own executor. There are likely
-        # better solutions.
-        self._marker_node = Node("interactive_marker_node")
+        # better solutions but in the interim this removes all latency to let updates be processed
+        # as soon as they come in, otherwise the server seems to get hung up.
+        self._marker_node = Node(
+            "interactive_marker_node" + str(uuid.uuid4()).replace("-", "_")[:8]
+        )
         self._ik_server = InteractiveMarkerServer(self._marker_node, self.namespace)
         self._create_interactive_marker(self._current_pose)
         self._ik_server.applyChanges()
@@ -123,13 +125,6 @@ class InteractiveMarkerIK:
         self._joint_state_msg.name = self.scene.getJointNames()
         self._joint_state_msg.header.frame_id = ""
 
-        # Create timer to solve IK and publish at fixed rate if set
-        if update_rate is not None:
-            self._timer_callback_group = MutuallyExclusiveCallbackGroup()
-            self._timer = self.node.create_timer(
-                1.0 / update_rate, self._solve_and_publish, self._timer_callback_group
-            )
-
         self.node.get_logger().info("Constructed interactive marker controller")
         self.node.get_logger().info(f"Joint group: {self.joint_group}")
         self.node.get_logger().info(f"Joints: {self._joint_names}")
@@ -138,19 +133,16 @@ class InteractiveMarkerIK:
 
     def _spin_marker_executor(self):
         """Spin the marker executor, catching shutdown exceptions."""
+        # self._marker_executor.spin()
         try:
             self._marker_executor.spin()
-        except Exception:
+        except ExternalShutdownException:
             pass
 
     def shutdown(self):
-        """Clean up resources."""
-        if hasattr(self, "_marker_executor"):
-            self._marker_executor.shutdown()
-        if hasattr(self, "_marker_thread"):
-            self._marker_thread.join(timeout=1.0)
-        if hasattr(self, "_marker_node"):
-            self._marker_node.destroy_node()
+        self._marker_executor.shutdown()
+        self._marker_thread.join(timeout=0.25)
+        self._marker_node.destroy_node()
 
     def _create_interactive_marker(self, pose: Pose):
         """
@@ -242,15 +234,14 @@ class InteractiveMarkerIK:
         Args:
             feedback: InteractiveMarkerFeedback message
         """
-        # Record the iMarker state as it is interacted with, we throttle on
-        # processing so there isn't really a limit here, and the server seems to be
-        # slow.
-        self._target_pose = feedback.pose
-        self.solve_ik()
+        # Record the iMarker state as it is updated and solve
+        if feedback.event_type == InteractiveMarkerFeedback.POSE_UPDATE:
+            self._target_pose = feedback.pose
+            self.solve_ik()
 
     def solve_ik(self):
         """
-        Solve IK for the current target pose.
+        Solve IK for the latest set target pose.
         """
         joint_positions = self._ik_solver.solve_ik(
             self._target_pose, seed_state=self.last_joint_positions
@@ -262,13 +253,6 @@ class InteractiveMarkerIK:
                 self.solve_callback(joint_positions)
         else:
             self.node.get_logger().warn("IK failed to find solution for target pose")
-
-    def _solve_and_publish(self):
-        """
-        Solve IK for the latest imarker pose and publish the result.
-        """
-        self.solve_ik()
-        self._publish_joint_states()
 
     def publish_joint_states(self):
         """
