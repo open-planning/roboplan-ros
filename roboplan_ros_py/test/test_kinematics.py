@@ -31,7 +31,8 @@ def ik_solver(test_scene: Scene) -> RoboPlanIK:
     options.max_iters = 100
     options.step_size = 0.25
     options.damping = 0.001
-    options.max_error_norm = 0.001
+    options.max_error_norm = 0.0005
+    options.check_collisions = False
 
     return RoboPlanIK(
         scene=test_scene,
@@ -61,10 +62,7 @@ def test_solve_ik(ik_solver: RoboPlanIK, test_scene: Scene) -> None:
     # Convert to ROS Pose and solve
     target_pose = se3_to_pose(fk_transform)
     q_indices = ik_solver.q_indices_
-
-    # Warm start from the next random position
-    seed_state = test_scene.randomCollisionFreePositions()[q_indices]
-    solution = ik_solver.solve_ik(target_pose, seed_state)
+    solution = ik_solver.solve_ik(target_pose)
 
     # Should find a solution that is reasonably close the the start pose
     assert solution is not None

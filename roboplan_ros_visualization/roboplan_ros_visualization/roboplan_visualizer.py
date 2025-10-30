@@ -138,7 +138,6 @@ class RoboplanVisualizer:
                 )
                 continue
 
-        # Publish markers
         if marker_array.markers:
             self.marker_pub.publish(marker_array)
 
@@ -167,6 +166,7 @@ class RoboplanVisualizer:
         marker.pose = se3_to_pose(placement.homogeneous)
 
         # Handle different geometry types
+        # TODO: Something more intelligent with pin's types?
         geometry = geom_obj.geometry
         if isinstance(geometry, pin.hppfcl.Box):
             marker.type = Marker.CUBE
@@ -200,7 +200,7 @@ class RoboplanVisualizer:
                 else:
                     marker.mesh_resource = mesh_path
             else:
-                # Fallback: can't visualize without mesh path
+                # If there isn't a mesh path we can't do anything?
                 return None
 
             if hasattr(geom_obj, "meshScale"):
@@ -212,7 +212,7 @@ class RoboplanVisualizer:
 
         else:
             # Unknown geometry type, skip
-            self.node.get_logger().debug(
+            self.node.get_logger().warn(
                 f"Unknown geometry type for {geom_obj.name}: {type(geometry)}"
             )
             return None
@@ -233,7 +233,6 @@ class RoboplanVisualizer:
         return marker
 
     def clear_markers(self):
-        """Remove all visualization markers"""
         marker_array = MarkerArray()
         marker = Marker()
         marker.action = Marker.DELETEALL
@@ -241,5 +240,4 @@ class RoboplanVisualizer:
         self.marker_pub.publish(marker_array)
 
     def set_color(self, color: ColorRGBA):
-        """Update the visualization color"""
         self.color = color
