@@ -5,6 +5,7 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <pinocchio/spatial/se3.hpp>
 #include <roboplan/core/types.hpp>
+#include <sensor_msgs/msg/joint_state.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
 
@@ -26,6 +27,17 @@ inline builtin_interfaces::msg::Duration toDuration(const double time_sec) {
 inline double fromDuration(const builtin_interfaces::msg::Duration& duration) {
   return duration.sec + duration.nanosec * 1e-9;
 }
+
+/// @brief Converts a roboplan::JointConfiguration object to a ROS 2 JointState message.
+/// @param joint_configuration The roboplan JointConfiguration to convert
+/// @return An equivalent ROS 2 JointState message.
+sensor_msgs::msg::JointState toJointState(const roboplan::JointConfiguration& joint_configuration);
+
+/// @brief Convert the provided ROS 2 JointState message to an equivalent
+/// roboplan::JointConfiguration.
+/// @param joint_state The ROS 2 JointState message to convert.
+/// @return An equivalent roboplan::JointConfiguration.
+roboplan::JointConfiguration fromJointState(const sensor_msgs::msg::JointState& joint_state);
 
 /// @brief Converts a roboplan::JointTrajectory object to a ROS 2 JointTrajectory message.
 /// @details This function will convert joint names and joint trajectory points. The caller

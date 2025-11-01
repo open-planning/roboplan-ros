@@ -10,6 +10,7 @@ find_package(roboplan REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(tf2_eigen REQUIRED)
 
@@ -26,8 +27,9 @@ target_link_libraries(roboplan_ros_cpp
     Eigen3::Eigen
     pinocchio::pinocchio
     ${tf2_eigen_TARGETS}
-    ${trajectory_msgs_TARGETS}
     ${geometry_msgs_TARGETS}
+    ${sensor_msgs_TARGETS}
+    ${trajectory_msgs_TARGETS}
 )
 set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
 ament_export_dependencies(
