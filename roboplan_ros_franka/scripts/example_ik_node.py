@@ -110,6 +110,13 @@ class InteractiveMarkerIKNode(Node):
             "Move the interactive marker in RViz to visualize IK solutions"
         )
 
+    def destroy_node(self):
+        """
+        Override the default to ensure a clean shutdown.
+        """
+        self.imarker_ik.shutdown()
+        super().destroy_node()
+
 
 def main(args=None):
     rclpy.init(args=args)
