@@ -4,6 +4,48 @@
 
 namespace roboplan_ros_cpp {
 
+sensor_msgs::msg::JointState toJointState(const roboplan::JointConfiguration& joint_configuration) {
+  sensor_msgs::msg::JointState joint_state;
+
+  joint_state.name = joint_configuration.joint_names;
+
+  joint_state.position.resize(joint_configuration.positions.size());
+  for (int i = 0; i < joint_configuration.positions.size(); ++i) {
+    joint_state.position[i] = joint_configuration.positions[i];
+  }
+
+  joint_state.velocity.resize(joint_configuration.velocities.size());
+  for (int i = 0; i < joint_configuration.velocities.size(); ++i) {
+    joint_state.velocity[i] = joint_configuration.velocities[i];
+  }
+
+  // Effort != acceleration but including and kind of abusing the interface.
+  joint_state.effort.resize(joint_configuration.accelerations.size());
+  for (int i = 0; i < joint_configuration.accelerations.size(); ++i) {
+    joint_state.effort[i] = joint_configuration.accelerations[i];
+  }
+
+  return joint_state;
+}
+
+roboplan::JointConfiguration fromJointState(const sensor_msgs::msg::JointState& joint_state) {
+  roboplan::JointConfiguration joint_configuration;
+
+  joint_configuration.joint_names = joint_state.name;
+
+  joint_configuration.positions =
+      Eigen::VectorXd::Map(joint_state.position.data(), joint_state.position.size());
+
+  joint_configuration.velocities =
+      Eigen::VectorXd::Map(joint_state.velocity.data(), joint_state.velocity.size());
+
+  // Effort != acceleration but including and kind of abusing the interface.
+  joint_configuration.accelerations =
+      Eigen::VectorXd::Map(joint_state.effort.data(), joint_state.effort.size());
+
+  return joint_configuration;
+}
+
 trajectory_msgs::msg::JointTrajectory
 toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory) {
 

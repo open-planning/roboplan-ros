@@ -4,6 +4,27 @@
 
 namespace roboplan_ros_cpp {
 
+TEST(TypeConversions, TestConvertJointState) {
+  roboplan::JointConfiguration joint_configuration;
+  joint_configuration.joint_names = {"joint1", "joint2"};
+  joint_configuration.positions = Eigen::VectorXd(2);
+  joint_configuration.positions << 0.0, 1.0;
+  joint_configuration.velocities = Eigen::VectorXd(2);
+  joint_configuration.velocities << 2.0, 3.0;
+  joint_configuration.accelerations = Eigen::VectorXd(2);
+  joint_configuration.accelerations << 4.0, 5.0;
+
+  // Convert back and forth and we should get the same values
+  sensor_msgs::msg::JointState joint_state = roboplan_ros_cpp::toJointState(joint_configuration);
+  roboplan::JointConfiguration check_joint_configuration =
+      roboplan_ros_cpp::fromJointState(joint_state);
+
+  ASSERT_EQ(joint_configuration.joint_names, check_joint_configuration.joint_names);
+  ASSERT_TRUE(joint_configuration.positions.isApprox(check_joint_configuration.positions));
+  ASSERT_TRUE(joint_configuration.velocities.isApprox(check_joint_configuration.velocities));
+  ASSERT_TRUE(joint_configuration.accelerations.isApprox(check_joint_configuration.accelerations));
+}
+
 TEST(ConversionTest, TestEmptyConversions) {
   roboplan::JointTrajectory roboplan_traj;
   const auto ros_traj = toJointTrajectory(roboplan_traj);
