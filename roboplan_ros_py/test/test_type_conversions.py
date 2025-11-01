@@ -4,6 +4,8 @@ from geometry_msgs.msg import Pose, TransformStamped
 
 import roboplan
 from roboplan_ros_py.type_conversions import (
+    to_joint_state,
+    from_joint_state,
     to_joint_trajectory,
     from_joint_trajectory,
     to_transform_stamped,
@@ -11,6 +13,29 @@ from roboplan_ros_py.type_conversions import (
     se3_to_pose,
     pose_to_se3,
 )
+
+
+def test_joint_state():
+    joint_configuration = roboplan.JointConfiguration()
+    joint_configuration.joint_names = ["joint1", "joint2"]
+    joint_configuration.positions = np.array([0.0, 1.0])
+    joint_configuration.velocities = np.array([2.0, 3.0])
+    joint_configuration.accelerations = np.array([4.0, 5.0])
+
+    # Convert back and forth and we should get the same values
+    joint_state = to_joint_state(joint_configuration)
+    check_joint_configuration = from_joint_state(joint_state)
+
+    assert joint_configuration.joint_names == check_joint_configuration.joint_names
+    assert np.allclose(
+        joint_configuration.positions, check_joint_configuration.positions
+    )
+    assert np.allclose(
+        joint_configuration.velocities, check_joint_configuration.velocities
+    )
+    assert np.allclose(
+        joint_configuration.accelerations, check_joint_configuration.accelerations
+    )
 
 
 def test_empty_conversions():
