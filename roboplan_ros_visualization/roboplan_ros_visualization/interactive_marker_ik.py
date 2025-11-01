@@ -132,8 +132,6 @@ class InteractiveMarkerIK:
         self.node.get_logger().info(f"End-effector: {self.tip_link}")
 
     def _spin_marker_executor(self):
-        """Spin the marker executor, catching shutdown exceptions."""
-        # self._marker_executor.spin()
         try:
             self._marker_executor.spin()
         except ExternalShutdownException:

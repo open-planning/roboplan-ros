@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-import sys
 import xacro
 import numpy as np
 
@@ -81,17 +80,19 @@ class InteractiveMarkerIKNode(Node):
         options.max_iters = 100
         options.step_size = 0.25
 
-        # Setup a visualize marker model for rendering IK solutions
+        # Setup a visualize marker model for rendering IK solutions. The markers will
+        # be published to "/roboplan_ik/markers" and are renderable in rviz.
         self.ik_viz = RoboplanVisualizer(
             node=self,
             scene=self.scene,
             urdf_xml=urdf_xml,
             package_paths=package_paths,
             color=ColorRGBA(r=0.5, g=0.5, b=1.0, a=0.5),
+            frame_id="world",
             namespace="roboplan_ik",
         )
 
-        # Create the interactive marker controller, which will call the viz to
+        # Create the interactive marker controller, which will call the ik_viz to
         # update anytime a solution is found.
         self.get_logger().info("Creating interactive marker controller...")
         self.imarker_ik = InteractiveMarkerIK(

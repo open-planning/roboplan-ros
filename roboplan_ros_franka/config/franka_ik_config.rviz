@@ -6,9 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /InteractiveMarkers1
-        - /MarkerArray1
-        - /MarkerArray1/Topic1
+        - /IK_SolutionMarkers1/Topic1
       Splitter Ratio: 0.5
     Tree Height: 571
   - Class: rviz_common/Selection
@@ -152,14 +150,14 @@ Visualization Manager:
       Enable Transparency: true
       Enabled: true
       Interactive Markers Namespace: /roboplan_ik
-      Name: InteractiveMarkers
+      Name: IK_iMarker
       Show Axes: false
       Show Descriptions: false
       Show Visual Aids: false
       Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
-      Name: MarkerArray
+      Name: IK_SolutionMarkers
       Namespaces:
         roboplan_ik/fr3_hand_0: true
         roboplan_ik/fr3_leftfinger_0: true

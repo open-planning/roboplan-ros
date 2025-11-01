@@ -34,6 +34,7 @@ class RoboplanVisualizer:
         package_paths: list = [],
         color: Optional[ColorRGBA] = None,
         update_rate: Optional[float] = None,
+        frame_id: str = "world",
         namespace: str = "/roboplan",
     ):
         """
@@ -48,11 +49,14 @@ class RoboplanVisualizer:
             color: Default color for the robot visualization, if set will override defaults.
             update_rate: If provided, subscribes to joint_states and auto-updates.
                          If None, call visualize_configuration() manually.
+            frame_id: The name of the frame to render markers in (defaults to world).
+            namespace: The topic prefix for the "<namespace>/markers" publisher.
         """
         self.node = node
         self.scene = scene
         self.namespace = namespace
         self.color = color
+        self.frame_id = frame_id
 
         # Build visual geometry model from URDF. I think if/when the scene model has python bindings
         # this will be unnecessary.
@@ -156,9 +160,7 @@ class RoboplanVisualizer:
             Marker or None
         """
         marker = Marker()
-
-        # TODO: Parameterize this...
-        marker.header.frame_id = "world"
+        marker.header.frame_id = self.frame_id
         marker.header.stamp = self.node.get_clock().now().to_msg()
         marker.ns = f"{self.namespace}/{geom_obj.name}"
         marker.id = marker_id
@@ -168,7 +170,8 @@ class RoboplanVisualizer:
         marker.pose = se3_to_pose(placement.homogeneous)
 
         # Handle different geometry types
-        # TODO: Something more intelligent with pin's types?
+        # TODO: Something more intelligent with pin's types? There are more types
+        #       than are enumerated here...
         geometry = geom_obj.geometry
         if isinstance(geometry, pin.hppfcl.Box):
             marker.type = Marker.CUBE
