@@ -11,9 +11,9 @@ from rclpy.qos import (
     QoSHistoryPolicy,
     QoSDurabilityPolicy,
 )
-from visualization_msgs.msg import Marker, MarkerArray
 from std_msgs.msg import ColorRGBA
 from sensor_msgs.msg import JointState
+from visualization_msgs.msg import Marker, MarkerArray
 
 from roboplan import Scene
 from roboplan_ros_py.type_conversions import se3_to_pose
@@ -24,6 +24,9 @@ class RoboplanVisualizer:
     Utility for visualizing a robot configuration using markers in RViz.
     Does not use TF or robot_state_publisher - computes forward kinematics
     directly from the Scene and publishes visualization markers.
+
+    TODO: Consider porting to Pinnochio's or updating their visualizer to ROS 2.
+    TODO: Support visualizing collisions?
     """
 
     def __init__(
@@ -60,7 +63,7 @@ class RoboplanVisualizer:
 
         # Build visual geometry model from URDF. I think if/when the scene model has python bindings
         # this will be unnecessary.
-        self._build_visual_model(urdf_xml, package_paths or [])
+        self._build_visual_model(urdf_xml, package_paths)
 
         # Create marker publisher
         qos = QoSProfile(
@@ -137,7 +140,7 @@ class RoboplanVisualizer:
                     marker_array.markers.append(marker)
 
             except Exception as e:
-                self.node.get_logger().debug(
+                self.node.get_logger().warn(
                     f"Could not create marker for geometry {geom_obj.name}: {e}"
                 )
                 continue
@@ -151,13 +154,15 @@ class RoboplanVisualizer:
         """
         Create a marker for a Pinocchio geometry object.
 
+        Handles basic shapes (Box, Sphere, Cylinder) and meshes.
+
         Args:
-            marker_id: Marker ID
-            geom_obj: Pinocchio GeometryObject
-            placement: SE3 placement of the geometry
+            marker_id: The marker ID.
+            geom_obj: Pinocchio GeometryObject.
+            placement: SE3 placement of the geometry.
 
         Returns:
-            Marker or None
+            Filled marker message or None if the geometry is not supported.
         """
         marker = Marker()
         marker.header.frame_id = self.frame_id
@@ -170,43 +175,49 @@ class RoboplanVisualizer:
         marker.pose = se3_to_pose(placement.homogeneous)
 
         # Handle different geometry types
-        # TODO: Something more intelligent with pin's types? There are more types
-        #       than are enumerated here...
+        # TODO: Something more intelligent with pin's types?
+        # See https://github.com/stack-of-tasks/pinocchio/blob/devel/bindings/python/pinocchio/visualize/rviz_visualizer.py
         geometry = geom_obj.geometry
-        if isinstance(geometry, pin.hppfcl.Box):
+        if isinstance(geometry, pin.hppfcl.Cylinder) or isinstance(
+            geometry, pin.hppfcl.Capsule
+        ):
+            # Just modeling capsules as cylinders for now...
+            marker.type = Marker.CYLINDER
+            radius = geometry.radius * 2.0
+            length = geometry.halfLength * 2.0
+            marker.scale.x = marker.scale.y = radius
+            marker.scale.z = length
+        elif isinstance(geometry, pin.hppfcl.Box):
             marker.type = Marker.CUBE
-            marker.scale.x = float(geometry.halfSide[0] * 2)
-            marker.scale.y = float(geometry.halfSide[1] * 2)
-            marker.scale.z = float(geometry.halfSide[2] * 2)
-
+            marker.scale.x = geometry.halfSide[0] * 2.0
+            marker.scale.y = geometry.halfSide[1] * 2.0
+            marker.scale.z = geometry.halfSide[2] * 2.0
         elif isinstance(geometry, pin.hppfcl.Sphere):
             marker.type = Marker.SPHERE
-            r = float(geometry.radius * 2)
-            marker.scale.x = marker.scale.y = marker.scale.z = r
-
-        elif isinstance(geometry, pin.hppfcl.Cylinder):
-            marker.type = Marker.CYLINDER
-            marker.scale.x = float(geometry.radius * 2)
-            marker.scale.y = float(geometry.radius * 2)
-            marker.scale.z = float(geometry.halfLength * 2)
-
+            diameter = geometry.radius * 2.0
+            marker.scale.x = marker.scale.y = marker.scale.z = diameter
+        elif isinstance(geometry, pin.hppfcl.Cone):
+            # No cone markers...
+            self.node.get_logger().debug(
+                f"Cone geometry {geom_obj.name} not supported, skipping"
+            )
+            return None
         elif isinstance(geometry, (pin.hppfcl.Convex, pin.hppfcl.BVHModelBase)):
-            # For mesh geometries
             marker.type = Marker.MESH_RESOURCE
 
-            # Ensure proper URI format because RViz gets angry at absolute paths
-            if hasattr(geom_obj, "meshPath") and geom_obj.meshPath:
-                mesh_path = geom_obj.meshPath
-
-                if not mesh_path.startswith("package://") and not mesh_path.startswith(
-                    "file://"
-                ):
-                    marker.mesh_resource = f"file://{mesh_path}"
-                else:
-                    marker.mesh_resource = mesh_path
-            else:
-                # If there isn't a mesh path we can't do anything?
+            # If there isn't a mesh path we can't do anything?
+            if not hasattr(geom_obj, "meshPath") or not geom_obj.meshPath:
+                self.node.get_logger().debug(
+                    f"Mesh geometry {geom_obj.name} has no meshPath, skipping"
+                )
                 return None
+
+            # Ensure proper URI format because RViz gets angry at absolute paths
+            mesh_path = geom_obj.meshPath
+            if mesh_path.startswith("package://") or mesh_path.startswith("file://"):
+                marker.mesh_resource = mesh_path
+            else:
+                marker.mesh_resource = f"file://{mesh_path}"
 
             if hasattr(geom_obj, "meshScale"):
                 marker.scale.x = float(geom_obj.meshScale[0])
@@ -225,12 +236,14 @@ class RoboplanVisualizer:
         # Use embedded colorings for meshes
         if marker.type == Marker.MESH_RESOURCE:
             marker.mesh_use_embedded_materials = True
+
         # If the geometry has a color user it
         if hasattr(geom_obj, "meshColor") and len(geom_obj.meshColor) >= 4:
             marker.color.r = float(geom_obj.meshColor[0])
             marker.color.g = float(geom_obj.meshColor[1])
             marker.color.b = float(geom_obj.meshColor[2])
             marker.color.a = float(geom_obj.meshColor[3])
+
         # Apply colorings if set
         if self.color:
             marker.color = self.color
