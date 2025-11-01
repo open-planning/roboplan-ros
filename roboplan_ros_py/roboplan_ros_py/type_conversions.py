@@ -4,9 +4,13 @@ import pinocchio as pin
 from builtin_interfaces.msg import Duration
 from geometry_msgs.msg import Pose, TransformStamped
 from sensor_msgs.msg import JointState
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from trajectory_msgs.msg import JointTrajectory as ROSJointTrajectory
+from trajectory_msgs.msg import JointTrajectoryPoint
 
-import roboplan
+from roboplan import (
+    JointConfiguration,
+    JointTrajectory,
+)
 
 
 def to_duration(time_sec: float) -> Duration:
@@ -38,7 +42,7 @@ def from_duration(duration: Duration) -> float:
     return duration.sec + duration.nanosec * 1e-9
 
 
-def to_joint_state(joint_configuration: roboplan.JointConfiguration) -> JointState:
+def to_joint_state(joint_configuration: JointConfiguration) -> JointState:
     """
     Converts a roboplan.JointConfiguration object to a ROS 2 JointState message.
 
@@ -69,7 +73,7 @@ def from_joint_state(joint_state: JointState):
     Returns:
         An equivalent roboplan.JointConfiguration.
     """
-    joint_configuration = roboplan.JointConfiguration()
+    joint_configuration = JointConfiguration()
     joint_configuration.joint_names = joint_state.name
     joint_configuration.positions = np.array(joint_state.position)
     joint_configuration.velocities = np.array(joint_state.velocity)
@@ -80,8 +84,8 @@ def from_joint_state(joint_state: JointState):
 
 
 def to_joint_trajectory(
-    roboplan_trajectory: roboplan.JointTrajectory,
-) -> JointTrajectory:
+    roboplan_trajectory: JointTrajectory,
+) -> ROSJointTrajectory:
     """
     Converts a roboplan.JointTrajectory object to a ROS 2 JointTrajectory message.
 
@@ -91,7 +95,7 @@ def to_joint_trajectory(
     Returns:
         An equivalent ROS 2 JointTrajectory message.
     """
-    ros_traj = JointTrajectory()
+    ros_traj = ROSJointTrajectory()
     ros_traj.joint_names = roboplan_trajectory.joint_names
 
     ros_traj.points = []
@@ -114,7 +118,7 @@ def to_joint_trajectory(
     return ros_traj
 
 
-def from_joint_trajectory(ros_trajectory: JointTrajectory) -> roboplan.JointTrajectory:
+def from_joint_trajectory(ros_trajectory: ROSJointTrajectory) -> JointTrajectory:
     """
     Convert the provided ROS 2 JointTrajectory message to an equivalent
     roboplan.JointTrajectory.
@@ -125,7 +129,7 @@ def from_joint_trajectory(ros_trajectory: JointTrajectory) -> roboplan.JointTraj
     Returns:
         An equivalent roboplan.JointTrajectory.
     """
-    joint_traj = roboplan.JointTrajectory()
+    joint_traj = JointTrajectory()
 
     joint_traj.joint_names = ros_trajectory.joint_names
 
