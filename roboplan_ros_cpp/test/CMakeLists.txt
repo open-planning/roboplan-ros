@@ -1,5 +1,6 @@
 find_package(GTest REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
+find_package(roboplan_example_models REQUIRED)
 
 add_executable(test_type_conversions test_type_conversions.cpp)
 set_property(TARGET test_type_conversions PROPERTY CXX_STANDARD 20)

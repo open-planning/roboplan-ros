@@ -1,9 +1,15 @@
 import pytest
 import numpy as np
+from geometry_msgs.msg import Pose, TransformStamped
+
 import roboplan
 from roboplan_ros_py.type_conversions import (
     to_joint_trajectory,
     from_joint_trajectory,
+    to_transform_stamped,
+    from_transform_stamped,
+    se3_to_pose,
+    pose_to_se3,
 )
 
 
@@ -51,3 +57,70 @@ def test_convert_to_joint_trajectory():
         assert new_roboplan_traj.accelerations[i] == pytest.approx(
             roboplan_traj.accelerations[i]
         )
+
+
+def test_transform_stamped_conversion():
+    # Given a transform convert it to/from a CartesianConfiguration and validate it is the same.
+    original_transform = TransformStamped()
+    original_transform.header.frame_id = "world"
+    original_transform.child_frame_id = "end_effector"
+
+    original_transform.transform.translation.x = 1.2
+    original_transform.transform.translation.y = -0.5
+    original_transform.transform.translation.z = 3.7
+    original_transform.transform.rotation.w = 0.6532815
+    original_transform.transform.rotation.x = 0.2705981
+    original_transform.transform.rotation.y = -0.6532815
+    original_transform.transform.rotation.z = -0.2705979
+
+    cartesian_config = from_transform_stamped(original_transform)
+    converted_transform = to_transform_stamped(cartesian_config)
+
+    assert original_transform.header.frame_id == converted_transform.header.frame_id
+    assert original_transform.child_frame_id == converted_transform.child_frame_id
+
+    assert converted_transform.transform.translation.x == pytest.approx(
+        original_transform.transform.translation.x
+    )
+    assert converted_transform.transform.translation.y == pytest.approx(
+        original_transform.transform.translation.y
+    )
+    assert converted_transform.transform.translation.z == pytest.approx(
+        original_transform.transform.translation.z
+    )
+    assert converted_transform.transform.rotation.w == pytest.approx(
+        original_transform.transform.rotation.w
+    )
+    assert converted_transform.transform.rotation.x == pytest.approx(
+        original_transform.transform.rotation.x
+    )
+    assert converted_transform.transform.rotation.y == pytest.approx(
+        original_transform.transform.rotation.y
+    )
+    assert converted_transform.transform.rotation.z == pytest.approx(
+        original_transform.transform.rotation.z
+    )
+
+
+def test_pose_to_se3():
+    # Given a pose convert it to/from an SE3 matrix and validate it is the same.
+    original_pose = Pose()
+    original_pose.position.x = 1.2
+    original_pose.position.y = -0.5
+    original_pose.position.z = 3.7
+    original_pose.orientation.x = 0.2705981
+    original_pose.orientation.y = -0.6532815
+    original_pose.orientation.z = -0.2705979
+    original_pose.orientation.w = 0.6532815
+
+    transform = pose_to_se3(original_pose)
+    converted_pose = se3_to_pose(transform)
+
+    assert converted_pose.position.x == pytest.approx(original_pose.position.x)
+    assert converted_pose.position.y == pytest.approx(original_pose.position.y)
+    assert converted_pose.position.z == pytest.approx(original_pose.position.z)
+
+    assert converted_pose.orientation.w == pytest.approx(original_pose.orientation.w)
+    assert converted_pose.orientation.x == pytest.approx(original_pose.orientation.x)
+    assert converted_pose.orientation.y == pytest.approx(original_pose.orientation.y)
+    assert converted_pose.orientation.z == pytest.approx(original_pose.orientation.z)

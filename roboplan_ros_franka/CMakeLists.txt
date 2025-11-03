@@ -12,4 +12,9 @@ find_package(roboplan_example_models REQUIRED)
 install(DIRECTORY config launch
         DESTINATION share/${PROJECT_NAME})
 
+install(PROGRAMS
+        scripts/example_ik_node.py
+        DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

@@ -1,5 +1,7 @@
 #include <roboplan_ros_cpp/type_conversions.hpp>
 
+#include <tf2_eigen/tf2_eigen.hpp>
+
 namespace roboplan_ros_cpp {
 
 trajectory_msgs::msg::JointTrajectory
@@ -68,6 +70,36 @@ fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory)
   }
 
   return joint_traj;
+}
+
+geometry_msgs::msg::TransformStamped
+toTransformStamped(const roboplan::CartesianConfiguration& cartesian_configuration) {
+  Eigen::Isometry3d isometry(cartesian_configuration.tform);
+  geometry_msgs::msg::TransformStamped ret = tf2::eigenToTransform(isometry);
+  ret.header.frame_id = cartesian_configuration.base_frame;
+  ret.child_frame_id = cartesian_configuration.tip_frame;
+  return ret;
+}
+
+roboplan::CartesianConfiguration
+fromTransformStamped(const geometry_msgs::msg::TransformStamped& transform_stamped) {
+  roboplan::CartesianConfiguration config;
+  config.base_frame = transform_stamped.header.frame_id;
+  config.tip_frame = transform_stamped.child_frame_id;
+  Eigen::Isometry3d isometry = tf2::transformToEigen(transform_stamped.transform);
+  config.tform = isometry.matrix();
+  return config;
+}
+
+Eigen::Matrix4d poseToSE3(const geometry_msgs::msg::Pose& pose) {
+  Eigen::Isometry3d isometry;
+  tf2::fromMsg(pose, isometry);
+  return isometry.matrix();
+}
+
+geometry_msgs::msg::Pose se3ToPose(const Eigen::Matrix4d& transform) {
+  Eigen::Isometry3d isometry(transform);
+  return tf2::toMsg(isometry);
 }
 
 }  // namespace roboplan_ros_cpp
