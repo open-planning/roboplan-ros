@@ -1382,6 +1382,8 @@ environments:
       - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-tinyxml-vendor-0.8.3-np126py311hbc2a38a_13.conda
       - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-tinyxml2-vendor-0.7.6-np126py311hbc2a38a_14.conda
       - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-tl-expected-1.0.2-np126py311hbc2a38a_13.conda
+      - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-topic-tools-1.1.1-np126py311hbc2a38a_13.conda
+      - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-topic-tools-interfaces-1.1.1-np126py311hbc2a38a_13.conda
       - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-tracetools-4.1.1-np126py311hbc2a38a_13.conda
       - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-trajectory-msgs-4.9.0-np126py311hbc2a38a_13.conda
       - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-tricycle-controller-2.48.0-np126py311hbc2a38a_13.conda
@@ -2064,6 +2066,8 @@ environments:
       - conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-tinyxml-vendor-0.8.3-np126py311hbdd918e_13.conda
       - conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-tinyxml2-vendor-0.7.6-np126py311hbdd918e_14.conda
       - conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-tl-expected-1.0.2-np126py311hbdd918e_13.conda
+      - conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-topic-tools-1.1.1-np126py311hbdd918e_13.conda
+      - conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-topic-tools-interfaces-1.1.1-np126py311hbdd918e_13.conda
       - conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-tracetools-4.1.1-np126py311hbdd918e_13.conda
       - conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-trajectory-msgs-4.9.0-np126py311hbdd918e_13.conda
       - conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-tricycle-controller-2.48.0-np126py311hbdd918e_13.conda
@@ -2789,6 +2793,8 @@ environments:
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-tf2-ros-py-0.36.14-np126py312h3bd2861_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-tinyxml2-vendor-0.9.1-np126py312h3bd2861_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-tl-expected-1.0.2-np126py312h3bd2861_10.conda
+      - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-topic-tools-1.3.3-np126py312h3bd2861_10.conda
+      - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-topic-tools-interfaces-1.3.3-np126py312h3bd2861_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-tracetools-8.2.4-np126py312h3bd2861_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-trajectory-msgs-5.3.6-np126py312h3bd2861_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-tricycle-controller-4.32.0-np126py312h3bd2861_10.conda
@@ -3502,6 +3508,8 @@ environments:
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-tf2-ros-py-0.36.14-np126py312h01c0cb9_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-tinyxml2-vendor-0.9.1-np126py312h01c0cb9_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-tl-expected-1.0.2-np126py312h01c0cb9_10.conda
+      - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-topic-tools-1.3.3-np126py312h01c0cb9_10.conda
+      - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-topic-tools-interfaces-1.3.3-np126py312h01c0cb9_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-tracetools-8.2.4-np126py312h01c0cb9_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-trajectory-msgs-5.3.6-np126py312h01c0cb9_10.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-tricycle-controller-4.32.0-np126py312h01c0cb9_10.conda
@@ -4238,6 +4246,8 @@ environments:
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-tf2-ros-py-0.41.2-np2py312h31f38b3_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-tinyxml2-vendor-0.10.0-np2py312h31f38b3_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-tl-expected-1.0.2-np2py312h31f38b3_14.conda
+      - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-topic-tools-1.4.2-np2py312h31f38b3_14.conda
+      - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-topic-tools-interfaces-1.4.2-np2py312h31f38b3_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-tracetools-8.6.0-np2py312h31f38b3_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-trajectory-msgs-5.5.0-np2py312h31f38b3_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-tricycle-controller-5.7.0-np2py312h31f38b3_14.conda
@@ -4961,6 +4971,8 @@ environments:
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-tf2-ros-py-0.41.2-np2py312h2c707e6_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-tinyxml2-vendor-0.10.0-np2py312h2c707e6_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-tl-expected-1.0.2-np2py312h2c707e6_14.conda
+      - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-topic-tools-1.4.2-np2py312h2c707e6_14.conda
+      - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-topic-tools-interfaces-1.4.2-np2py312h2c707e6_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-tracetools-8.6.0-np2py312h2c707e6_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-trajectory-msgs-5.5.0-np2py312h2c707e6_14.conda
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-tricycle-controller-5.7.0-np2py312h2c707e6_14.conda
@@ -28881,6 +28893,87 @@ packages:
   license: BSD-3-Clause
   size: 32904
   timestamp: 1753308565269
+- conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-topic-tools-1.1.1-np126py311hbc2a38a_13.conda
+  sha256: dd774701845c5c197f94246a2f68a7e2eb076bb92e28a93800f9e6b9661e1096
+  md5: 36f830fd3e19074b80d8fafc53a60cf3
+  depends:
+  - python
+  - ros-humble-rclcpp
+  - ros-humble-rclcpp-components
+  - ros-humble-rclpy
+  - ros-humble-ros-workspace
+  - ros-humble-ros2cli
+  - ros-humble-rosidl-runtime-py
+  - ros-humble-topic-tools-interfaces
+  - ros2-distro-mutex 0.7.* humble_*
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=13
+  - libstdcxx >=13
+  - libgcc >=13
+  - python_abi 3.11.* *_cp311
+  - ros2-distro-mutex >=0.7.0,<0.8.0a0
+  - numpy >=1.26.4,<2.0a0
+  license: BSD-3-Clause
+  size: 282836
+  timestamp: 1753313497233
+- conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-topic-tools-1.1.1-np126py311hbdd918e_13.conda
+  sha256: fbcf58610771a77b8304d904f997c01553324320c414ba8efe473d08865b1b86
+  md5: 16526683a7f5828b3fcc7b05e88b40fd
+  depends:
+  - python
+  - ros-humble-rclcpp
+  - ros-humble-rclcpp-components
+  - ros-humble-rclpy
+  - ros-humble-ros-workspace
+  - ros-humble-ros2cli
+  - ros-humble-rosidl-runtime-py
+  - ros-humble-topic-tools-interfaces
+  - ros2-distro-mutex 0.7.* humble_*
+  - libstdcxx >=13
+  - libgcc >=13
+  - numpy >=1.26.4,<2.0a0
+  - ros2-distro-mutex >=0.7.0,<0.8.0a0
+  - python_abi 3.11.* *_cp311
+  license: BSD-3-Clause
+  size: 289727
+  timestamp: 1753313660524
+- conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-topic-tools-interfaces-1.1.1-np126py311hbc2a38a_13.conda
+  sha256: d2165a24198d7576b58c200b2dccea0b0e687e6fff0154b68053539a4157c8b0
+  md5: 4e6600d4a7f31d881e35ee340fe94d0d
+  depends:
+  - python
+  - ros-humble-builtin-interfaces
+  - ros-humble-ros-workspace
+  - ros-humble-rosidl-default-runtime
+  - ros2-distro-mutex 0.7.* humble_*
+  - libgcc >=13
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=13
+  - libgcc >=13
+  - ros2-distro-mutex >=0.7.0,<0.8.0a0
+  - numpy >=1.26.4,<2.0a0
+  - python_abi 3.11.* *_cp311
+  license: BSD-3-Clause
+  size: 127838
+  timestamp: 1753311868769
+- conda: https://prefix.dev/robostack-humble/linux-aarch64/ros-humble-topic-tools-interfaces-1.1.1-np126py311hbdd918e_13.conda
+  sha256: 375a6b5d306409e175939d9777d785c716c6eaddfe63e070c9dc0166ffcbdc21
+  md5: 67768774ceb6432126bccdb5e3d56365
+  depends:
+  - python
+  - ros-humble-builtin-interfaces
+  - ros-humble-ros-workspace
+  - ros-humble-rosidl-default-runtime
+  - ros2-distro-mutex 0.7.* humble_*
+  - libgcc >=13
+  - libstdcxx >=13
+  - libgcc >=13
+  - ros2-distro-mutex >=0.7.0,<0.8.0a0
+  - python_abi 3.11.* *_cp311
+  - numpy >=1.26.4,<2.0a0
+  license: BSD-3-Clause
+  size: 130655
+  timestamp: 1753312350925
 - conda: https://prefix.dev/robostack-humble/linux-64/ros-humble-tracetools-4.1.1-np126py311hbc2a38a_13.conda
   sha256: 93982131be249a36fddde88395345ccdc6d3aed356e13ffcb1a54bb43c1b8b4c
   md5: de14d6283f08354ac73d99104822d0c3
@@ -39732,6 +39825,85 @@ packages:
   license: BSD-3-Clause
   size: 33340
   timestamp: 1759134679194
+- conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-topic-tools-1.3.3-np126py312h3bd2861_10.conda
+  sha256: d8d673615be66b9c7f8a8243fe68553f7423dac4583b9939f759d060dfaac828
+  md5: 81093487d13241f7564e53d721b28812
+  depends:
+  - python
+  - ros-jazzy-rclcpp
+  - ros-jazzy-rclcpp-components
+  - ros-jazzy-rclpy
+  - ros-jazzy-ros-workspace
+  - ros-jazzy-ros2cli
+  - ros-jazzy-rosidl-runtime-py
+  - ros-jazzy-topic-tools-interfaces
+  - ros2-distro-mutex 0.11.* jazzy_*
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - numpy >=1.26.4,<2.0a0
+  - python_abi 3.12.* *_cp312
+  - ros2-distro-mutex >=0.11.0,<0.12.0a0
+  license: BSD-3-Clause
+  size: 281826
+  timestamp: 1759138528240
+- conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-topic-tools-1.3.3-np126py312h01c0cb9_10.conda
+  sha256: 698ed4417e781d77d10338fd14c9a0d6854d862513a267df2fc10a09a0cb64c1
+  md5: b450ea34f4d6b868fbca590358f48bba
+  depends:
+  - python
+  - ros-jazzy-rclcpp
+  - ros-jazzy-rclcpp-components
+  - ros-jazzy-rclpy
+  - ros-jazzy-ros-workspace
+  - ros-jazzy-ros2cli
+  - ros-jazzy-rosidl-runtime-py
+  - ros-jazzy-topic-tools-interfaces
+  - ros2-distro-mutex 0.11.* jazzy_*
+  - libstdcxx >=14
+  - libgcc >=14
+  - numpy >=1.26.4,<2.0a0
+  - python_abi 3.12.* *_cp312
+  - ros2-distro-mutex >=0.11.0,<0.12.0a0
+  license: BSD-3-Clause
+  size: 283132
+  timestamp: 1759138304191
+- conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-topic-tools-interfaces-1.3.3-np126py312h3bd2861_10.conda
+  sha256: d5589c2c7a1a4dfffa85528613f7f4ff573295cbe3fb7dc81b837f7ba30a1340
+  md5: fcee7459888efc4d7e993bc65b81e6a0
+  depends:
+  - python
+  - ros-jazzy-builtin-interfaces
+  - ros-jazzy-ros-workspace
+  - ros-jazzy-rosidl-default-runtime
+  - ros2-distro-mutex 0.11.* jazzy_*
+  - libstdcxx >=14
+  - libgcc >=14
+  - __glibc >=2.17,<3.0.a0
+  - numpy >=1.26.4,<2.0a0
+  - python_abi 3.12.* *_cp312
+  - ros2-distro-mutex >=0.11.0,<0.12.0a0
+  license: BSD-3-Clause
+  size: 317261
+  timestamp: 1759136535421
+- conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-topic-tools-interfaces-1.3.3-np126py312h01c0cb9_10.conda
+  sha256: 5bed90f0a620a634dcc1817678267dfa1cf1c4583e001b05cc3e264766933ad9
+  md5: 83901c42e91de5651c2bd49c695fa09f
+  depends:
+  - python
+  - ros-jazzy-builtin-interfaces
+  - ros-jazzy-ros-workspace
+  - ros-jazzy-rosidl-default-runtime
+  - ros2-distro-mutex 0.11.* jazzy_*
+  - libstdcxx >=14
+  - libgcc >=14
+  - python_abi 3.12.* *_cp312
+  - numpy >=1.26.4,<2.0a0
+  - ros2-distro-mutex >=0.11.0,<0.12.0a0
+  license: BSD-3-Clause
+  size: 323101
+  timestamp: 1759136767427
 - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-tracetools-8.2.4-np126py312h3bd2861_10.conda
   sha256: f25d0f1a214c27118745c3ca772ffa64631489be4e9868c9daaf300ca11b26af
   md5: af1df22dc8dd175c42fe14c84fcfb71b
@@ -50757,6 +50929,87 @@ packages:
   license: BSD-3-Clause
   size: 33271
   timestamp: 1759315103308
+- conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-topic-tools-1.4.2-np2py312h31f38b3_14.conda
+  sha256: 0f9a8655784c2749b894b9b3750999bbc5a1c25c6b653193ed9c564b9b70cb9e
+  md5: f7954508658ef57ed94206c9a3634caa
+  depends:
+  - python
+  - ros-kilted-rclcpp
+  - ros-kilted-rclcpp-components
+  - ros-kilted-rclpy
+  - ros-kilted-ros-workspace
+  - ros-kilted-ros2cli
+  - ros-kilted-rosidl-runtime-py
+  - ros-kilted-topic-tools-interfaces
+  - ros2-distro-mutex 0.12.* kilted_*
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=13
+  - libgcc >=13
+  - ros2-distro-mutex >=0.12.0,<0.13.0a0
+  - numpy >=1.23,<3
+  - python_abi 3.12.* *_cp312
+  license: BSD-3-Clause
+  size: 282634
+  timestamp: 1759314339518
+- conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-topic-tools-1.4.2-np2py312h2c707e6_14.conda
+  sha256: 62bd9d762ea31e52b53797c65299aac76b5fcde338fa06c8c88c6cd56511dabd
+  md5: 4446b919258f2933029ee279cb943e04
+  depends:
+  - python
+  - ros-kilted-rclcpp
+  - ros-kilted-rclcpp-components
+  - ros-kilted-rclpy
+  - ros-kilted-ros-workspace
+  - ros-kilted-ros2cli
+  - ros-kilted-rosidl-runtime-py
+  - ros-kilted-topic-tools-interfaces
+  - ros2-distro-mutex 0.12.* kilted_*
+  - libgcc >=13
+  - libstdcxx >=13
+  - libgcc >=13
+  - ros2-distro-mutex >=0.12.0,<0.13.0a0
+  - python_abi 3.12.* *_cp312
+  - numpy >=1.23,<3
+  license: BSD-3-Clause
+  size: 287646
+  timestamp: 1759318755946
+- conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-topic-tools-interfaces-1.4.2-np2py312h31f38b3_14.conda
+  sha256: 3f5c4779c3ae0b9a10bffc118b78c8cba8c992ce888b8d9f9f19703bfc279c19
+  md5: 56a36a76f8e6fb025a3713cb846e9d4a
+  depends:
+  - python
+  - ros-kilted-builtin-interfaces
+  - ros-kilted-ros-workspace
+  - ros-kilted-rosidl-default-runtime
+  - ros2-distro-mutex 0.12.* kilted_*
+  - libstdcxx >=13
+  - libgcc >=13
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=13
+  - numpy >=1.23,<3
+  - ros2-distro-mutex >=0.12.0,<0.13.0a0
+  - python_abi 3.12.* *_cp312
+  license: BSD-3-Clause
+  size: 318555
+  timestamp: 1759312337261
+- conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-topic-tools-interfaces-1.4.2-np2py312h2c707e6_14.conda
+  sha256: 30f78111e6b9591142318e1e48cd5d5c9c6fe2c2e783212dc36052d8941e940d
+  md5: a112b3c0b2fc29ca450603cb3d3590fc
+  depends:
+  - python
+  - ros-kilted-builtin-interfaces
+  - ros-kilted-ros-workspace
+  - ros-kilted-rosidl-default-runtime
+  - ros2-distro-mutex 0.12.* kilted_*
+  - libgcc >=13
+  - libstdcxx >=13
+  - libgcc >=13
+  - ros2-distro-mutex >=0.12.0,<0.13.0a0
+  - python_abi 3.12.* *_cp312
+  - numpy >=1.23,<3
+  license: BSD-3-Clause
+  size: 324267
+  timestamp: 1759316898989
 - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-tracetools-8.6.0-np2py312h31f38b3_14.conda
   sha256: d5566180b6d0b80437f921482c1326cc19a1317177b1e4401d33eea055ca9517
   md5: 61a009492f44fa9c8c53ee58e30abe07
