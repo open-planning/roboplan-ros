@@ -8,6 +8,7 @@ from trajectory_msgs.msg import JointTrajectory as ROSJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
 from roboplan import (
+    CartesianConfiguration,
     JointConfiguration,
     JointTrajectory,
 )
@@ -159,7 +160,7 @@ def from_joint_trajectory(ros_trajectory: ROSJointTrajectory) -> JointTrajectory
 
 
 def to_transform_stamped(
-    cartesian_configuration: roboplan.CartesianConfiguration,
+    cartesian_configuration: CartesianConfiguration,
 ) -> TransformStamped:
     """
     Converts a roboplan.CartesianConfiguration to ROS TransformStamped.
@@ -196,7 +197,7 @@ def to_transform_stamped(
 
 def from_transform_stamped(
     transform_stamped: TransformStamped,
-) -> roboplan.CartesianConfiguration:
+) -> CartesianConfiguration:
     """
     Convert ROS TransformStamped to a roboplan.CartesianConfiguration.
 
@@ -206,7 +207,7 @@ def from_transform_stamped(
     Returns:
         An equivalent roboplan.CartesianConfiguration.
     """
-    config = roboplan.CartesianConfiguration()
+    config = CartesianConfiguration()
     config.base_frame = transform_stamped.header.frame_id
     config.tip_frame = transform_stamped.child_frame_id
 
