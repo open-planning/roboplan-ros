@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include <pinocchio/spatial/se3.hpp>
 #include <roboplan/core/types.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
@@ -40,6 +41,18 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory);
 /// @return An equivalent roboplan::JointTrajectory.
 roboplan::JointTrajectory
 fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory);
+
+/// @brief Converts a roboplan::CartesianConfiguration to a ROS 2 TransformStamped message.
+/// @param cartesian_configuration The roboplan CartesianConfiguration to convert.
+/// @return An equivalent geometry_msgs::msg::TransformStamped.
+geometry_msgs::msg::TransformStamped
+toTransformStamped(const roboplan::CartesianConfiguration& cartesian_configuration);
+
+/// @brief Converts a geometry_msgs::msg::TransformStamped to a roboplan CartesianConfiguration.
+/// @param transform The ROS 2 TransformStamped message to convert.
+/// @return An equivalent roboplan::CartesianConfiguration.
+roboplan::CartesianConfiguration
+fromTransformStamped(const geometry_msgs::msg::TransformStamped& transform);
 
 /// @brief Convert ROS Pose to a 4x4 SE3 transformation matrix.
 /// @param pose ROS Pose message

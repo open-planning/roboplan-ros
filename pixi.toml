@@ -82,6 +82,7 @@ ros-kilted-robot-state-publisher = "*"
 ros-kilted-geometry-msgs = "*"
 ros-kilted-rviz2 = "*"
 ros-kilted-interactive-markers = "*"
+ros-kilted-tf2-eigen = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
@@ -100,6 +101,7 @@ ros-jazzy-robot-state-publisher = "*"
 ros-jazzy-geometry-msgs = "*"
 ros-jazzy-rviz2 = "*"
 ros-jazzy-interactive-markers = "*"
+ros-jazzy-tf2-eigen = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
@@ -118,6 +120,7 @@ ros-humble-robot-state-publisher = "*"
 ros-humble-geometry-msgs = "*"
 ros-humble-rviz2 = "*"
 ros-humble-interactive-markers = "*"
+ros-humble-tf2-eigen = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"

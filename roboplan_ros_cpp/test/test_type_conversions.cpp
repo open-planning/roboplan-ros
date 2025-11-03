@@ -39,6 +39,45 @@ TEST(ConversionTest, TestConvertToJointTrajectory) {
   ASSERT_EQ(new_roboplan_traj.accelerations, roboplan_traj.accelerations);
 }
 
+TEST(ConversionTest, TestTransformStampedConversion) {
+  // Convert a TransformStamped to CartesianConfiguration then convert it back
+  // and make sure it is the same.
+  geometry_msgs::msg::TransformStamped original_transform;
+  original_transform.header.frame_id = "world";
+  original_transform.child_frame_id = "end_effector";
+  original_transform.transform.translation.x = 1.2;
+  original_transform.transform.translation.y = -0.5;
+  original_transform.transform.translation.z = 3.7;
+
+  // Normalized quaternion (pi/2, -pi/2, pi/4)
+  original_transform.transform.rotation.w = 0.6532815;
+  original_transform.transform.rotation.x = 0.2705981;
+  original_transform.transform.rotation.y = -0.6532815;
+  original_transform.transform.rotation.z = -0.2705979;
+
+  const auto cartesian_config = fromTransformStamped(original_transform);
+  const auto converted_transform = toTransformStamped(cartesian_config);
+
+  EXPECT_EQ(original_transform.header.frame_id, converted_transform.header.frame_id);
+  EXPECT_EQ(original_transform.child_frame_id, converted_transform.child_frame_id);
+
+  EXPECT_FLOAT_EQ(original_transform.transform.translation.x,
+                  converted_transform.transform.translation.x);
+  EXPECT_FLOAT_EQ(original_transform.transform.translation.y,
+                  converted_transform.transform.translation.y);
+  EXPECT_FLOAT_EQ(original_transform.transform.translation.z,
+                  converted_transform.transform.translation.z);
+
+  EXPECT_FLOAT_EQ(original_transform.transform.rotation.w,
+                  converted_transform.transform.rotation.w);
+  EXPECT_FLOAT_EQ(original_transform.transform.rotation.x,
+                  converted_transform.transform.rotation.x);
+  EXPECT_FLOAT_EQ(original_transform.transform.rotation.y,
+                  converted_transform.transform.rotation.y);
+  EXPECT_FLOAT_EQ(original_transform.transform.rotation.z,
+                  converted_transform.transform.rotation.z);
+}
+
 TEST(ConversionTest, TestPoseToSE3) {
   // Convert a random pose to SE3 then convert it back and make sure it is the same.
   geometry_msgs::msg::Pose original_pose;
@@ -55,14 +94,13 @@ TEST(ConversionTest, TestPoseToSE3) {
   Eigen::Matrix4d transform = poseToSE3(original_pose);
   geometry_msgs::msg::Pose converted_pose = se3ToPose(transform);
 
-  const auto tolerance = 1e-8;
-  EXPECT_NEAR(original_pose.position.x, converted_pose.position.x, tolerance);
-  EXPECT_NEAR(original_pose.position.y, converted_pose.position.y, tolerance);
-  EXPECT_NEAR(original_pose.position.z, converted_pose.position.z, tolerance);
-  EXPECT_NEAR(original_pose.orientation.w, converted_pose.orientation.w, tolerance);
-  EXPECT_NEAR(original_pose.orientation.x, converted_pose.orientation.x, tolerance);
-  EXPECT_NEAR(original_pose.orientation.y, converted_pose.orientation.y, tolerance);
-  EXPECT_NEAR(original_pose.orientation.z, converted_pose.orientation.z, tolerance);
+  EXPECT_FLOAT_EQ(original_pose.position.x, converted_pose.position.x);
+  EXPECT_FLOAT_EQ(original_pose.position.y, converted_pose.position.y);
+  EXPECT_FLOAT_EQ(original_pose.position.z, converted_pose.position.z);
+  EXPECT_FLOAT_EQ(original_pose.orientation.w, converted_pose.orientation.w);
+  EXPECT_FLOAT_EQ(original_pose.orientation.x, converted_pose.orientation.x);
+  EXPECT_FLOAT_EQ(original_pose.orientation.y, converted_pose.orientation.y);
+  EXPECT_FLOAT_EQ(original_pose.orientation.z, converted_pose.orientation.z);
 }
 
 }  // namespace roboplan_ros_cpp

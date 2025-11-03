@@ -17,6 +17,7 @@
   <depend>geometry_msgs</depend>
   <depend>pinocchio</depend>
   <depend>trajectory_msgs</depend>
+  <depend>tf2_eigen</depend>
 
   <test_depend>roboplan_example_models</test_depend>
 

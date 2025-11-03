@@ -2,6 +2,7 @@ import numpy as np
 import pinocchio as pin
 
 from builtin_interfaces.msg import Duration
+from geometry_msgs.msg import TransformStamped
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from geometry_msgs.msg import Pose
 
@@ -110,6 +111,76 @@ def from_joint_trajectory(ros_trajectory: JointTrajectory) -> roboplan.JointTraj
     joint_traj.accelerations = accelerations
 
     return joint_traj
+
+
+def to_transform_stamped(
+    cartesian_configuration: roboplan.CartesianConfiguration,
+) -> TransformStamped:
+    """
+    Converts a roboplan.CartesianConfiguration to ROS TransformStamped.
+
+    Args:
+        cartesian_configuration: The roboplan.CartesianConfiguration to convert.
+
+    Returns:
+        An equivalent ROS TransformStamped message.
+    """
+    transform_stamped = TransformStamped()
+    transform_stamped.header.frame_id = cartesian_configuration.base_frame
+    transform_stamped.child_frame_id = cartesian_configuration.tip_frame
+
+    transform_stamped.transform.translation.x = float(
+        cartesian_configuration.tform[0, 3]
+    )
+    transform_stamped.transform.translation.y = float(
+        cartesian_configuration.tform[1, 3]
+    )
+    transform_stamped.transform.translation.z = float(
+        cartesian_configuration.tform[2, 3]
+    )
+
+    rotation = cartesian_configuration.tform[:3, :3]
+    quat = pin.Quaternion(rotation)
+    transform_stamped.transform.rotation.w = float(quat.w)
+    transform_stamped.transform.rotation.x = float(quat.x)
+    transform_stamped.transform.rotation.y = float(quat.y)
+    transform_stamped.transform.rotation.z = float(quat.z)
+
+    return transform_stamped
+
+
+def from_transform_stamped(
+    transform_stamped: TransformStamped,
+) -> roboplan.CartesianConfiguration:
+    """
+    Convert ROS TransformStamped to a roboplan.CartesianConfiguration.
+
+    Args:
+        transform_stamped: The ROS TransformStamped message to convert.
+
+    Returns:
+        An equivalent roboplan.CartesianConfiguration.
+    """
+    config = roboplan.CartesianConfiguration()
+    config.base_frame = transform_stamped.header.frame_id
+    config.tip_frame = transform_stamped.child_frame_id
+
+    position = np.array(
+        [
+            transform_stamped.transform.translation.x,
+            transform_stamped.transform.translation.y,
+            transform_stamped.transform.translation.z,
+        ]
+    )
+    quaternion = pin.Quaternion(
+        transform_stamped.transform.rotation.w,
+        transform_stamped.transform.rotation.x,
+        transform_stamped.transform.rotation.y,
+        transform_stamped.transform.rotation.z,
+    )
+    config.tform = pin.SE3(quaternion, position).homogeneous
+
+    return config
 
 
 def pose_to_se3(pose: Pose) -> np.ndarray:

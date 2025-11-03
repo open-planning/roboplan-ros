@@ -12,6 +12,7 @@ find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(trajectory_msgs REQUIRED)
+find_package(tf2_eigen REQUIRED)
 
 add_library(roboplan_ros_cpp SHARED
     src/type_conversions.cpp
@@ -27,6 +28,7 @@ target_link_libraries(roboplan_ros_cpp
     roboplan_simple_ik::roboplan_simple_ik
     Eigen3::Eigen
     pinocchio::pinocchio
+    ${tf2_eigen_TARGETS}
     ${trajectory_msgs_TARGETS}
     ${geometry_msgs_TARGETS}
 )
@@ -36,6 +38,7 @@ ament_export_dependencies(
   roboplan_simple_ik
   Eigen3
   pinocchio
+  tf2_eigen
   trajectory_msgs
   geometry_msgs
 )
