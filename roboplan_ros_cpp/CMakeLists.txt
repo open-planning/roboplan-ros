@@ -7,7 +7,6 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(roboplan REQUIRED)
-find_package(roboplan_simple_ik REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
@@ -16,7 +15,6 @@ find_package(tf2_eigen REQUIRED)
 
 add_library(roboplan_ros_cpp SHARED
     src/type_conversions.cpp
-    src/kinematics.cpp
 )
 target_include_directories(roboplan_ros_cpp PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -25,7 +23,6 @@ target_include_directories(roboplan_ros_cpp PUBLIC
 target_link_libraries(roboplan_ros_cpp
   PUBLIC
     roboplan::roboplan
-    roboplan_simple_ik::roboplan_simple_ik
     Eigen3::Eigen
     pinocchio::pinocchio
     ${tf2_eigen_TARGETS}
@@ -35,7 +32,6 @@ target_link_libraries(roboplan_ros_cpp
 set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
 ament_export_dependencies(
   roboplan
-  roboplan_simple_ik
   Eigen3
   pinocchio
   tf2_eigen
