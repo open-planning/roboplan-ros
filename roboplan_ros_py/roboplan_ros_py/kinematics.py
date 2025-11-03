@@ -1,9 +1,6 @@
 import numpy as np
 
 from typing import Optional
-from geometry_msgs.msg import Pose
-
-from roboplan_ros_py.type_conversions import pose_to_se3
 
 from roboplan import (
     Scene,
@@ -33,6 +30,9 @@ class RoboPlanIK:
         """
         Construct an IK solver.
 
+        A thin wrapper around the RoboPlan SimpleIK class that manages joint states and group
+        indices. Callers can expect to use the full set of joint states for the Scene.
+
         Args:
             scene: RoboPlan Scene object.
             group_name: Name of the joint group to use.
@@ -46,23 +46,27 @@ class RoboPlanIK:
         self.tip_frame = tip_frame
         self.options = options
 
-        # Initialize the IK solver
-        self.ik_solver_ = SimpleIk(self.scene, self.options)
+        # Initialize the IK solver and configurations
+        self._ik_solver = SimpleIk(self.scene, self.options)
+        self._start = JointConfiguration()
+        self._goal = CartesianConfiguration()
+        self._goal.base_frame = self.base_frame
+        self._goal.tip_frame = self.tip_frame
 
         # Get joint group information
         self.joint_group_info_ = scene.getJointGroupInfo(group_name)
-        self.q_indices_ = self.joint_group_info_.q_indices
+        self._q_indices = self.joint_group_info_.q_indices
 
     def solve_ik(
         self,
-        target_pose: Pose,
+        target_transform: np.ndarray,
         seed_state: Optional[np.ndarray] = None,
     ) -> Optional[np.ndarray]:
         """
-        Solve IK for a target pose.
+        Solve IK for a target transform.
 
         Args:
-            target_pose: ROS Pose message with target position and orientation.
+            target_transform: A pin.SE3 4x4 transformation matrix.
             seed_state: Optional seed joint positions, defaults to current pose.
 
         Returns:
@@ -70,27 +74,20 @@ class RoboPlanIK:
         """
         cur_pos_full = np.array(self.scene.getCurrentJointPositions())
         if seed_state is None:
-            seed_state = cur_pos_full[self.q_indices_]
+            seed_state = cur_pos_full[self._q_indices]
         else:
             if len(seed_state) == len(cur_pos_full):
-                seed_state = seed_state[self.q_indices_]
-
-        target_transform = pose_to_se3(target_pose)
+                seed_state = seed_state[self._q_indices]
 
         # Setup start and goal configurations
-        start = JointConfiguration()
-        start.positions = seed_state
-
-        goal = CartesianConfiguration()
-        goal.base_frame = self.base_frame
-        goal.tip_frame = self.tip_frame
-        goal.tform = target_transform
+        self._start.positions = seed_state
+        self._goal.tform = target_transform
 
         # Solve
         solution = JointConfiguration()
-        result = self.ik_solver_.solveIk(goal, start, solution)
+        result = self._ik_solver.solveIk(self._goal, self._start, solution)
         if result:
-            cur_pos_full[self.q_indices_] = solution.positions
+            cur_pos_full[self._q_indices] = solution.positions
             return cur_pos_full
         else:
             return None

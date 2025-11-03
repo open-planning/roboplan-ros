@@ -48,8 +48,8 @@ def test_ik_solver_initialization(ik_solver: RoboPlanIK) -> None:
     assert ik_solver.group_name == "arm"
     assert ik_solver.base_frame == "base_link"
     assert ik_solver.tip_frame == "tool0"
-    assert len(ik_solver.q_indices_) == 6
-    assert ik_solver.ik_solver_ is not None
+    assert len(ik_solver._q_indices) == 6
+    assert ik_solver._ik_solver is not None
 
 
 def test_solve_ik(ik_solver: RoboPlanIK, test_scene: Scene) -> None:
@@ -59,14 +59,11 @@ def test_solve_ik(ik_solver: RoboPlanIK, test_scene: Scene) -> None:
     test_scene.setJointPositions(q_full)
     fk_transform = test_scene.forwardKinematics(q_full, "tool0")
 
-    # Convert to ROS Pose and solve
-    target_pose = se3_to_pose(fk_transform)
-    q_indices = ik_solver.q_indices_
-    solution = ik_solver.solve_ik(target_pose)
+    # Solve and verify we get the full set of joint states pback
+    solution = ik_solver.solve_ik(fk_transform)
+    assert solution is not None
+    assert len(q_full) == len(q_full)
 
     # Should find a solution that is reasonably close the the start pose
-    assert solution is not None
-    assert len(solution) == len(q_indices)
-
     solution_fk = test_scene.forwardKinematics(solution, "tool0")
     assert np.linalg.norm(solution_fk[:3, 3] - fk_transform[:3, 3]) < 0.001

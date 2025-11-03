@@ -25,10 +25,9 @@ from visualization_msgs.msg import (
     InteractiveMarkerFeedback,
     Marker,
 )
-
 from roboplan import Scene, SimpleIkOptions
 from roboplan_ros_py.kinematics import RoboPlanIK
-from roboplan_ros_py.type_conversions import se3_to_pose
+from roboplan_ros_py.type_conversions import pose_to_se3, se3_to_pose
 
 
 class InteractiveMarkerIK:
@@ -87,9 +86,7 @@ class InteractiveMarkerIK:
 
         # Set initial states based on the state of the scene
         self.last_joint_positions = self.scene.getCurrentJointPositions()
-        se3_pose = scene.forwardKinematics(
-            self.last_joint_positions, self._ik_solver.tip_frame
-        )
+        se3_pose = scene.forwardKinematics(self.last_joint_positions, self.tip_link)
         self._current_pose = se3_to_pose(se3_pose)
         self._target_pose = self._current_pose
 
@@ -147,7 +144,7 @@ class InteractiveMarkerIK:
         Constructs a new interactive marker at the specified pose.
         """
         int_marker = InteractiveMarker()
-        int_marker.header.frame_id = self._ik_solver.base_frame
+        int_marker.header.frame_id = self.base_link
         int_marker.name = "ik_target"
         int_marker.description = f"IK Target Pose for {self.joint_group}"
         int_marker.pose = pose
@@ -241,8 +238,10 @@ class InteractiveMarkerIK:
         """
         Solve IK for the latest set target pose.
         """
+        # Get the transform for the target pose and solve
+        transform = pose_to_se3(self._target_pose)
         joint_positions = self._ik_solver.solve_ik(
-            self._target_pose, seed_state=self.last_joint_positions
+            transform, seed_state=self.last_joint_positions
         )
 
         if joint_positions is not None:
