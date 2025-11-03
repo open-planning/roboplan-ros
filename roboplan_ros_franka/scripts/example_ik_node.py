@@ -25,21 +25,37 @@ class InteractiveMarkerIKNode(Node):
     def __init__(self):
         super().__init__("interactive_marker_ik_node")
 
-        # Hardcoded Franka FR3 configuration
-        self.joint_group = "fr3_arm"
-        self.base_link = "fr3_link0"
-        self.tip_link = "fr3_hand"
+        # Declare parameters with Franka FR3 defaults
+        self.declare_parameter("joint_group", "fr3_arm")
+        self.declare_parameter("base_link", "fr3_link0")
+        self.declare_parameter("tip_link", "fr3_hand")
+        self.declare_parameter("robot_description_package", "roboplan_example_models")
+        self.declare_parameter("urdf_filename", "fr3.urdf")
+        self.declare_parameter("srdf_filename", "fr3.srdf")
+        self.declare_parameter("yaml_config_filename", "fr3_config.yaml")
+
+        # Get parameter values
+        self.joint_group = self.get_parameter("joint_group").value
+        self.base_link = self.get_parameter("base_link").value
+        self.tip_link = self.get_parameter("tip_link").value
+        robot_description_package = self.get_parameter(
+            "robot_description_package"
+        ).value
+        urdf_filename = self.get_parameter("urdf_filename").value
+        srdf_filename = self.get_parameter("srdf_filename").value
+        yaml_config_filename = self.get_parameter("yaml_config_filename").value
 
         # Get robot description files
         models_dir = os.path.join(
-            get_package_share_directory("roboplan_example_models"),
+            get_package_share_directory(robot_description_package),
             "models",
             "franka_robot_model",
         )
+        self.get_logger().info(f"Loading configuration from {models_dir}...")
 
-        urdf_path = os.path.join(models_dir, "fr3.urdf")
-        srdf_path = os.path.join(models_dir, "fr3.srdf")
-        yaml_config_path = os.path.join(models_dir, "fr3_config.yaml")
+        urdf_path = os.path.join(models_dir, urdf_filename)
+        srdf_path = os.path.join(models_dir, srdf_filename)
+        yaml_config_path = os.path.join(models_dir, yaml_config_filename)
 
         # Process files with xacro
         self.get_logger().info("Processing URDF and SRDF with xacro...")
@@ -48,7 +64,7 @@ class InteractiveMarkerIKNode(Node):
 
         # Create the RoboPlan scene
         self.get_logger().info("Creating RoboPlan scene...")
-        package_paths = [get_package_share_directory("roboplan_example_models")]
+        package_paths = [get_package_share_directory(robot_description_package)]
 
         self.scene = Scene(
             name="franka_ik_scene",
@@ -122,7 +138,7 @@ def main(args=None):
     rclpy.init(args=args)
     node = InteractiveMarkerIKNode()
 
-    executor = MultiThreadedExecutor(num_threads=4)
+    executor = MultiThreadedExecutor()
     executor.add_node(node)
 
     try:

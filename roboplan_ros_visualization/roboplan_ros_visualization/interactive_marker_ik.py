@@ -2,7 +2,6 @@
 
 import os
 import threading
-import uuid
 from collections.abc import Callable
 from typing import Optional
 import numpy as np
@@ -15,7 +14,6 @@ from rclpy.qos import (
     QoSHistoryPolicy,
     QoSDurabilityPolicy,
 )
-
 from geometry_msgs.msg import Pose
 from sensor_msgs.msg import JointState
 from interactive_markers import InteractiveMarkerServer
@@ -33,7 +31,7 @@ from roboplan_ros_py.type_conversions import pose_to_se3, se3_to_pose
 class InteractiveMarkerIK:
     """
     Utility for creating an interactive marker in RViz and passing published
-    Poses to an IK solver. Useful for nodes that ingest poses from users and
+    poses to an IK solver. Useful for nodes that ingest poses from users and
     publish or process IK solutions for those poses.
     """
 
@@ -46,6 +44,7 @@ class InteractiveMarkerIK:
         tip_link: str,
         options: SimpleIkOptions = SimpleIkOptions(),
         solve_callback: Optional[Callable] = None,
+        node_name: str = "imarker_ik_node",
         namespace: str = "/roboplan_ik",
     ):
         """
@@ -58,8 +57,9 @@ class InteractiveMarkerIK:
             base_link: Base link of the IK chain.
             tip_link: Tip link of the iK chain.
             options: Options for the IK solver.
-            solve_callback: Callback function to immediately handle IK solutions
-            namespace: Namespace for the InteractiveMarkerServer and JointStatePublisher
+            solve_callback: Callback function to immediately handle IK solutions.
+            node_name: Name for the dedicated Node for callbacks to the IK marker.
+            namespace: Namespace for the InteractiveMarkerServer and JointStatePublisher.
         """
         self.node = node
         self.scene = scene
@@ -93,9 +93,7 @@ class InteractiveMarkerIK:
         # Create a separate node for the marker server with its own executor. There are likely
         # better solutions but in the interim this removes all latency to let updates be processed
         # as soon as they come in, otherwise the server seems to get hung up.
-        self._marker_node = Node(
-            "interactive_marker_node" + str(uuid.uuid4()).replace("-", "_")[:8]
-        )
+        self._marker_node = Node(node_name)
         self._ik_server = InteractiveMarkerServer(self._marker_node, self.namespace)
         self._create_interactive_marker(self._current_pose)
         self._ik_server.applyChanges()
