@@ -7,11 +7,7 @@ from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory as ROSJointTrajectory
 from trajectory_msgs.msg import JointTrajectoryPoint
 
-from roboplan import (
-    CartesianConfiguration,
-    JointConfiguration,
-    JointTrajectory,
-)
+from roboplan.core import JointTrajectory, JointConfiguration, CartesianConfiguration
 
 
 def to_duration(time_sec: float) -> Duration:
