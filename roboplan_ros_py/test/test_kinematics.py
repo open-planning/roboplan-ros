@@ -2,11 +2,9 @@ import pytest
 import numpy as np
 from pathlib import Path
 
-from roboplan import (
-    get_package_share_dir,
-    Scene,
-    SimpleIkOptions,
-)
+from roboplan.example_models import get_package_share_dir
+from roboplan.core import Scene
+from roboplan.simple_ik import SimpleIkOptions
 
 from roboplan_ros_py.kinematics import RoboPlanIK
 from roboplan_ros_py.type_conversions import se3_to_pose

@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from geometry_msgs.msg import Pose, TransformStamped
 
-import roboplan
+from roboplan.core import JointConfiguration, JointTrajectory
 from roboplan_ros_py.type_conversions import (
     to_joint_state,
     from_joint_state,
@@ -16,7 +16,7 @@ from roboplan_ros_py.type_conversions import (
 
 
 def test_joint_state():
-    joint_configuration = roboplan.JointConfiguration()
+    joint_configuration = JointConfiguration()
     joint_configuration.joint_names = ["joint1", "joint2"]
     joint_configuration.positions = np.array([0.0, 1.0])
     joint_configuration.velocities = np.array([2.0, 3.0])
@@ -39,7 +39,7 @@ def test_joint_state():
 
 
 def test_empty_conversions():
-    roboplan_traj = roboplan.JointTrajectory()
+    roboplan_traj = JointTrajectory()
     ros_traj = to_joint_trajectory(roboplan_traj)
     assert len(ros_traj.joint_names) == 0
 
@@ -50,7 +50,7 @@ def test_empty_conversions():
 def test_convert_to_joint_trajectory():
     # Create a roboplan trajectory with two joints and two points, convert it to/from
     # ROS and ensure we get the same data back.
-    roboplan_traj = roboplan.JointTrajectory()
+    roboplan_traj = JointTrajectory()
     roboplan_traj.joint_names = ["joint1", "joint2"]
     roboplan_traj.times = [0.0, 1.0]
     roboplan_traj.positions = [np.array([0.0, 0.0]), np.array([1.0, -1.0])]
