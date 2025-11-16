@@ -4,12 +4,54 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <pinocchio/spatial/se3.hpp>
+#include <roboplan/core/scene.hpp>
 #include <roboplan/core/types.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
+#include <tl/expected.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
 
 namespace roboplan_ros_cpp {
+
+/// @brief Pre-computed mapping for ROS JointState to RoboPlan type conversions.
+/// @details JointState messages may be in different orders, will not contain mimic states, and
+/// have different representation of continuous types. This structure maintains a mapping
+/// from ROS JointStates to RoboPlan JointConfigurations to enable efficient conversion
+/// from one type to the other.
+struct JointStateConverterMap {
+  struct JointMapping {
+    /// @brief the String name of the joint.
+    std::string joint_name;
+
+    /// @brief Index in the ROS JointState type.
+    size_t ros_index;
+
+    /// @brief The start index in the positions vector.
+    size_t q_start;
+
+    /// @brief The start index in velocities vector.
+    size_t v_start;
+
+    /// @brief The RoboPlan type of the Joint.
+    roboplan::JointType type;
+  };
+
+  /// @brief Index of JointState joints in the Scene.
+  std::vector<JointMapping> mappings;
+
+  /// @brief Number of position states in the Scene.
+  size_t nq;
+
+  /// @brief Numbef of velocity states in the Scene.
+  size_t nv;
+};
+
+/// @brief Constructs a JointState conversion map given a RoboPlan scene and JointState message.
+/// @param scene The RoboPlan Scene.
+/// @param joint_state Sample ROS joint_state message.
+/// @return The joint information struct if successful, else a string describing the error.
+tl::expected<JointStateConverterMap, std::string>
+buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointState& joint_state);
 
 /// @brief Converts a double timestamp to an equivalent ROS Duration.
 /// @param time Timestamp in seconds.

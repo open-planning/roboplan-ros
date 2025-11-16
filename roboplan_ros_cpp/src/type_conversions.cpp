@@ -4,6 +4,58 @@
 
 namespace roboplan_ros_cpp {
 
+tl::expected<JointStateConverterMap, std::string>
+buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointState& joint_state) {
+  // Setup a mapping joint names to their index in the joint state
+  const auto ros_joint_names = joint_state.name;
+  std::unordered_map<std::string, size_t> ros_map;
+  ros_map.reserve(ros_joint_names.size());
+  for (size_t i = 0; i < ros_joint_names.size(); ++i) {
+    ros_map[ros_joint_names[i]] = i;
+  }
+
+  // Pull out actuated joint state sizes
+  const auto& model = scene.getModel();
+  JointStateConverterMap conversion_map;
+  conversion_map.nq = model.nq;
+  conversion_map.nv = model.nv;
+  conversion_map.mappings.reserve(scene.getActuatedJointNames().size());
+
+  // For each joint name, determine type and it's location in the Scene's configuration,
+  // and put it into the mapping.
+  for (const auto& joint_name : scene.getJointNames()) {
+    const auto joint_info = scene.getJointInfo(joint_name);
+    if (!joint_info) {
+      return tl::make_unexpected("Failed to get joint info for: " + joint_name);
+    }
+    const auto& info = joint_info.value();
+
+    // No need to handle mimic joints
+    if (info.mimic_info) {
+      continue;
+    }
+
+    // TODO: Do we actually need this?
+    auto it = ros_map.find(joint_name);
+    if (it == ros_map.end()) {
+      return tl::make_unexpected("Actuated joint: " + joint_name + ", not in list!");
+    }
+
+    // Grab the joint info and store the relevant information
+    const auto joint_id = model.getJointId(joint_name);
+    const auto q_idx = model.idx_qs[joint_id];
+    const auto v_idx = model.idx_vs[joint_id];
+    JointStateConverterMap::JointMapping mapping{.joint_name = joint_name,
+                                                 .ros_index = it->second,
+                                                 .q_start = static_cast<size_t>(q_idx),
+                                                 .v_start = static_cast<size_t>(v_idx),
+                                                 .type = info.type};
+    conversion_map.mappings.push_back(mapping);
+  }
+
+  return conversion_map;
+}
+
 sensor_msgs::msg::JointState toJointState(const roboplan::JointConfiguration& joint_configuration) {
   sensor_msgs::msg::JointState joint_state;
 

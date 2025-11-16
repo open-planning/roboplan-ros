@@ -4,6 +4,80 @@
 
 namespace roboplan_ros_cpp {
 
+// Sample URDF and SRDF for testing ROS to RoboPlan joint mappings
+// for different types of joints.
+const std::string URDF = R"(
+<robot name="robot">
+  <link name="base_link"/>
+  <link name="link1" />
+  <link name="link2" />
+  <link name="link3" />
+  <joint name="continuous_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="revolute_joint" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
+  </joint>
+  <joint name="mimic_joint" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
+    <mimic joint="revolute_joint" multiplier="1.0" offset="0.0"/>
+  </joint>
+</robot>
+)";
+
+const std::string SRDF = R"(
+<robot name="robot">
+  <group name="arm">
+    <joint name="revolute_joint"/>
+    <joint name="mimic_joint"/>
+  </group>
+  <disable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
+  <disable_collisions link1="link1" link2="link2" reason="Adjacent"/>
+  <disable_collisions link1="link2" link2="link3" reason="Adjacent"/>
+</robot>
+)";
+
+TEST(TypeConversions, TestJointStateMapping) {
+  // Setup the Scene and ROS JointState message
+  const auto scene = roboplan::Scene("test_scene", URDF, SRDF);
+  sensor_msgs::msg::JointState joint_state;
+  joint_state.name = {"continuous_joint", "revolute_joint"};
+
+  // Build the conversion map
+  auto conversion_map_maybe = buildConversionMap(scene, joint_state);
+  ASSERT_TRUE(conversion_map_maybe.has_value());
+  const auto conversion_map = conversion_map_maybe.value();
+
+  // Confirm that there are two actuated joints of the correct type and order
+  const auto& model = scene.getModel();
+  ASSERT_EQ(conversion_map.mappings.size(), 2);
+  EXPECT_EQ(conversion_map.nq, model.nq);
+  EXPECT_EQ(conversion_map.nv, model.nv);
+  EXPECT_EQ(conversion_map.mappings[0].type, roboplan::JointType::CONTINUOUS);
+  EXPECT_EQ(conversion_map.mappings[1].type, roboplan::JointType::REVOLUTE);
+
+  // Check each mapping
+  for (size_t i = 0; i < conversion_map.mappings.size(); ++i) {
+    const auto& mapping = conversion_map.mappings[i];
+    EXPECT_EQ(mapping.joint_name, joint_state.name[i]);
+    EXPECT_EQ(mapping.ros_index, i);
+    const auto joint_id = model.getJointId(mapping.joint_name);
+    EXPECT_EQ(mapping.q_start, model.idx_qs[joint_id]);
+    EXPECT_EQ(mapping.v_start, model.idx_vs[joint_id]);
+  }
+}
+
 TEST(TypeConversions, TestConvertJointState) {
   roboplan::JointConfiguration joint_configuration;
   joint_configuration.joint_names = {"joint1", "joint2"};
