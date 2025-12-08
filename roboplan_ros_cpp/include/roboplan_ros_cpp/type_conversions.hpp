@@ -72,14 +72,20 @@ inline double fromDuration(const builtin_interfaces::msg::Duration& duration) {
 
 /// @brief Converts a roboplan::JointConfiguration object to a ROS 2 JointState message.
 /// @param joint_configuration The roboplan JointConfiguration to convert
-/// @return An equivalent ROS 2 JointState message.
-sensor_msgs::msg::JointState toJointState(const roboplan::JointConfiguration& joint_configuration);
+/// @param scene The RoboPlan scene containing the model's joint information.
+/// @return An equivalent ROS 2 JointState message, or an error.
+tl::expected<sensor_msgs::msg::JointState, std::string>
+toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& scene);
 
 /// @brief Convert the provided ROS 2 JointState message to an equivalent
 /// roboplan::JointConfiguration.
 /// @param joint_state The ROS 2 JointState message to convert.
-/// @return An equivalent roboplan::JointConfiguration.
-roboplan::JointConfiguration fromJointState(const sensor_msgs::msg::JointState& joint_state);
+/// @param scene The RoboPlan scene containing the model's joint information.
+/// @param joint_conversion_map A mapping of joint names to their indexes in the model.
+/// @return An equivalent roboplan::JointConfiguration, or an error.
+tl::expected<roboplan::JointConfiguration, std::string>
+fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::Scene& scene,
+               const JointStateConverterMap& joint_conversion_map);
 
 /// @brief Converts a roboplan::JointTrajectory object to a ROS 2 JointTrajectory message.
 /// @details This function will convert joint names and joint trajectory points. The caller

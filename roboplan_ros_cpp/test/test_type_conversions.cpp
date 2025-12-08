@@ -79,19 +79,37 @@ TEST(TypeConversions, TestJointStateMapping) {
 }
 
 TEST(TypeConversions, TestConvertJointState) {
+  // Setup the Scene and ROS JointState message
+  auto scene = roboplan::Scene("test_scene", URDF, SRDF);
+  scene.setRngSeed(1234);
+  sensor_msgs::msg::JointState joint_state;
+  joint_state.name = scene.getActuatedJointNames();
+
+  // Build the conversion map
+  auto conversion_map_maybe = buildConversionMap(scene, joint_state);
+  ASSERT_TRUE(conversion_map_maybe.has_value());
+  const auto conversion_map = conversion_map_maybe.value();
+
+  // Setup a joint configuration
   roboplan::JointConfiguration joint_configuration;
-  joint_configuration.joint_names = {"joint1", "joint2"};
-  joint_configuration.positions = Eigen::VectorXd(2);
-  joint_configuration.positions << 0.0, 1.0;
-  joint_configuration.velocities = Eigen::VectorXd(2);
-  joint_configuration.velocities << 2.0, 3.0;
-  joint_configuration.accelerations = Eigen::VectorXd(2);
-  joint_configuration.accelerations << 4.0, 5.0;
+  joint_configuration.joint_names = scene.getJointNames();
+  joint_configuration.positions = scene.randomPositions();
+  joint_configuration.velocities = Eigen::VectorXd::Zero(conversion_map.nv);
+  joint_configuration.accelerations = Eigen::VectorXd::Zero(conversion_map.nv);
 
   // Convert back and forth and we should get the same values
-  sensor_msgs::msg::JointState joint_state = roboplan_ros_cpp::toJointState(joint_configuration);
-  roboplan::JointConfiguration check_joint_configuration =
-      roboplan_ros_cpp::fromJointState(joint_state);
+  const auto ros_joint_state_maybe = roboplan_ros_cpp::toJointState(joint_configuration, scene);
+  ASSERT_TRUE(ros_joint_state_maybe.has_value());
+  const auto ros_joint_state = ros_joint_state_maybe.value();
+  ASSERT_EQ(ros_joint_state.name.size(), 2);
+
+  const auto check_joint_configuration_maybe =
+      roboplan_ros_cpp::fromJointState(ros_joint_state, scene, conversion_map);
+  if (!check_joint_configuration_maybe.has_value()) {
+    std::cout << check_joint_configuration_maybe.error() << std::endl;
+  }
+  ASSERT_TRUE(check_joint_configuration_maybe.has_value());
+  const auto check_joint_configuration = check_joint_configuration_maybe.value();
 
   ASSERT_EQ(joint_configuration.joint_names, check_joint_configuration.joint_names);
   ASSERT_TRUE(joint_configuration.positions.isApprox(check_joint_configuration.positions));

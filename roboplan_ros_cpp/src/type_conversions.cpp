@@ -35,10 +35,10 @@ buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointSt
       continue;
     }
 
-    // TODO: Do we actually need this?
+    // TODO: This might not actually be worth failing for
     auto it = ros_map.find(joint_name);
     if (it == ros_map.end()) {
-      return tl::make_unexpected("Actuated joint: " + joint_name + ", not in list!");
+      return tl::make_unexpected("Actuated joint: " + joint_name + ", not in the ROS message!");
     }
 
     // Grab the joint info and store the relevant information
@@ -56,46 +56,87 @@ buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointSt
   return conversion_map;
 }
 
-sensor_msgs::msg::JointState toJointState(const roboplan::JointConfiguration& joint_configuration) {
-  sensor_msgs::msg::JointState joint_state;
+tl::expected<sensor_msgs::msg::JointState, std::string>
+toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& scene) {
+  const auto& model = scene.getModel();
 
-  joint_state.name = joint_configuration.joint_names;
+  sensor_msgs::msg::JointState msg;
+  msg.name.reserve(scene.getActuatedJointNames().size());
+  msg.position.reserve(scene.getActuatedJointNames().size());
+  msg.velocity.reserve(scene.getActuatedJointNames().size());
+  msg.effort.reserve(scene.getActuatedJointNames().size());
 
-  joint_state.position.resize(joint_configuration.positions.size());
-  for (int i = 0; i < joint_configuration.positions.size(); ++i) {
-    joint_state.position[i] = joint_configuration.positions[i];
+  for (const auto& joint_name : scene.getJointNames()) {
+    const auto joint_info = scene.getJointInfo(joint_name);
+    if (!joint_info) {
+      return tl::make_unexpected("Failed to get joint info: " + joint_name);
+    }
+    const auto& info = joint_info.value();
+    if (info.mimic_info) {
+      continue;
+    }
+
+    const auto joint_id = model.getJointId(joint_name);
+    const auto q_idx = model.idx_qs[joint_id];
+    const auto v_idx = model.idx_vs[joint_id];
+
+    msg.name.push_back(joint_name);
+    if (info.type == roboplan::JointType::CONTINUOUS) {
+      const double theta = std::atan2(config.positions(q_idx + 1), config.positions(q_idx));
+      msg.position.push_back(theta);
+    } else {
+      msg.position.push_back(config.positions(q_idx));
+    }
+
+    msg.velocity.push_back(v_idx < config.velocities.size() ? config.velocities(v_idx) : 0.0);
+    msg.effort.push_back(v_idx < config.accelerations.size() ? config.accelerations(v_idx) : 0.0);
   }
 
-  joint_state.velocity.resize(joint_configuration.velocities.size());
-  for (int i = 0; i < joint_configuration.velocities.size(); ++i) {
-    joint_state.velocity[i] = joint_configuration.velocities[i];
-  }
-
-  // Effort != acceleration but including and kind of abusing the interface.
-  joint_state.effort.resize(joint_configuration.accelerations.size());
-  for (int i = 0; i < joint_configuration.accelerations.size(); ++i) {
-    joint_state.effort[i] = joint_configuration.accelerations[i];
-  }
-
-  return joint_state;
+  return msg;
 }
 
-roboplan::JointConfiguration fromJointState(const sensor_msgs::msg::JointState& joint_state) {
-  roboplan::JointConfiguration joint_configuration;
+tl::expected<roboplan::JointConfiguration, std::string>
+fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::Scene& scene,
+               const JointStateConverterMap& conversion_map) {
+  roboplan::JointConfiguration config;
+  config.joint_names = scene.getJointNames();
+  const auto current_positions = scene.getCurrentJointPositions();
+  config.positions = Eigen::VectorXd::Zero(current_positions.size());
+  config.velocities = Eigen::VectorXd::Zero(conversion_map.nv);
+  config.accelerations = Eigen::VectorXd::Zero(conversion_map.nv);
 
-  joint_configuration.joint_names = joint_state.name;
+  // Process actuated joints using pre-computed indices
+  for (const auto& mapping : conversion_map.mappings) {
+    const size_t ros_idx = mapping.ros_index;
 
-  joint_configuration.positions =
-      Eigen::VectorXd::Map(joint_state.position.data(), joint_state.position.size());
+    if (ros_idx >= joint_state.position.size()) {
+      return tl::make_unexpected("Missing position data for joint '" + mapping.joint_name + "'");
+    }
 
-  joint_configuration.velocities =
-      Eigen::VectorXd::Map(joint_state.velocity.data(), joint_state.velocity.size());
+    if (mapping.type == roboplan::JointType::CONTINUOUS) {
+      const double theta = joint_state.position[ros_idx];
+      config.positions(mapping.q_start) = std::cos(theta);
+      config.positions(mapping.q_start + 1) = std::sin(theta);
+      if (ros_idx < joint_state.velocity.size()) {
+        config.velocities(mapping.v_start) = joint_state.velocity[ros_idx];
+      }
+      if (ros_idx < joint_state.effort.size()) {
+        config.accelerations(mapping.v_start) = joint_state.effort[ros_idx];
+      }
+    } else {
+      config.positions(mapping.q_start) = joint_state.position[ros_idx];
 
-  // Effort != acceleration but including and kind of abusing the interface.
-  joint_configuration.accelerations =
-      Eigen::VectorXd::Map(joint_state.effort.data(), joint_state.effort.size());
+      if (ros_idx < joint_state.velocity.size()) {
+        config.velocities(mapping.v_start) = joint_state.velocity[ros_idx];
+      }
+      if (ros_idx < joint_state.effort.size()) {
+        config.accelerations(mapping.v_start) = joint_state.effort[ros_idx];
+      }
+    }
+  }
 
-  return joint_configuration;
+  scene.applyMimics(config.positions);
+  return config;
 }
 
 trajectory_msgs::msg::JointTrajectory
