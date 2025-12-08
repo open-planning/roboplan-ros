@@ -33,13 +33,6 @@ def generate_launch_description():
     )
 
     nodes = [
-        # Throttle joint states for the sample node since we don't need things at high rates
-        Node(
-            package="topic_tools",
-            executable="throttle",
-            name="joint_state_throttler",
-            arguments=["messages", "/joint_states", "5.0", "/joint_states_throttled"],
-        ),
         Node(
             package="roboplan_ros_franka",
             executable="example_ik_node.py",
