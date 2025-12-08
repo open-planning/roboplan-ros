@@ -48,6 +48,7 @@ viser = ">=1.0.11,<2"
 tyro = ">=0.9.32,<0.10"
 matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
+numpy = ">=1.26.4,<3"
 
 # For ROS, should be available across distros
 lttng-ust = ">=2.13.9,<3"
