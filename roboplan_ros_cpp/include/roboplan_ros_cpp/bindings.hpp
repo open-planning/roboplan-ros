@@ -6,18 +6,27 @@
 
 namespace nb = nanobind;
 
+// Static, non-owned pointer to the imported module.
+// The object itself will be destroyed by the python application.
+inline nb::object get_rclpy_serialization() {
+  static nb::object* rclpy_serial = nullptr;
+  if (!rclpy_serial) {
+    rclpy_serial = new nb::object(nb::module_::import_("rclpy.serialization"));
+  }
+  return *rclpy_serial;
+}
+
 /// @brief Template for converting Python ROS 2 message types to their C++ equivalents.
 /// @details Conversion is done using rclcpp's serialization utility, which converts messages
-/// to raw bytes and back.
+/// to raw bytes and back.e
 /// @param py_msg The python ROS 2 message.
 /// @return An equivalent C++ ROS 2 message.
 template <typename ROSMsgType> ROSMsgType pyToMsg(nb::handle py_msg) {
   // Serialize with rclpy
-  nb::module_ rclpy_serial = nb::module_::import_("rclpy.serialization");
-  nb::object serialize_func = rclpy_serial.attr("serialize_message");
-  nb::bytes serialized_data = nb::cast<nb::bytes>(serialize_func(py_msg));
+  auto serialize_func = get_rclpy_serialization().attr("serialize_message");
+  auto serialized_data = nb::cast<nb::bytes>(serialize_func(py_msg));
   const auto data = serialized_data.c_str();
-  size_t size = serialized_data.size();
+  const auto size = serialized_data.size();
 
   // Then deserialize with rclcpp
   rclcpp::SerializedMessage serialized_msg(size);
@@ -45,7 +54,6 @@ nb::object msgToPy(const ROSMsgType& cpp_msg, nb::object py_msg_class) {
   // Then deserialize with rclpy
   auto& rcl_msg = serialized_msg.get_rcl_serialized_message();
   nb::bytes serialized_data(reinterpret_cast<const char*>(rcl_msg.buffer), rcl_msg.buffer_length);
-  nb::module_ rclpy_serial = nb::module_::import_("rclpy.serialization");
-  nb::object deserialize_func = rclpy_serial.attr("deserialize_message");
+  auto deserialize_func = get_rclpy_serialization().attr("deserialize_message");
   return deserialize_func(serialized_data, py_msg_class);
 }
