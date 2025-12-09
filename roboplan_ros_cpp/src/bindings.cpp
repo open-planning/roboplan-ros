@@ -1,8 +1,8 @@
+#include <nanobind/eigen/dense.h>
 #include <nanobind/nanobind.h>
 
 #include <geometry_msgs/msg/pose.hpp>
-
-#include <nanobind/eigen/dense.h>
+#include <trajectory_msgs/msg/joint_trajectory.hpp>
 
 #include "roboplan_ros_cpp/bindings.hpp"
 #include "roboplan_ros_cpp/type_conversions.hpp"
@@ -33,5 +33,16 @@ NB_MODULE(bindings, m) {
     auto ros_traj = pyToMsg<trajectory_msgs::msg::JointTrajectory>(py_ros_traj);
     auto roboplan_traj = fromJointTrajectory(ros_traj);
     return nb::cast(roboplan_traj);
+  });
+
+  m.def("to_transform_stamped", [](const roboplan::CartesianConfiguration& cartesian_config) {
+    auto transform = toTransformStamped(cartesian_config);
+    return msgToPy(transform, nb::module_::import_("geometry_msgs.msg").attr("TransformStamped"));
+  });
+
+  m.def("from_transform_stamped", [](nb::handle py_transform) {
+    auto transform = pyToMsg<geometry_msgs::msg::TransformStamped>(py_transform);
+    auto cartesian_config = fromTransformStamped(transform);
+    return nb::cast(cartesian_config);
   });
 }
