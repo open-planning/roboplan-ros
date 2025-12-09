@@ -3,15 +3,17 @@ import numpy as np
 from geometry_msgs.msg import Pose, TransformStamped
 
 from roboplan.core import JointConfiguration, JointTrajectory
+from roboplan_ros_cpp.bindings import (
+    to_joint_trajectory,
+    from_joint_trajectory,
+    se3_to_pose,
+    pose_to_se3,
+)
 from roboplan_ros_py.type_conversions import (
     to_joint_state,
     from_joint_state,
-    to_joint_trajectory,
-    from_joint_trajectory,
     to_transform_stamped,
     from_transform_stamped,
-    se3_to_pose,
-    pose_to_se3,
 )
 
 

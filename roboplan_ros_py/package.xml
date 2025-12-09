@@ -13,6 +13,7 @@
   <depend>trajectory_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>roboplan_bindings</depend>
+  <depend>roboplan_ros_cpp</depend>
 
   <test_depend>python3-pytest</test_depend>
 
