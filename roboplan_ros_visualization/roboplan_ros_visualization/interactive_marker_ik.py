@@ -26,7 +26,7 @@ from visualization_msgs.msg import (
 from roboplan.core import Scene
 from roboplan.simple_ik import SimpleIkOptions
 from roboplan_ros_py.kinematics import RoboPlanIK
-from roboplan_ros_py.type_conversions import pose_to_se3, se3_to_pose
+from roboplan_ros_cpp.bindings import pose_to_se3, se3_to_pose
 
 
 class InteractiveMarkerIK:

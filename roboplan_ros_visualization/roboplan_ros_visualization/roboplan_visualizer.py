@@ -16,7 +16,7 @@ from sensor_msgs.msg import JointState
 from visualization_msgs.msg import Marker, MarkerArray
 
 from roboplan.core import Scene
-from roboplan_ros_py.type_conversions import se3_to_pose
+from roboplan_ros_cpp.bindings import se3_to_pose
 
 
 class RoboplanVisualizer:
