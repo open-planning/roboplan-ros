@@ -86,6 +86,7 @@ ros-kilted-interactive-markers = "*"
 ros-kilted-tf2-eigen = "*"
 ros-kilted-sensor-msgs = "*"
 ros-kilted-topic-tools = "*"
+ros-kilted-rosidl-generator-cpp = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
@@ -107,6 +108,7 @@ ros-jazzy-interactive-markers = "*"
 ros-jazzy-tf2-eigen = "*"
 ros-jazzy-sensor-msgs = "*"
 ros-jazzy-topic-tools = "*"
+ros-jazzy-rosidl-generator-cpp = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
@@ -128,6 +130,7 @@ ros-humble-interactive-markers = "*"
 ros-humble-tf2-eigen = "*"
 ros-humble-sensor-msgs = "*"
 ros-humble-topic-tools = "*"
+ros-humble-rosidl-generator-cpp = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
