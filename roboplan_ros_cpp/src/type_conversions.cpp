@@ -82,7 +82,7 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
 
     msg.name.push_back(joint_name);
     if (info.type == roboplan::JointType::CONTINUOUS) {
-      const double theta = std::atan2(config.positions(q_idx + 1), config.positions(q_idx));
+      const auto theta = std::atan2(config.positions(q_idx + 1), config.positions(q_idx));
       msg.position.push_back(theta);
     } else {
       msg.position.push_back(config.positions(q_idx));
@@ -114,23 +114,23 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
     }
 
     if (mapping.type == roboplan::JointType::CONTINUOUS) {
-      const double theta = joint_state.position[ros_idx];
+      const double theta = joint_state.position.at(ros_idx);
       config.positions(mapping.q_start) = std::cos(theta);
       config.positions(mapping.q_start + 1) = std::sin(theta);
       if (ros_idx < joint_state.velocity.size()) {
-        config.velocities(mapping.v_start) = joint_state.velocity[ros_idx];
+        config.velocities(mapping.v_start) = joint_state.velocity.at(ros_idx);
       }
       if (ros_idx < joint_state.effort.size()) {
-        config.accelerations(mapping.v_start) = joint_state.effort[ros_idx];
+        config.accelerations(mapping.v_start) = joint_state.effort.at(ros_idx);
       }
     } else {
-      config.positions(mapping.q_start) = joint_state.position[ros_idx];
+      config.positions(mapping.q_start) = joint_state.position.at(ros_idx);
 
       if (ros_idx < joint_state.velocity.size()) {
-        config.velocities(mapping.v_start) = joint_state.velocity[ros_idx];
+        config.velocities(mapping.v_start) = joint_state.velocity.at(ros_idx);
       }
       if (ros_idx < joint_state.effort.size()) {
-        config.accelerations(mapping.v_start) = joint_state.effort[ros_idx];
+        config.accelerations(mapping.v_start) = joint_state.effort.at(ros_idx);
       }
     }
   }
