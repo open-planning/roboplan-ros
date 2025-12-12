@@ -87,6 +87,8 @@ jobs:
             ROS_DISTRO=${{ matrix.ros_distro }}
           push: false
           load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Run tests
         run: |
           docker run --rm \
