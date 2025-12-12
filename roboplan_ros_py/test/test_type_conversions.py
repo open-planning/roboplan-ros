@@ -1,9 +1,13 @@
 import pytest
 import numpy as np
+from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose, TransformStamped
 
-from roboplan.core import JointConfiguration, JointTrajectory
+from roboplan.core import Scene, JointConfiguration, JointTrajectory
 from roboplan_ros_cpp.bindings import (
+    build_conversion_map,
+    to_joint_state,
+    from_joint_state,
     to_joint_trajectory,
     from_joint_trajectory,
     se3_to_pose,
@@ -11,23 +15,87 @@ from roboplan_ros_cpp.bindings import (
     to_transform_stamped,
     from_transform_stamped,
 )
-from roboplan_ros_py.type_conversions import (
-    to_joint_state,
-    from_joint_state,
-)
 
 
-def test_joint_state():
+# Sample URDF and SRDF for testing
+URDF = """
+<robot name="robot">
+  <link name="base_link"/>
+  <link name="link1" />
+  <link name="link2" />
+  <link name="link3" />
+  <joint name="continuous_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="revolute_joint" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
+  </joint>
+  <joint name="mimic_joint" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
+    <mimic joint="revolute_joint" multiplier="1.0" offset="0.0"/>
+  </joint>
+</robot>
+"""
+
+SRDF = """
+<robot name="robot">
+  <group name="arm">
+    <joint name="revolute_joint"/>
+    <joint name="mimic_joint"/>
+  </group>
+  <disable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
+  <disable_collisions link1="link1" link2="link2" reason="Adjacent"/>
+  <disable_collisions link1="link2" link2="link3" reason="Adjacent"/>
+</robot>
+"""
+
+
+def test_joint_state_mapping():
+    scene = Scene("test_scene", urdf=URDF, srdf=SRDF)
+    joint_state = JointState()
+    joint_state.name = ["continuous_joint", "revolute_joint"]
+    conversion_map = build_conversion_map(scene, joint_state)
+
+    # Verify what we can since we don't have direct access to the Pinocchio model
+    assert len(conversion_map.mappings) == 2
+    for i, mapping in enumerate(conversion_map.mappings):
+        assert mapping.joint_name == joint_state.name[i]
+        assert mapping.ros_index == i
+
+
+def test_convert_joint_state():
+    """Test converting between JointConfiguration and JointState."""
+    scene = Scene("test_scene", urdf=URDF, srdf=SRDF)
+    scene.setRngSeed(1234)
+
+    joint_state = JointState()
+    joint_state.name = scene.getActuatedJointNames()
+    conversion_map = build_conversion_map(scene, joint_state)
+
+    # Setup a joint configuration
     joint_configuration = JointConfiguration()
-    joint_configuration.joint_names = ["joint1", "joint2"]
-    joint_configuration.positions = np.array([0.0, 1.0])
-    joint_configuration.velocities = np.array([2.0, 3.0])
-    joint_configuration.accelerations = np.array([4.0, 5.0])
+    joint_configuration.joint_names = scene.getJointNames()
+    joint_configuration.positions = scene.randomPositions()
+    joint_configuration.velocities = np.zeros(conversion_map.nv)
+    joint_configuration.accelerations = np.zeros(conversion_map.nv)
 
-    # Convert back and forth and we should get the same values
-    joint_state = to_joint_state(joint_configuration)
-    check_joint_configuration = from_joint_state(joint_state)
+    # Convert to ROS JointState and back
+    ros_joint_state = to_joint_state(joint_configuration, scene)
+    check_joint_configuration = from_joint_state(ros_joint_state, scene, conversion_map)
 
+    # Verify we get the same values back
+    assert len(ros_joint_state.name) == 2
     assert joint_configuration.joint_names == check_joint_configuration.joint_names
     assert np.allclose(
         joint_configuration.positions, check_joint_configuration.positions
