@@ -7,7 +7,7 @@ namespace roboplan_ros_cpp {
 tl::expected<JointStateConverterMap, std::string>
 buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointState& joint_state) {
   // Setup a mapping joint names to their index in the joint state
-  const auto ros_joint_names = joint_state.name;
+  const auto& ros_joint_names = joint_state.name;
   std::unordered_map<std::string, size_t> ros_map;
   ros_map.reserve(ros_joint_names.size());
   for (size_t i = 0; i < ros_joint_names.size(); ++i) {
@@ -43,8 +43,8 @@ buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointSt
 
     // Grab the joint info and store the relevant information
     const auto joint_id = model.getJointId(joint_name);
-    const auto q_idx = model.idx_qs[joint_id];
-    const auto v_idx = model.idx_vs[joint_id];
+    const auto q_idx = model.idx_qs.at(joint_id);
+    const auto v_idx = model.idx_vs.at(joint_id);
     JointStateConverterMap::JointMapping mapping{.joint_name = joint_name,
                                                  .ros_index = it->second,
                                                  .q_start = static_cast<size_t>(q_idx),
@@ -77,8 +77,8 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
     }
 
     const auto joint_id = model.getJointId(joint_name);
-    const auto q_idx = model.idx_qs[joint_id];
-    const auto v_idx = model.idx_vs[joint_id];
+    const auto q_idx = model.idx_qs.at(joint_id);
+    const auto v_idx = model.idx_vs.at(joint_id);
 
     msg.name.push_back(joint_name);
     if (info.type == roboplan::JointType::CONTINUOUS) {

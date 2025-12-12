@@ -21,7 +21,7 @@ inline nb::object get_rclpy_serialization() {
 /// to raw bytes and back.e
 /// @param py_msg The python ROS 2 message.
 /// @return An equivalent C++ ROS 2 message.
-template <typename ROSMsgType> ROSMsgType pyToMsg(nb::handle py_msg) {
+template <typename ROSMsgType> ROSMsgType pyToCppMsg(nb::handle py_msg) {
   // Serialize with rclpy
   auto serialize_func = get_rclpy_serialization().attr("serialize_message");
   auto serialized_data = nb::cast<nb::bytes>(serialize_func(py_msg));
@@ -45,7 +45,7 @@ template <typename ROSMsgType> ROSMsgType pyToMsg(nb::handle py_msg) {
 /// @param cpp_msg The C++ ROS 2 message.
 /// @return An equivalent python ROS 2 message.
 template <typename ROSMsgType>
-nb::object msgToPy(const ROSMsgType& cpp_msg, nb::object py_msg_class) {
+nb::object cppToPyMsg(const ROSMsgType& cpp_msg, nb::object py_msg_class) {
   // Serialize with rclcpp
   rclcpp::Serialization<ROSMsgType> serializer;
   rclcpp::SerializedMessage serialized_msg;
