@@ -31,14 +31,12 @@ jobs:
       matrix:
         ros_distro: [kilted, jazzy, humble]
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          # TODO: Remove this either with an org actions runner or public repos.
-          token: ${{ secrets.DEPLOY_TOKEN }}
       # Cache build directories and sccache
       - name: Cache build directories and sccache
         uses: actions/cache@v4
@@ -55,8 +53,6 @@ jobs:
           cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
           frozen: true
           manifest-path: pixi.toml
-          # TODO: Remove this when we do not have self-hosted runners in the public repo
-          pixi-bin-path: ~/actions-runner/.pixi/bin/pixi
       - name: Build and test
         run: |
           pixi run -e ${{ matrix.ros_distro }} setup-colcon
@@ -71,14 +67,12 @@ jobs:
       matrix:
         ros_distro: [humble, jazzy, kilted, rolling]
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           submodules: true
-          # TODO: Remove this either with an org actions runner or public repos.
-          token: ${{ secrets.DEPLOY_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build and push
