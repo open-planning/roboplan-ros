@@ -16,6 +16,7 @@ find_package(tf2_eigen REQUIRED)
 
 # For nanobind python bindings
 find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+find_package(roboplan_bindings REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_generator_cpp REQUIRED)
@@ -80,6 +81,7 @@ target_link_libraries(bindings PRIVATE
   roboplan_ros_cpp
   roboplan::roboplan
   roboplan::expected
+  roboplan_bindings::roboplan_bindings_utils
   ${rosidl_generator_cpp_LIBRARIES}
 )
 ament_get_python_install_dir(PYTHON_INSTALL_DIR)
