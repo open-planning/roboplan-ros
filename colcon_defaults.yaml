@@ -5,6 +5,6 @@ build:
     - compile-commands
     - mold
     - rel-with-deb-info
-    - ccache
+    - sccache
   event-handlers:
     - console_direct+
