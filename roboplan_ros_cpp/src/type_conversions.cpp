@@ -21,7 +21,7 @@ buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointSt
   conversion_map.nv = model.nv;
   conversion_map.mappings.reserve(scene.getActuatedJointNames().size());
 
-  // For each joint name, determine type and it's location in the Scene's configuration,
+  // For each joint name, determine type and its location in the Scene's configuration,
   // and put it into the mapping.
   for (const auto& joint_name : scene.getJointNames()) {
     const auto joint_info = scene.getJointInfo(joint_name);

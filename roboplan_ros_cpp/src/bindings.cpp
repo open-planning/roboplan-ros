@@ -118,12 +118,7 @@ NB_MODULE(bindings, m) {
       [](nb::handle py_scene, nb::handle py_joint_state) {
         auto scene = nb::cast<roboplan::Scene>(py_scene);
         auto joint_state = pyToCppMsg<sensor_msgs::msg::JointState>(py_joint_state);
-        auto result = buildConversionMap(scene, joint_state);
-        if (result.has_value()) {
-          return nb::cast(result.value());
-        } else {
-          throw std::runtime_error(result.error());
-        }
+        return handle_expected(buildConversionMap(scene, joint_state));
       },
       "py_scene"_a, "py_joint_state"_a,
       "Constructs a JointState conversion map given a RoboPlan Scene and JointState message.");

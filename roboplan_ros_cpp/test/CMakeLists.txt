@@ -12,7 +12,8 @@ target_link_libraries(
 )
 ament_add_gtest_test(test_type_conversions)
 
+ament_get_python_install_dir(PYTHON_INSTALL_DIR)
 ament_add_pytest_test(test_type_conversions_py test_type_conversions.py
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  APPEND_ENV PYTHONPATH=${CMAKE_BINARY_DIR}
+  APPEND_ENV PYTHONPATH=${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTALL_DIR}
 )
