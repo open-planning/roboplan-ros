@@ -1,24 +1,20 @@
 import pytest
 import numpy as np
-from pathlib import Path
 
-from roboplan import (
-    get_package_share_dir,
-    Scene,
-    SimpleIkOptions,
-)
+from roboplan.example_models import get_package_models_dir, get_package_share_dir
+from roboplan.core import Scene
+from roboplan.simple_ik import SimpleIkOptions
 
 from roboplan_ros_py.kinematics import RoboPlanIK
-from roboplan_ros_py.type_conversions import se3_to_pose
 
 
 @pytest.fixture
 def test_scene() -> Scene:
     """Create a test scene with UR5 robot."""
-    roboplan_examples_dir = Path(get_package_share_dir())
-    urdf_path = roboplan_examples_dir / "ur_robot_model" / "ur5_gripper.urdf"
-    srdf_path = roboplan_examples_dir / "ur_robot_model" / "ur5_gripper.srdf"
-    package_paths = [roboplan_examples_dir]
+    roboplan_models_dir = get_package_models_dir()
+    urdf_path = roboplan_models_dir / "ur_robot_model" / "ur5_gripper.urdf"
+    srdf_path = roboplan_models_dir / "ur_robot_model" / "ur5_gripper.srdf"
+    package_paths = [get_package_share_dir()]
 
     return Scene("test_scene", urdf_path, srdf_path, package_paths)
 

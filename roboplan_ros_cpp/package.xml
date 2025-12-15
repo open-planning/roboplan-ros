@@ -10,14 +10,19 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>roboplan</depend>
+  <build_depend>builtin_interfaces</build_depend>
 
+  <depend>roboplan</depend>
+  <depend>roboplan_bindings</depend>
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
   <depend>pinocchio</depend>
+  <depend>rosidl_generator_cpp</depend>
+  <depend>sensor_msgs</depend>
   <depend>trajectory_msgs</depend>
   <depend>tf2_eigen</depend>
 
+  <test_depend>ament_index_cpp</test_depend>
   <test_depend>roboplan_example_models</test_depend>
 
   <export>

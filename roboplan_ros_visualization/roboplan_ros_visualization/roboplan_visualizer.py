@@ -15,8 +15,8 @@ from std_msgs.msg import ColorRGBA
 from sensor_msgs.msg import JointState
 from visualization_msgs.msg import Marker, MarkerArray
 
-from roboplan import Scene
-from roboplan_ros_py.type_conversions import se3_to_pose
+from roboplan.core import Scene
+from roboplan_ros_cpp.bindings import se3ToPose
 
 
 class RoboplanVisualizer:
@@ -172,7 +172,7 @@ class RoboplanVisualizer:
         marker.action = Marker.ADD
 
         # Convert SE3 placement to pose
-        marker.pose = se3_to_pose(placement.homogeneous)
+        marker.pose = se3ToPose(placement.homogeneous)
 
         # Handle different geometry types
         # TODO: Something more intelligent with pin's types?

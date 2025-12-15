@@ -11,7 +11,8 @@ from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
 from std_msgs.msg import ColorRGBA
 
-from roboplan import Scene, SimpleIkOptions
+from roboplan.core import Scene
+from roboplan.simple_ik import SimpleIkOptions
 from roboplan_ros_visualization.interactive_marker_ik import InteractiveMarkerIK
 from roboplan_ros_visualization.roboplan_visualizer import RoboplanVisualizer
 
@@ -103,7 +104,7 @@ class InteractiveMarkerIKNode(Node):
             scene=self.scene,
             urdf_xml=urdf_xml,
             package_paths=package_paths,
-            color=ColorRGBA(r=0.5, g=0.5, b=1.0, a=0.5),
+            color=ColorRGBA(r=0.0, g=0.0, b=1.0, a=0.5),
             frame_id="world",
             namespace="roboplan_ik",
         )

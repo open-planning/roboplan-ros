@@ -10,8 +10,23 @@ find_package(roboplan REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(tf2_eigen REQUIRED)
+
+# For nanobind python bindings
+find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+find_package(roboplan_bindings REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(rosidl_generator_cpp REQUIRED)
+include(FetchContent)
+FetchContent_Declare(
+  nanobind
+  GIT_REPOSITORY https://github.com/wjakob/nanobind.git
+  GIT_TAG v2.9.2
+)
+FetchContent_MakeAvailable(nanobind)
 
 add_library(roboplan_ros_cpp SHARED
     src/type_conversions.cpp
@@ -26,8 +41,10 @@ target_link_libraries(roboplan_ros_cpp
     Eigen3::Eigen
     pinocchio::pinocchio
     ${tf2_eigen_TARGETS}
-    ${trajectory_msgs_TARGETS}
     ${geometry_msgs_TARGETS}
+    ${sensor_msgs_TARGETS}
+    ${trajectory_msgs_TARGETS}
+    ${builtin_interfaces_TARGETS}
 )
 set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
 ament_export_dependencies(
@@ -46,6 +63,35 @@ install(
   INCLUDES DESTINATION include
 )
 install(DIRECTORY include/ DESTINATION include)
+
+# Compile the nanobind python bindings for type conversions.
+nanobind_add_module(
+  bindings
+  STABLE_ABI
+  NB_STATIC
+  src/bindings.cpp
+)
+target_include_directories(bindings PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  ${rosidl_generator_cpp_INCLUDE_DIRS}
+)
+set_property(TARGET bindings PROPERTY CXX_STANDARD 20)
+target_link_libraries(bindings PRIVATE
+  roboplan_ros_cpp
+  roboplan::roboplan
+  roboplan::expected
+  roboplan_bindings::roboplan_bindings_utils
+  ${rosidl_generator_cpp_LIBRARIES}
+)
+ament_get_python_install_dir(PYTHON_INSTALL_DIR)
+install(TARGETS bindings
+  LIBRARY DESTINATION "${PYTHON_INSTALL_DIR}/roboplan_ros_cpp"
+)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/__init__.py "")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/__init__.py
+  DESTINATION "${PYTHON_INSTALL_DIR}/roboplan_ros_cpp"
+)
 
 # Add the unit tests, if enabled.
 option(BUILD_TESTING "" ON)

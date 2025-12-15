@@ -10,7 +10,10 @@ setup(
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
     ],
-    install_requires=["setuptools"],
+    install_requires=[
+        "setuptools",
+        "roboplan_ros_cpp",
+    ],
     zip_safe=True,
     maintainer="Sebastian Castro, Erik Holum",
     maintainer_email="sebas.a.castro@gmail.com, eholum@gmail.com",

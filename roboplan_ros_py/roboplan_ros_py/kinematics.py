@@ -2,13 +2,9 @@ import numpy as np
 
 from typing import Optional
 
-from roboplan import (
-    Scene,
-    JointConfiguration,
-    CartesianConfiguration,
-    SimpleIkOptions,
-    SimpleIk,
-)
+
+from roboplan.core import Scene, JointConfiguration, CartesianConfiguration
+from roboplan.simple_ik import SimpleIkOptions, SimpleIk
 
 
 class RoboPlanIK:
