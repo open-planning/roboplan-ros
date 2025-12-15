@@ -20,7 +20,7 @@ NB_MODULE(bindings, m) {
   m.doc() = "RoboPlan ROS Python bindings for C++ Type Conversions";
 
   m.def(
-      "se3_to_pose",
+      "se3ToPose",
       [](const Eigen::Matrix4d& transform) {
         auto pose = se3ToPose(transform);
         return cppToPyMsg(pose, nb::module_::import_("geometry_msgs.msg").attr("Pose"));
@@ -28,7 +28,7 @@ NB_MODULE(bindings, m) {
       "transform"_a, "Converts an SE3 transformation matrix to a geometry_msgs::msg::Pose.");
 
   m.def(
-      "pose_to_se3",
+      "poseToSE3",
       [](nb::handle py_pose) {
         auto pose = pyToCppMsg<geometry_msgs::msg::Pose>(py_pose);
         return poseToSE3(pose);
@@ -36,7 +36,7 @@ NB_MODULE(bindings, m) {
       "py_pose"_a, "Converts the provided geometry_msgs::msg::Pose to an SE3 Matrix.");
 
   m.def(
-      "to_joint_trajectory",
+      "toJointTrajectory",
       [](nb::handle py_roboplan_traj) {
         auto cpp_roboplan_traj = nb::cast<roboplan::JointTrajectory>(py_roboplan_traj);
         auto ros_traj = toJointTrajectory(cpp_roboplan_traj);
@@ -47,7 +47,7 @@ NB_MODULE(bindings, m) {
       "Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory.");
 
   m.def(
-      "from_joint_trajectory",
+      "fromJointTrajectory",
       [](nb::handle py_ros_traj) {
         auto ros_traj = pyToCppMsg<trajectory_msgs::msg::JointTrajectory>(py_ros_traj);
         auto roboplan_traj = fromJointTrajectory(ros_traj);
@@ -57,7 +57,7 @@ NB_MODULE(bindings, m) {
       "Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory.");
 
   m.def(
-      "to_transform_stamped",
+      "toTransformStamped",
       [](const roboplan::CartesianConfiguration& cartesian_config) {
         auto transform = toTransformStamped(cartesian_config);
         return cppToPyMsg(transform,
@@ -67,7 +67,7 @@ NB_MODULE(bindings, m) {
       "Converts a roboplan::CartesianConfiguration to a geometry_msgs::msg::TransformStamped.");
 
   m.def(
-      "from_transform_stamped",
+      "fromTransformStamped",
       [](nb::handle py_transform) {
         auto transform = pyToCppMsg<geometry_msgs::msg::TransformStamped>(py_transform);
         auto cartesian_config = fromTransformStamped(transform);
@@ -89,7 +89,7 @@ NB_MODULE(bindings, m) {
       .def_ro("nv", &JointStateConverterMap::nv);
 
   m.def(
-      "build_conversion_map",
+      "buildConversionMap",
       [](nb::handle py_scene, nb::handle py_joint_state) {
         auto scene = nb::cast<roboplan::Scene>(py_scene);
         auto joint_state = pyToCppMsg<sensor_msgs::msg::JointState>(py_joint_state);
@@ -99,7 +99,7 @@ NB_MODULE(bindings, m) {
       "Constructs a JointState conversion map given a RoboPlan Scene and JointState message.");
 
   m.def(
-      "to_joint_state",
+      "toJointState",
       [](nb::handle py_config, nb::handle py_scene) {
         auto config = nb::cast<roboplan::JointConfiguration>(py_config);
         auto scene = nb::cast<roboplan::Scene>(py_scene);
@@ -110,7 +110,7 @@ NB_MODULE(bindings, m) {
       "Converts a roboplan::JointConfiguration to a ROS 2 sensor_msgs::msg::JointState message.");
 
   m.def(
-      "from_joint_state",
+      "fromJointState",
       [](nb::handle py_joint_state, nb::handle py_scene,
          const JointStateConverterMap& conversion_map) {
         auto joint_state = pyToCppMsg<sensor_msgs::msg::JointState>(py_joint_state);

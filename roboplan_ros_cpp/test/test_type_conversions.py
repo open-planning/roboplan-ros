@@ -5,15 +5,15 @@ from geometry_msgs.msg import Pose, TransformStamped
 
 from roboplan.core import Scene, JointConfiguration, JointTrajectory
 from roboplan_ros_cpp.bindings import (
-    build_conversion_map,
-    to_joint_state,
-    from_joint_state,
-    to_joint_trajectory,
-    from_joint_trajectory,
-    se3_to_pose,
-    pose_to_se3,
-    to_transform_stamped,
-    from_transform_stamped,
+    buildConversionMap,
+    toJointState,
+    fromJointState,
+    toJointTrajectory,
+    fromJointTrajectory,
+    se3ToPose,
+    poseToSE3,
+    toTransformStamped,
+    fromTransformStamped,
 )
 
 
@@ -65,7 +65,7 @@ def test_joint_state_mapping():
     scene = Scene("test_scene", urdf=URDF, srdf=SRDF)
     joint_state = JointState()
     joint_state.name = ["continuous_joint", "revolute_joint"]
-    conversion_map = build_conversion_map(scene, joint_state)
+    conversion_map = buildConversionMap(scene, joint_state)
 
     # Verify what we can since we don't have direct access to the Pinocchio model
     assert len(conversion_map.mappings) == 2
@@ -81,7 +81,7 @@ def test_convert_joint_state():
 
     joint_state = JointState()
     joint_state.name = scene.getActuatedJointNames()
-    conversion_map = build_conversion_map(scene, joint_state)
+    conversion_map = buildConversionMap(scene, joint_state)
 
     # Setup a joint configuration
     joint_configuration = JointConfiguration()
@@ -91,8 +91,8 @@ def test_convert_joint_state():
     joint_configuration.accelerations = np.zeros(conversion_map.nv)
 
     # Convert to ROS JointState and back
-    ros_joint_state = to_joint_state(joint_configuration, scene)
-    check_joint_configuration = from_joint_state(ros_joint_state, scene, conversion_map)
+    ros_joint_state = toJointState(joint_configuration, scene)
+    check_joint_configuration = fromJointState(ros_joint_state, scene, conversion_map)
 
     # Verify we get the same values back
     assert len(ros_joint_state.name) == 2
@@ -110,10 +110,10 @@ def test_convert_joint_state():
 
 def test_empty_conversions():
     roboplan_traj = JointTrajectory()
-    ros_traj = to_joint_trajectory(roboplan_traj)
+    ros_traj = toJointTrajectory(roboplan_traj)
     assert len(ros_traj.joint_names) == 0
 
-    orig_roboplan_traj = from_joint_trajectory(ros_traj)
+    orig_roboplan_traj = fromJointTrajectory(ros_traj)
     assert len(orig_roboplan_traj.joint_names) == 0
 
 
@@ -127,11 +127,11 @@ def test_convert_to_joint_trajectory():
     roboplan_traj.velocities = [np.array([0.0, 0.0]), np.array([2.0, -2.0])]
     roboplan_traj.accelerations = [np.array([0.0, 0.0]), np.array([3.0, -3.0])]
 
-    ros_traj = to_joint_trajectory(roboplan_traj)
+    ros_traj = toJointTrajectory(roboplan_traj)
     assert ros_traj.joint_names == roboplan_traj.joint_names
     assert len(ros_traj.points) == 2
 
-    new_roboplan_traj = from_joint_trajectory(ros_traj)
+    new_roboplan_traj = fromJointTrajectory(ros_traj)
     assert new_roboplan_traj.joint_names == roboplan_traj.joint_names
     assert new_roboplan_traj.times == roboplan_traj.times
 
@@ -168,8 +168,8 @@ def test_transform_stamped_conversion():
     original_transform.transform.rotation.y = -0.6532815
     original_transform.transform.rotation.z = -0.2705979
 
-    cartesian_config = from_transform_stamped(original_transform)
-    converted_transform = to_transform_stamped(cartesian_config)
+    cartesian_config = fromTransformStamped(original_transform)
+    converted_transform = toTransformStamped(cartesian_config)
 
     assert original_transform.header.frame_id == converted_transform.header.frame_id
     assert original_transform.child_frame_id == converted_transform.child_frame_id
@@ -208,8 +208,8 @@ def test_pose_to_se3():
     original_pose.orientation.z = -0.2705979
     original_pose.orientation.w = 0.6532815
 
-    transform = pose_to_se3(original_pose)
-    converted_pose = se3_to_pose(transform)
+    transform = poseToSE3(original_pose)
+    converted_pose = se3ToPose(transform)
 
     assert converted_pose.position.x == pytest.approx(original_pose.position.x)
     assert converted_pose.position.y == pytest.approx(original_pose.position.y)
