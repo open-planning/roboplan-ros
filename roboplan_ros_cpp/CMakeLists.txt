@@ -84,6 +84,7 @@ target_link_libraries(bindings PRIVATE
   roboplan_bindings::roboplan_bindings_utils
   ${rosidl_generator_cpp_LIBRARIES}
 )
+ament_python_install_package(${PROJECT_NAME})
 ament_get_python_install_dir(PYTHON_INSTALL_DIR)
 install(TARGETS bindings
   LIBRARY DESTINATION "${PYTHON_INSTALL_DIR}/roboplan_ros_cpp"
