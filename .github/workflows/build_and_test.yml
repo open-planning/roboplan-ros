@@ -88,7 +88,7 @@ jobs:
         with:
           context: .
           file: .docker/Dockerfile
-          tags: roboplan_ros_wrapper:${{ github.head_ref || github.ref_name }}
+          tags: roboplan_ros_wrapper:${{ steps.sanitize_tag.outputs.tag }}
           build-args: |
             ROS_DISTRO=${{ matrix.ros_distro }}
           push: false
@@ -98,7 +98,7 @@ jobs:
       - name: Run tests
         run: |
           docker run --rm \
-            roboplan_ros_wrapper:${{ github.head_ref || github.ref_name }} \
+            roboplan_ros_wrapper:${{ steps.sanitize_tag.outputs.tag }} \
             bash -c "
               colcon test && \
               colcon test-result --verbose
