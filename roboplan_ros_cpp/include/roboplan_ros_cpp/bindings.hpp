@@ -18,7 +18,7 @@ inline nb::object get_rclpy_serialization() {
 
 /// @brief Template for converting Python ROS 2 message types to their C++ equivalents.
 /// @details Conversion is done using rclcpp's serialization utility, which converts messages
-/// to raw bytes and back.e
+/// to raw bytes and back.
 /// @param py_msg The python ROS 2 message.
 /// @return An equivalent C++ ROS 2 message.
 template <typename ROSMsgType> ROSMsgType pyToCppMsg(nb::handle py_msg) {
