@@ -1,56 +1,29 @@
+#include <filesystem>
 #include <gtest/gtest.h>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <roboplan_ros_cpp/type_conversions.hpp>
 
 namespace roboplan_ros_cpp {
 
-// Sample URDF and SRDF for testing ROS to RoboPlan joint mappings
-// for different types of joints.
-const std::string URDF = R"(
-<robot name="robot">
-  <link name="base_link"/>
-  <link name="link1" />
-  <link name="link2" />
-  <link name="link3" />
-  <joint name="continuous_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="link1"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <axis xyz="0 0 1"/>
-  </joint>
-  <joint name="revolute_joint" type="revolute">
-    <parent link="link1"/>
-    <child link="link2"/>
-    <origin xyz="0 0 0.5" rpy="0 0 0"/>
-    <axis xyz="0 0 1"/>
-    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
-  </joint>
-  <joint name="mimic_joint" type="revolute">
-    <parent link="link2"/>
-    <child link="link3"/>
-    <origin xyz="0 0 0.5" rpy="0 0 0"/>
-    <axis xyz="0 0 1"/>
-    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
-    <mimic joint="revolute_joint" multiplier="1.0" offset="0.0"/>
-  </joint>
-</robot>
-)";
+class TypeConversionsTest : public ::testing::Test {
+protected:
+  void SetUp() override {
+    const auto resources_dir =
+        std::filesystem::path(ament_index_cpp::get_package_share_directory("roboplan_ros_cpp")) /
+        "test" / "resources";
 
-const std::string SRDF = R"(
-<robot name="robot">
-  <group name="arm">
-    <joint name="revolute_joint"/>
-    <joint name="mimic_joint"/>
-  </group>
-  <disable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
-  <disable_collisions link1="link1" link2="link2" reason="Adjacent"/>
-  <disable_collisions link1="link2" link2="link3" reason="Adjacent"/>
-</robot>
-)";
+    urdf_path = resources_dir / "test_robot.urdf";
+    srdf_path = resources_dir / "test_robot.srdf";
+  }
 
-TEST(TypeConversions, TestJointStateMapping) {
+  std::filesystem::path urdf_path;
+  std::filesystem::path srdf_path;
+};
+
+TEST_F(TypeConversionsTest, TestJointStateMapping) {
   // Setup the Scene and ROS JointState message
-  const auto scene = roboplan::Scene("test_scene", URDF, SRDF);
+  const auto scene = roboplan::Scene("test_scene", urdf_path, srdf_path);  // Load here
   sensor_msgs::msg::JointState joint_state;
   joint_state.name = {"continuous_joint", "revolute_joint"};
 
@@ -78,9 +51,9 @@ TEST(TypeConversions, TestJointStateMapping) {
   }
 }
 
-TEST(TypeConversions, TestConvertJointState) {
+TEST_F(TypeConversionsTest, TestConvertJointState) {
   // Setup the Scene and ROS JointState message
-  auto scene = roboplan::Scene("test_scene", URDF, SRDF);
+  auto scene = roboplan::Scene("test_scene", urdf_path, srdf_path);
   scene.setRngSeed(1234);
   sensor_msgs::msg::JointState joint_state;
   joint_state.name = scene.getActuatedJointNames();

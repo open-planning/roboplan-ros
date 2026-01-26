@@ -1,5 +1,10 @@
 import pytest
 import numpy as np
+import os
+
+from pathlib import Path
+
+from ament_index_python.packages import get_package_share_directory
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose, TransformStamped
 
@@ -17,52 +22,15 @@ from roboplan_ros_cpp.bindings import (
 )
 
 
-# Sample URDF and SRDF for testing
-URDF = """
-<robot name="robot">
-  <link name="base_link"/>
-  <link name="link1" />
-  <link name="link2" />
-  <link name="link3" />
-  <joint name="continuous_joint" type="continuous">
-    <parent link="base_link"/>
-    <child link="link1"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <axis xyz="0 0 1"/>
-  </joint>
-  <joint name="revolute_joint" type="revolute">
-    <parent link="link1"/>
-    <child link="link2"/>
-    <origin xyz="0 0 0.5" rpy="0 0 0"/>
-    <axis xyz="0 0 1"/>
-    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
-  </joint>
-  <joint name="mimic_joint" type="revolute">
-    <parent link="link2"/>
-    <child link="link3"/>
-    <origin xyz="0 0 0.5" rpy="0 0 0"/>
-    <axis xyz="0 0 1"/>
-    <limit lower="-3.14" upper="3.14" effort="100" velocity="1.0"/>
-    <mimic joint="revolute_joint" multiplier="1.0" offset="0.0"/>
-  </joint>
-</robot>
-"""
-
-SRDF = """
-<robot name="robot">
-  <group name="arm">
-    <joint name="revolute_joint"/>
-    <joint name="mimic_joint"/>
-  </group>
-  <disable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
-  <disable_collisions link1="link1" link2="link2" reason="Adjacent"/>
-  <disable_collisions link1="link2" link2="link3" reason="Adjacent"/>
-</robot>
-"""
+resource_path = (
+    Path(get_package_share_directory("roboplan_ros_cpp")) / "test" / "resources"
+)
+urdf_path = resource_path / "test_robot.urdf"
+srdf_path = resource_path / "test_robot.srdf"
 
 
 def test_joint_state_mapping():
-    scene = Scene("test_scene", urdf=URDF, srdf=SRDF)
+    scene = Scene("test_scene", urdf_path, srdf_path)
     joint_state = JointState()
     joint_state.name = ["continuous_joint", "revolute_joint"]
     conversion_map = buildConversionMap(scene, joint_state)
@@ -76,7 +44,7 @@ def test_joint_state_mapping():
 
 def test_convert_joint_state():
     """Test converting between JointConfiguration and JointState."""
-    scene = Scene("test_scene", urdf=URDF, srdf=SRDF)
+    scene = Scene("test_scene", urdf_path, srdf_path)
     scene.setRngSeed(1234)
 
     joint_state = JointState()
