@@ -44,6 +44,8 @@ jobs:
         with:
           path: |
             ${{ env.SCCACHE_DIR }}
+            build_${{ matrix.ros_distro }}
+            install_${{ matrix.ros_distro }}
           key: ${{ runner.os }}-${{ matrix.ros_distro }}-build-${{ github.sha }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.ros_distro }}-build-${{ github.sha }}
