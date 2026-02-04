@@ -17,7 +17,7 @@ setup-colcon = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = { cmd = ["colcon", "build", "--build-base", "build_$ROS_DISTRO", "--install-base", "install_$ROS_DISTRO", "--executor", "sequential"] }
+build = { cmd = ["colcon", "build", "--build-base", "build_$ROS_DISTRO", "--install-base", "install_$ROS_DISTRO"] }
 # TOPP-RA has failures in colcon, so ignoring for now.
 # https://github.com/sea-bass/toppra/pull/1
 test = { cmd = [
@@ -110,6 +110,8 @@ ros-jazzy-topic-tools = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
+AMENT_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_jazzy:${AMENT_PREFIX_PATH}"
+CMAKE_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_jazzy:${CMAKE_PREFIX_PATH}"
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]

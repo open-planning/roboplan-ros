@@ -47,7 +47,6 @@ jobs:
       - name: Build and test
         run: |
           pixi run -e ${{ matrix.ros_distro }} setup-colcon
-          pixi run -e ${{ matrix.ros_distro }} build --packages-up-to roboplan
           pixi run -e ${{ matrix.ros_distro }} build
           pixi run -e ${{ matrix.ros_distro }} test
           pixi run -e ${{ matrix.ros_distro }} test-result
