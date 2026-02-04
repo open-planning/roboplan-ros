@@ -89,6 +89,8 @@ ros-kilted-topic-tools = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
+AMENT_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_kilted:${AMENT_PREFIX_PATH}"
+CMAKE_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_kilted:${CMAKE_PREFIX_PATH}"
 
 [feature.jazzy]
 channels = ["https://prefix.dev/robostack-jazzy"]
@@ -133,6 +135,8 @@ ros-humble-topic-tools = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
+AMENT_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_humble:${AMENT_PREFIX_PATH}"
+CMAKE_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_humble:${CMAKE_PREFIX_PATH}"
 
 [environments]
 kilted = ["kilted"]
