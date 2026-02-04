@@ -17,7 +17,7 @@ setup-colcon = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = { cmd = ["colcon", "build", "--build-base", "build_$ROS_DISTRO", "--install-base", "install_$ROS_DISTRO"] }
+build = { cmd = ["colcon", "build", "--build-base", "build_$ROS_DISTRO", "--install-base", "install_$ROS_DISTRO", "--executor", "sequential"] }
 # TOPP-RA has failures in colcon, so ignoring for now.
 # https://github.com/sea-bass/toppra/pull/1
 test = { cmd = [
