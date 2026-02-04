@@ -91,6 +91,7 @@ ros-kilted-topic-tools = "*"
 ROS_DISTRO = "kilted"
 AMENT_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_kilted:${AMENT_PREFIX_PATH}"
 CMAKE_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_kilted:${CMAKE_PREFIX_PATH}"
+LD_LIBRARY_PATH = "${PIXI_PROJECT_ROOT}/install_kilted/lib:${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 
 [feature.jazzy]
 channels = ["https://prefix.dev/robostack-jazzy"]
@@ -114,6 +115,7 @@ ros-jazzy-topic-tools = "*"
 ROS_DISTRO = "jazzy"
 AMENT_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_jazzy:${AMENT_PREFIX_PATH}"
 CMAKE_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_jazzy:${CMAKE_PREFIX_PATH}"
+LD_LIBRARY_PATH = "${PIXI_PROJECT_ROOT}/install_jazzy/lib:${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]
@@ -137,6 +139,7 @@ ros-humble-topic-tools = "*"
 ROS_DISTRO = "humble"
 AMENT_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_humble:${AMENT_PREFIX_PATH}"
 CMAKE_PREFIX_PATH = "${PIXI_PROJECT_ROOT}/install_humble:${CMAKE_PREFIX_PATH}"
+LD_LIBRARY_PATH = "${PIXI_PROJECT_ROOT}/install_humble/lib:${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 
 [environments]
 kilted = ["kilted"]
