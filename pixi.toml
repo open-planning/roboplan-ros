@@ -111,6 +111,7 @@ ros-jazzy-topic-tools = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
+CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_jazzy
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]
@@ -132,6 +133,7 @@ ros-humble-topic-tools = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
+CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_humble
 
 [environments]
 kilted = ["kilted"]
