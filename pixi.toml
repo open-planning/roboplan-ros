@@ -89,6 +89,7 @@ ros-kilted-topic-tools = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
+CMAKE_PREFIX_PATH="${PIXI_PROJECT_ROOT}/install_kilted/roboplan"
 
 [feature.jazzy]
 channels = ["https://prefix.dev/robostack-jazzy"]
