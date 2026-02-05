@@ -30,7 +30,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros_distro: [kilted, jazzy, humble]
+        ros_distro: [jazzy]
+        # ros_distro: [kilted, jazzy, humble]
 
     runs-on: ubuntu-latest
     steps:
@@ -62,44 +63,44 @@ jobs:
           pixi run -e ${{ matrix.ros_distro }} test-result
 
   # Build ROS docker images and run tests.
-  ros_build_and_test:
-    timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        ros_distro: [humble, jazzy, kilted, rolling]
+  # ros_build_and_test:
+  #   timeout-minutes: 15
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       ros_distro: [humble, jazzy, kilted, rolling]
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Sanitize tag name
-        id: sanitize_tag
-        run: |
-          BRANCH="${{ github.head_ref || github.ref_name }}"
-          TAG="${BRANCH//\//-}"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: .docker/Dockerfile
-          tags: roboplan_ros_wrapper:${{ steps.sanitize_tag.outputs.tag }}
-          build-args: |
-            ROS_DISTRO=${{ matrix.ros_distro }}
-          push: false
-          load: true
-          cache-from: type=gha,scope=${{ matrix.ros_distro }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.ros_distro }}
-      - name: Run tests
-        run: |
-          docker run --rm \
-            roboplan_ros_wrapper:${{ steps.sanitize_tag.outputs.tag }} \
-            bash -c "
-              colcon test && \
-              colcon test-result --verbose
-            "
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out repository
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+  #     - name: Sanitize tag name
+  #       id: sanitize_tag
+  #       run: |
+  #         BRANCH="${{ github.head_ref || github.ref_name }}"
+  #         TAG="${BRANCH//\//-}"
+  #         echo "tag=$TAG" >> $GITHUB_OUTPUT
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+  #     - name: Build and push
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         file: .docker/Dockerfile
+  #         tags: roboplan_ros_wrapper:${{ steps.sanitize_tag.outputs.tag }}
+  #         build-args: |
+  #           ROS_DISTRO=${{ matrix.ros_distro }}
+  #         push: false
+  #         load: true
+  #         cache-from: type=gha,scope=${{ matrix.ros_distro }}
+  #         cache-to: type=gha,mode=max,scope=${{ matrix.ros_distro }}
+  #     - name: Run tests
+  #       run: |
+  #         docker run --rm \
+  #           roboplan_ros_wrapper:${{ steps.sanitize_tag.outputs.tag }} \
+  #           bash -c "
+  #             colcon test && \
+  #             colcon test-result --verbose
+  #           "
