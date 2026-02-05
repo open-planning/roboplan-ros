@@ -1,6 +1,7 @@
 build:
   symlink-install: true
   mixin:
+    - clang
     - build-testing-on
     - compile-commands
     - mold
