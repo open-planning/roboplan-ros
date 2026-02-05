@@ -136,7 +136,7 @@ ros-humble-topic-tools = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
-CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_humble"
+CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}${CONDA_PREFIX}:${PIXI_PROJECT_ROOT}/install_humble"
 LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIXI_PROJECT_ROOT}/install_humble/lib"
 
 [environments]
