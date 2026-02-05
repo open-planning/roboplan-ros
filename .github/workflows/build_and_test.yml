@@ -57,8 +57,8 @@ jobs:
       - name: Build and test
         run: |
           pixi run -e ${{ matrix.ros_distro }} setup-colcon
-          pixi run -e ${{ matrix.ros_distro }} build
-          pixi run -e ${{ matrix.ros_distro }} test
+          pixi run -e ${{ matrix.ros_distro }} build_ci
+          pixi run -e ${{ matrix.ros_distro }} test_ci
           pixi run -e ${{ matrix.ros_distro }} test-result
 
   # Build ROS docker images and run tests.
