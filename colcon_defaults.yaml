@@ -1,10 +1,8 @@
 build:
   symlink-install: true
   mixin:
-    - clang
     - build-testing-on
     - compile-commands
-    - mold
     - rel-with-deb-info
     - sccache
   event-handlers:
