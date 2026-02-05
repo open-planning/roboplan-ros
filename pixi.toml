@@ -91,7 +91,7 @@ ros-kilted-topic-tools = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
-# CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_kilted"
+CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_kilted"
 
 [feature.jazzy]
 channels = ["https://prefix.dev/robostack-jazzy"]
@@ -113,7 +113,7 @@ ros-jazzy-topic-tools = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
-# CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_jazzy"
+CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_jazzy"
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]
@@ -135,7 +135,8 @@ ros-humble-topic-tools = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
-# CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_humble"
+CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_humble"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PIXI_PROJECT_ROOT}/install_humble/lib"
 
 [environments]
 kilted = ["kilted"]
