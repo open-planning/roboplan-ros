@@ -64,10 +64,9 @@ pycollada = ">=0.9.2, <0.10"
 
 # [activation.env]
 # Ensures the linker knows where to look for conda managed packages
-# LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LIBRARY_PATH}"
-# LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
-# LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
-# CXXFLAGS = "-fuse-ld=mold"
+LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LIBRARY_PATH}"
+LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
+CMAKE_PREFIX_PATH = "${CONDA_PREFIX}"
 
 [activation]
 scripts = ["install_${ROS_DISTRO}/setup.bash"]
@@ -92,7 +91,7 @@ ros-kilted-topic-tools = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
-CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_kilted"
+# CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_kilted"
 
 [feature.jazzy]
 channels = ["https://prefix.dev/robostack-jazzy"]
@@ -114,7 +113,7 @@ ros-jazzy-topic-tools = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
-CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_jazzy"
+# CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_jazzy"
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]
@@ -136,7 +135,7 @@ ros-humble-topic-tools = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
-CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_humble"
+# CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:${PIXI_PROJECT_ROOT}/install_humble"
 
 [environments]
 kilted = ["kilted"]
