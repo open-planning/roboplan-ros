@@ -94,7 +94,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: mujoco_ros2_control
+          images: roboplan_ros_wrapper
           tags: |
             type=ref,event=branch
             type=ref,event=pr
