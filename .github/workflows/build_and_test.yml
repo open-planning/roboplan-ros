@@ -68,7 +68,7 @@ jobs:
             -v ${{ github.workspace }}/.sccache:/workspace/.sccache \
             -w /workspace \
             -e SCCACHE_DIR=/workspace/.sccache \
-            roboplan-ros:ci \
+            roboplan-ros-pixi:ci \
             bash -c "
               pixi run -e ${{ matrix.ros_distro }} setup-colcon && \
               pixi run -e ${{ matrix.ros_distro }} build && \
