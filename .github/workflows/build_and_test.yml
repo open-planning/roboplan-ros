@@ -30,11 +30,7 @@ jobs:
       matrix:
         ros_distro: [kilted, jazzy, humble]
 
-    runs-on: ubuntu-24.04
-
-    env:
-      SCCACHE_DIR: /workspace/.sccache
-
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -60,6 +56,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ matrix.ros_distro }}-sccache-main
             ${{ runner.os }}-${{ matrix.ros_distro }}-sccache
+      # Run pixi jobs, and ensure the cache is world readable.
       - name: Build and test in container
         run: |
           docker run --rm \
@@ -72,16 +69,9 @@ jobs:
               pixi run -e ${{ matrix.ros_distro }} setup-colcon && \
               pixi run -e ${{ matrix.ros_distro }} build && \
               pixi run -e ${{ matrix.ros_distro }} test && \
-              pixi run -e ${{ matrix.ros_distro }} test-result
+              pixi run -e ${{ matrix.ros_distro }} test-result && \
+              chmod -R a+rwX /workspace/.sccache
             "
-      - name: Check sccache directory
-        if: always()
-        run: |
-          id
-          echo ""
-          ls -la .sccache || echo "Directory doesn't exist"
-          echo ""
-          du -sh .sccache/* 2>/dev/null || echo "No contents or can't read"
 
   # Build ROS docker images and run tests.
   ros_build_and_test:
