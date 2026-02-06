@@ -90,12 +90,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Sanitize tag name
-        id: sanitize_tag
-        run: |
-          BRANCH="${{ github.head_ref || github.ref_name }}"
-          TAG="${BRANCH//\//-}"
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: mujoco_ros2_control
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build and push
@@ -103,7 +105,7 @@ jobs:
         with:
           context: .
           file: .docker/Dockerfile
-          tags: roboplan_ros_wrapper:${{ steps.sanitize_tag.outputs.tag }}
+          tags: roboplan_ros_wrapper:${{ steps.meta.outputs.tags }}
           build-args: |
             ROS_DISTRO=${{ matrix.ros_distro }}
           push: false
@@ -113,7 +115,7 @@ jobs:
       - name: Run tests
         run: |
           docker run --rm \
-            roboplan_ros_wrapper:${{ steps.sanitize_tag.outputs.tag }} \
+            roboplan_ros_wrapper:${{ steps.meta.outputs.tags }} \
             bash -c "
               colcon test && \
               colcon test-result --verbose
