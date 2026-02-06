@@ -74,6 +74,14 @@ jobs:
               pixi run -e ${{ matrix.ros_distro }} test && \
               pixi run -e ${{ matrix.ros_distro }} test-result
             "
+      - name: Check sccache directory
+        if: always()
+        run: |
+          id
+          echo ""
+          ls -la .sccache || echo "Directory doesn't exist"
+          echo ""
+          du -sh .sccache/* 2>/dev/null || echo "No contents or can't read"
 
   # Build ROS docker images and run tests.
   ros_build_and_test:
