@@ -16,6 +16,7 @@
   <depend>roboplan_bindings</depend>
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
+  <depend>nanobind-dev</depend>
   <depend>pinocchio</depend>
   <depend>rosidl_generator_cpp</depend>
   <depend>sensor_msgs</depend>

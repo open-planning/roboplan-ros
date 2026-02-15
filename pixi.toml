@@ -58,6 +58,7 @@ lttng-ust = ">=2.13.9,<3"
 # We could fix that: https://robostack.github.io/Contributing.html
 pinocchio = ">=3.7.0,<4"
 eigen = ">=3.4.0,<4"
+nanobind = ">=2.8.0,<3"
 
 [pypi-dependencies]
 xacro = ">=2.1.1, <3"
