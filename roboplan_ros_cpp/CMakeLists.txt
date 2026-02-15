@@ -14,20 +14,6 @@ find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(tf2_eigen REQUIRED)
 
-# For nanobind python bindings
-find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
-find_package(roboplan_bindings REQUIRED)
-find_package(ament_cmake_python REQUIRED)
-find_package(builtin_interfaces REQUIRED)
-find_package(rosidl_generator_cpp REQUIRED)
-include(FetchContent)
-FetchContent_Declare(
-  nanobind
-  GIT_REPOSITORY https://github.com/wjakob/nanobind.git
-  GIT_TAG v2.9.2
-)
-FetchContent_MakeAvailable(nanobind)
-
 add_library(roboplan_ros_cpp SHARED
     src/type_conversions.cpp
 )
@@ -63,6 +49,19 @@ install(
   INCLUDES DESTINATION include
 )
 install(DIRECTORY include/ DESTINATION include)
+
+# For nanobind python bindings
+find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+find_package(roboplan_bindings REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(rosidl_generator_cpp REQUIRED)
+
+# Detect the installed nanobind package and import it into CMake
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
+find_package(nanobind CONFIG REQUIRED)
 
 # Compile the nanobind python bindings for type conversions.
 nanobind_add_module(
