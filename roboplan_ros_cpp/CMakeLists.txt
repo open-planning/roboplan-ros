@@ -11,6 +11,7 @@ find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(tl_expected REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(tf2_eigen REQUIRED)
 
@@ -79,9 +80,9 @@ set_property(TARGET bindings PROPERTY CXX_STANDARD 20)
 target_link_libraries(bindings PRIVATE
   roboplan_ros_cpp
   roboplan::roboplan
-  roboplan::expected
   roboplan_bindings::roboplan_bindings_utils
   ${rosidl_generator_cpp_LIBRARIES}
+  tl_expected::tl_expected
 )
 ament_python_install_package(${PROJECT_NAME})
 ament_get_python_install_dir(PYTHON_INSTALL_DIR)
