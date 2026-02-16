@@ -27,7 +27,8 @@ def ik_solver(test_scene: Scene) -> RoboPlanIK:
     options.max_iters = 100
     options.step_size = 0.25
     options.damping = 0.001
-    options.max_error_norm = 0.0005
+    options.max_linear_error_norm = 0.001
+    options.max_angular_error_norm = 0.001
     options.check_collisions = False
 
     return RoboPlanIK(
