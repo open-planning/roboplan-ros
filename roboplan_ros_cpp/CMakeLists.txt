@@ -68,7 +68,7 @@ find_package(nanobind CONFIG REQUIRED)
 nanobind_add_module(
   bindings
   STABLE_ABI
-  NB_SHARED
+  NB_STATIC
   NB_SUPPRESS_WARNINGS
   src/bindings.cpp
 )
