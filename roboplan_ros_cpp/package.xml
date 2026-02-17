@@ -16,9 +16,14 @@
   <depend>roboplan_bindings</depend>
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
+  <!-- While nanobind-dev is available from rosdistro the apt package is very out of date. -->
+  <!-- Nanobind should only be installed manually from pip until this is released in a sync: -->
+  <!-- https://github.com/ros/rosdistro/pull/49894 -->
+  <!-- <depend>nanobind-dev</depend> -->
   <depend>pinocchio</depend>
   <depend>rosidl_generator_cpp</depend>
   <depend>sensor_msgs</depend>
+  <depend>tl_expected</depend>
   <depend>trajectory_msgs</depend>
   <depend>tf2_eigen</depend>
 
