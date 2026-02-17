@@ -16,8 +16,9 @@
   <depend>roboplan_bindings</depend>
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
-  <!-- While nanobind-dev is available from rosdistro the apt package installs it in -->
-  <!-- inconsistent places. Users should ensure nanobind is just installed with pip. -->
+  <!-- While nanobind-dev is available from rosdistro the apt package is very out of date. -->
+  <!-- Nanobind should only be installed manually from pip until this is released in a sync: -->
+  <!-- https://github.com/ros/rosdistro/pull/49894 -->
   <!-- <depend>nanobind-dev</depend> -->
   <depend>pinocchio</depend>
   <depend>rosidl_generator_cpp</depend>
