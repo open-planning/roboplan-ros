@@ -8,6 +8,8 @@ namespace nb = nanobind;
 
 // Static, non-owned pointer to the imported module.
 // The object itself will be destroyed by the python application.
+/// @brief Retrieves the rclpy serialization module.
+/// @return A nanobind object pointing to the imported rclpy.serialization module
 inline nb::object get_rclpy_serialization() {
   static nb::object* rclpy_serial = nullptr;
   if (!rclpy_serial) {
@@ -43,6 +45,7 @@ template <typename ROSMsgType> ROSMsgType pyToCppMsg(nb::handle py_msg) {
 /// @details Conversion is done using rclcpp's serialization utility, which converts messages
 /// to raw bytes and back.
 /// @param cpp_msg The C++ ROS 2 message.
+/// @param py_msg_class The Python class/type to deserialize into
 /// @return An equivalent python ROS 2 message.
 template <typename ROSMsgType>
 nb::object cppToPyMsg(const ROSMsgType& cpp_msg, nb::object py_msg_class) {
