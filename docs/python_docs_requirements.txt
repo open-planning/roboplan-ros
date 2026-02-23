@@ -1,0 +1,6 @@
+breathe
+sphinx<9.0.0
+sphinx-autoapi
+sphinx-autodoc-typehints
+sphinx-copybutton
+sphinx_rtd_theme
