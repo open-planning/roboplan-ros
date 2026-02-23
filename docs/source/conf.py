@@ -55,21 +55,21 @@ exclude_patterns: list[str] = []
 
 # Mock imports for external dependencies.
 autodoc_mock_imports = [
-    "rclpy", 
-    "roboplan", 
-    "std_msgs", 
-    "geometry_msgs", 
-    "sensor_msgs", 
+    "rclpy",
+    "roboplan",
+    "std_msgs",
+    "geometry_msgs",
+    "sensor_msgs",
     "visualization_msgs",
     "interactive_markers",
-    "tf2_ros"
+    "tf2_ros",
 ]
 autoapi_options = [
     "members",
-    "undoc-members",      
+    "undoc-members",
     "show-inheritance",
     "show-module-summary",
-    "imported-members",   
+    "imported-members",
 ]
 autoapi_type = "python"
 autoapi_add_toctree_entry = False
@@ -92,9 +92,7 @@ breathe_default_project = "roboplan-ros"
 breathe_projects = {}
 breathe_projects_source = {}
 
-for package in [
-    "roboplan_ros_cpp"
-]:
+for package in ["roboplan_ros_cpp"]:
     # Generate Doxygen XML and add it to the breathe projects.
     subprocess.call(f"cd ../../{package}/docs; rm -rf html/ xml/; doxygen", shell=True)
     breathe_projects[package] = os.path.abspath(f"../../{package}/docs/xml")
