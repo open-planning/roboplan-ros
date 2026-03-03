@@ -251,6 +251,9 @@ class RoboplanVisualizer:
         return marker
 
     def clear_markers(self):
+        """
+        Remove all published markers.
+        """
         marker_array = MarkerArray()
         marker = Marker()
         marker.action = Marker.DELETEALL
@@ -258,4 +261,10 @@ class RoboplanVisualizer:
         self.marker_pub.publish(marker_array)
 
     def set_color(self, color: ColorRGBA):
+        """
+        Set a color for the robot visualization.
+
+        Args:
+            color: The RGBA color to apply to all robot markers.
+        """
         self.color = color
