@@ -63,7 +63,7 @@ autodoc_mock_imports = [
     "interactive_markers",
     "tf2_ros",
     "pinocchio",
-    "roboplan_ros_cpp.bindings"
+    "roboplan_ros_cpp.bindings",
 ]
 autoapi_options = [
     "members",
