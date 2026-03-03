@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath("../../roboplan_ros_visualization"))
 
 project = "roboplan-ros"
 copyright = "2025-2026, Open Planning"
-author = "Sebastian Castro"
+author = "Erik Holum"
 
 # The full version, including alpha/beta/rc tags
 version = release = "0.2.0"
