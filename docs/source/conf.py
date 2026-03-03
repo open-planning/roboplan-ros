@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 import subprocess
 
@@ -13,11 +14,10 @@ import subprocess
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-import sys
 
-sys.path.insert(0, os.path.abspath("../../"))
+sys.path.insert(0, os.path.abspath("../../roboplan_ros_cpp"))
+sys.path.insert(0, os.path.abspath("../../roboplan_ros_py"))
+sys.path.insert(0, os.path.abspath("../../roboplan_ros_visualization"))
 
 # -- Project information -----------------------------------------------------
 
@@ -35,7 +35,6 @@ version = release = "0.2.0"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "autoapi.extension",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
@@ -63,13 +62,14 @@ autodoc_mock_imports = [
     "visualization_msgs",
     "interactive_markers",
     "tf2_ros",
+    "pinocchio",
+    "roboplan_ros_cpp.bindings"
 ]
 autoapi_options = [
     "members",
     "undoc-members",
     "show-inheritance",
     "show-module-summary",
-    "imported-members",
 ]
 autoapi_type = "python"
 autoapi_add_toctree_entry = False
