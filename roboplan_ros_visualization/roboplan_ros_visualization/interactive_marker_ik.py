@@ -134,6 +134,9 @@ class InteractiveMarkerIK:
             pass
 
     def shutdown(self):
+        """
+        Shut down the interactive marker controller.
+        """
         self._marker_executor.shutdown()
         self._marker_thread.join(timeout=0.25)
         self._marker_node.destroy_node()
