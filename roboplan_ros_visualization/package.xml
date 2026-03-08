@@ -20,6 +20,7 @@
   <depend>interactive_markers</depend>
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
+  <depend>tl_expected</depend>
   <depend>visualization_msgs</depend>
 
   <exec_depend>rviz2</exec_depend>
