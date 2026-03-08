@@ -9,12 +9,19 @@ from ament_index_python.packages import get_package_share_directory
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import MultiThreadedExecutor
+from rclpy.qos import (
+    QoSProfile,
+    QoSReliabilityPolicy,
+    QoSHistoryPolicy,
+    QoSDurabilityPolicy,
+)
 from std_msgs.msg import ColorRGBA
+from visualization_msgs.msg import MarkerArray
 
 from roboplan.core import Scene
 from roboplan.simple_ik import SimpleIkOptions
 from roboplan_ros_visualization.interactive_marker_ik import InteractiveMarkerIK
-from roboplan_ros_visualization.roboplan_visualizer import RoboplanVisualizer
+from roboplan_ros_visualization.bindings import RoboplanVisualizer
 
 
 class InteractiveMarkerIKNode(Node):
@@ -97,20 +104,29 @@ class InteractiveMarkerIKNode(Node):
         options.max_iters = 100
         options.step_size = 0.25
 
-        # Setup a visualize marker model for rendering IK solutions. The markers will
-        # be published to "/roboplan_ik/markers" and are renderable in rviz.
-        self.ik_viz = RoboplanVisualizer(
-            node=self,
+        # Setup the C++ visualizer (pure computation, no ROS node ownership)
+        self._visualizer = RoboplanVisualizer(
             scene=self.scene,
             urdf_xml=urdf_xml,
             package_paths=package_paths,
-            color=ColorRGBA(r=0.0, g=0.0, b=1.0, a=0.5),
             frame_id="world",
-            namespace="roboplan_ik",
+            ns="roboplan_ik",
+            color=ColorRGBA(r=0.0, g=0.0, b=1.0, a=0.5),
         )
 
-        # Create the interactive marker controller, which will call the ik_viz to
-        # update anytime a solution is found.
+        # Create the marker publisher
+        qos = QoSProfile(
+            depth=1,
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            durability=QoSDurabilityPolicy.VOLATILE,
+        )
+        self._marker_pub = self.create_publisher(
+            MarkerArray, "roboplan_ik/markers", qos
+        )
+
+        # Create the interactive marker controller, which will call our
+        # callback to visualize anytime a solution is found.
         self.get_logger().info("Creating interactive marker controller...")
         self.imarker_ik = InteractiveMarkerIK(
             node=self,
@@ -119,13 +135,20 @@ class InteractiveMarkerIKNode(Node):
             base_link=self.base_link,
             tip_link=self.tip_link,
             options=options,
-            solve_callback=self.ik_viz.visualize_configuration,
+            solve_callback=self._visualize_and_publish,
             namespace="roboplan_ik",
         )
 
         self.get_logger().info(
             "Move the interactive marker in RViz to visualize IK solutions"
         )
+
+    def _visualize_and_publish(self, q):
+        """
+        Compute the marker locations and publish them.
+        """
+        marker_array = self._visualizer.visualize_configuration(q)
+        self._marker_pub.publish(marker_array)
 
     def destroy_node(self):
         """
