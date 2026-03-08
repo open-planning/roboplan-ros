@@ -9,7 +9,7 @@
 
 #include <utils/expected.hpp>
 
-#include "roboplan_ros_cpp/bindings.hpp"
+#include "roboplan_ros_cpp/roboplan_ros_cpp_bindings.hpp"
 #include "roboplan_ros_cpp/type_conversions.hpp"
 
 namespace nb = nanobind;

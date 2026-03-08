@@ -4,7 +4,7 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
-#include <roboplan_ros_cpp/bindings.hpp>
+#include <roboplan_ros_cpp/roboplan_ros_cpp_bindings.hpp>
 #include <roboplan_ros_cpp/type_conversions.hpp>
 
 #include <roboplan_ros_visualization/roboplan_visualizer.hpp>
@@ -12,6 +12,10 @@
 namespace nb = nanobind;
 using namespace nb::literals;
 
+/// @brief Python nanobind bindings for the roboplan_ros_visualization package.
+/// @details Pulls in the roboplan and roboplan_ros_cpp bindings as necessary,
+/// and installs the packages here into a "bindings" subpackage of the existing
+/// python package.
 NB_MODULE(bindings, m) {
 
   nb::class_<roboplan_ros_cpp::RoboplanVisualizer>(

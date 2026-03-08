@@ -69,7 +69,7 @@ nanobind_add_module(
   STABLE_ABI
   NB_STATIC
   NB_SUPPRESS_WARNINGS
-  src/bindings.cpp
+  src/roboplan_ros_visualization_bindings.cpp
 )
 target_include_directories(roboplan_ros_visualization_bindings PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
