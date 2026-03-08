@@ -19,6 +19,7 @@ namespace roboplan_ros_cpp {
 /// from ROS JointStates to RoboPlan JointConfigurations to enable efficient conversion
 /// from one type to the other.
 struct JointStateConverterMap {
+  /// @brief Mapping for an individual joint
   struct JointMapping {
     /// @brief the String name of the joint.
     std::string joint_name;
@@ -54,7 +55,7 @@ tl::expected<JointStateConverterMap, std::string>
 buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointState& joint_state);
 
 /// @brief Converts a double timestamp to an equivalent ROS Duration.
-/// @param time Timestamp in seconds.
+/// @param time_sec Timestamp in seconds.
 /// @return ROS 2 Duration with seconds and nanoseconds.
 inline builtin_interfaces::msg::Duration toDuration(const double time_sec) {
   builtin_interfaces::msg::Duration duration;
@@ -71,7 +72,7 @@ inline double fromDuration(const builtin_interfaces::msg::Duration& duration) {
 }
 
 /// @brief Converts a roboplan::JointConfiguration object to a ROS 2 JointState message.
-/// @param joint_configuration The roboplan JointConfiguration to convert
+/// @param config The roboplan JointConfiguration to convert
 /// @param scene The RoboPlan scene containing the model's joint information.
 /// @return An equivalent ROS 2 JointState message, or an error.
 tl::expected<sensor_msgs::msg::JointState, std::string>
