@@ -47,5 +47,7 @@ def test_visualize_configuration():
         len(marker_array.markers) == 1
     ), f"Expected 1 marker, got {len(marker_array.markers)}"
 
-    # marker_array = viz.clear_markers()
-    # assert len(marker_array.markers) == 1, f"Expected 1 marker, got {len(marker_array.markers)}"
+    marker_array = viz.clear_markers()
+    assert (
+        len(marker_array.markers) == 1
+    ), f"Expected 1 marker, got {len(marker_array.markers)}"
