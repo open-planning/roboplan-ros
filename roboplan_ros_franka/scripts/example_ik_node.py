@@ -104,7 +104,7 @@ class InteractiveMarkerIKNode(Node):
         options.max_iters = 100
         options.step_size = 0.25
 
-        # Setup the C++ visualizer (pure computation, no ROS node ownership)
+        # Setup the visualizer from the nanobind wrapper
         self._visualizer = RoboplanVisualizer(
             scene=self.scene,
             urdf_xml=urdf_xml,
@@ -125,8 +125,8 @@ class InteractiveMarkerIKNode(Node):
             MarkerArray, "roboplan_ik/markers", qos
         )
 
-        # Create the interactive marker controller, which will call our
-        # callback to visualize anytime a solution is found.
+        # Create the interactive marker controller, which will publish solutions to the
+        # desired topic using the visualizer.
         self.get_logger().info("Creating interactive marker controller...")
         self.imarker_ik = InteractiveMarkerIK(
             node=self,
