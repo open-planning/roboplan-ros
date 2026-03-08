@@ -11,14 +11,15 @@
 
 namespace roboplan_ros_cpp {
 
-RoboplanVisualizer::RoboplanVisualizer(const roboplan::Scene& scene, const std::string& urdf_xml,
+RoboplanVisualizer::RoboplanVisualizer(std::shared_ptr<const roboplan::Scene> scene,
+                                       const std::string& urdf_xml,
                                        const std::vector<std::string>& package_paths,
                                        const std::string& frame_id, const std::string& ns,
                                        const std::optional<std_msgs::msg::ColorRGBA>& color)
-    : scene_(scene), frame_id_(frame_id), ns_(ns), color_(color) {
+    : scene_(std::move(scene)), frame_id_(frame_id), ns_(ns), color_(color) {
   // Build a visual GeometryModel from the URDF.
   // Scene only holds the collision model, so we need this for rendering.
-  const auto& model = scene_.getModel();
+  const auto& model = scene_->getModel();
   std::istringstream urdf_stream(urdf_xml);
   pinocchio::urdf::buildGeom(model, urdf_stream, pinocchio::VISUAL, visual_model_, package_paths);
 }
@@ -27,7 +28,7 @@ visualization_msgs::msg::MarkerArray
 RoboplanVisualizer::visualize_configuration(const Eigen::VectorXd& q) const {
   visualization_msgs::msg::MarkerArray marker_array;
 
-  const auto& model = scene_.getModel();
+  const auto& model = scene_->getModel();
 
   pinocchio::Data data(model);
   pinocchio::GeometryData visual_data(visual_model_);

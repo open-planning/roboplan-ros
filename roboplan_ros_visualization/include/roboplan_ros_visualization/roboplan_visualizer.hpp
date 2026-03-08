@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
@@ -34,7 +35,7 @@ public:
    * @param ns             Marker namespace prefix.
    * @param color          Optional override colour applied to every marker.
    */
-  RoboplanVisualizer(const roboplan::Scene& scene, const std::string& urdf_xml,
+  RoboplanVisualizer(std::shared_ptr<const roboplan::Scene> scene, const std::string& urdf_xml,
                      const std::vector<std::string>& package_paths = {},
                      const std::string& frame_id = "world", const std::string& ns = "/roboplan",
                      const std::optional<std_msgs::msg::ColorRGBA>& color = std::nullopt);
@@ -61,15 +62,13 @@ public:
   /** @brief Remove any colour override so per-geometry colours are used. */
   void clear_color();
 
-  /** @brief Access the underlying Scene. */
-  const roboplan::Scene& getScene() const { return scene_; }
-
 private:
   std::optional<visualization_msgs::msg::Marker>
   createGeometryMarker(int marker_id, const pinocchio::GeometryObject& geom_obj,
                        const pinocchio::SE3& placement) const;
 
-  const roboplan::Scene& scene_;
+  /// Ensure we use a shared ptr to avoid ownership issues between C++ and python
+  std::shared_ptr<const roboplan::Scene> scene_;
 
   /// Visual geometry model built from URDF
   pinocchio::GeometryModel visual_model_;

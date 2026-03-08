@@ -57,10 +57,10 @@ static const std::string EMPTY_SRDF = R"(<?xml version="1.0"?>
 class RoboplanVisualizerTest : public ::testing::Test {};
 
 TEST_F(RoboplanVisualizerTest, VisualizeFixedJointConfiguration) {
-  const auto scene = roboplan::Scene("test", BOX_URDF, EMPTY_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>("test", BOX_URDF, EMPTY_SRDF);
   RoboplanVisualizer viz(scene, BOX_URDF);
 
-  const Eigen::VectorXd q = scene.getCurrentJointPositions();
+  const Eigen::VectorXd q = scene->getCurrentJointPositions();
   const auto marker_array = viz.visualize_configuration(q);
 
   // One visual geometry (the box) should produce one marker
@@ -72,10 +72,10 @@ TEST_F(RoboplanVisualizerTest, VisualizeFixedJointConfiguration) {
 }
 
 TEST_F(RoboplanVisualizerTest, VisualizeRevoluteJointConfiguration) {
-  const auto scene = roboplan::Scene("test", REVOLUTE_URDF, EMPTY_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>("test", REVOLUTE_URDF, EMPTY_SRDF);
   RoboplanVisualizer viz(scene, REVOLUTE_URDF);
 
-  const Eigen::VectorXd q = scene.getCurrentJointPositions();
+  const Eigen::VectorXd q = scene->getCurrentJointPositions();
   const auto marker_array = viz.visualize_configuration(q);
 
   ASSERT_EQ(marker_array.markers.size(), 1u);
