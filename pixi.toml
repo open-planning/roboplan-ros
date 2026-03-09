@@ -87,9 +87,9 @@ ROS_DISTRO = "kilted"
 [feature.kilted.dev]
 # Add path dependencies to the package.xmls in the workspace
 ros-kilted-roboplan-ros-cpp = { path = "./roboplan_ros_cpp/package.xml" }
-ros-kilted-roboplan-ros-franka = { path = "./roboplan_ros_franka/package.xml" }
 ros-kilted-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
 ros-kilted-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
+ros-kilted-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_franka/package.xml" }
 
 # TODO: Once roboplan is stable enough we could just install those packages from Conda
 ros-kilted-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
@@ -114,9 +114,9 @@ ROS_DISTRO = "jazzy"
 [feature.jazzy.dev]
 # Add path dependencies to the package.xmls in the workspace
 ros-jazzy-roboplan-ros-cpp = { path = "./roboplan_ros_cpp/package.xml" }
-ros-jazzy-roboplan-ros-franka = { path = "./roboplan_ros_franka/package.xml" }
 ros-jazzy-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
 ros-jazzy-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
+ros-jazzy-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_franka/package.xml" }
 
 # TODO: Once roboplan is stable enough we could just install those packages from Conda
 ros-jazzy-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
@@ -141,9 +141,9 @@ ROS_DISTRO = "humble"
 [feature.humble.dev]
 # Add path dependencies to the package.xmls in the workspace
 # ros-humble-roboplan-ros-cpp = { path = "./roboplan_ros_cpp/package.xml" }
-# ros-humble-roboplan-ros-franka = { path = "./roboplan_ros_franka/package.xml" }
 # ros-humble-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
 # ros-humble-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
+# ros-humble-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_franka/package.xml" }
 
 # # TODO: Once roboplan is stable enough we could just install those packages from Conda
 # ros-humble-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
