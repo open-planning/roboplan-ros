@@ -14,6 +14,7 @@ SHELL ["/bin/bash", "-c"]
 
 # Install core dependencies.
 RUN apt update -y \
+    && apt upgrade -y \
     && apt install -y libgmock-dev python3-pip
 
 # Install Python dependencies needed for bindings.
