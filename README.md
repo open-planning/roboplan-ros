@@ -56,6 +56,10 @@ The examples from the upstream repository should now be available, as well,
 python3 roboplan/bindings/examples/example_scene.py
 ```
 
+> [!IMPORTANT]
+> All ROS distros will share build/install directories by default.
+> Be sure to clear them out when switching between ROS versions or things will break.
+
 ### Docker Development
 
 A [Docker Compose](https://docs.docker.com/compose/) workflow is also provided by the [compose specification](./docker-compose.yaml).
