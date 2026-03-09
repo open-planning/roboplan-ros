@@ -108,7 +108,6 @@ class InteractiveMarkerIKNode(Node):
         self._visualizer = RoboplanVisualizer(
             scene=self.scene,
             urdf_xml=urdf_xml,
-            package_paths=package_paths,
             frame_id="world",
             ns="roboplan_ik",
             color=ColorRGBA(r=0.0, g=0.0, b=1.0, a=0.5),
@@ -147,7 +146,7 @@ class InteractiveMarkerIKNode(Node):
         """
         Compute the marker locations and publish them.
         """
-        marker_array = self._visualizer.visualize_configuration(q)
+        marker_array = self._visualizer.markers_from_configuration(q)
         self._marker_pub.publish(marker_array)
 
     def destroy_node(self):
