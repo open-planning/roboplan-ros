@@ -1,34 +1,26 @@
-[project]
+[workspace]
 authors = ["Erik Holum <eholum@gmail.com>"]
 channels = ["conda-forge"]
 name = "roboplan-ros"
 platforms = ["linux-64", "linux-aarch64"]
 version = "0.1.0"
+# For the pixi-build-ros backend
+preview = ["pixi-build"]
 
 [tasks]
 setup-colcon = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = { cmd = ["colcon", "build", "--build-base", "build_$ROS_DISTRO", "--install-base", "install_$ROS_DISTRO"] }
-# TOPP-RA has failures in colcon, so ignoring for now.
-# https://github.com/sea-bass/toppra/pull/1
+build = { cmd = ["colcon", "build"] }
 test = { cmd = [
   "colcon",
   "test",
-  "--packages-skip",
-  "toppra",
-  "--build-base",
-  "build_$ROS_DISTRO",
-  "--install-base",
-  "install_$ROS_DISTRO",
 ]}
 test-result = {cmd = [
   "colcon",
   "test-result",
   "--verbose",
-  "--test-result-base",
-  "build_$ROS_DISTRO",
 ]}
 
 [dependencies]
@@ -79,65 +71,83 @@ channels = ["https://prefix.dev/robostack-kilted"]
 
 [feature.kilted.dependencies]
 ros-kilted-ros-core = "*"
-ros-kilted-trajectory-msgs = "*"
-ros-kilted-yaml-cpp-vendor = "*"
-ros-kilted-tinyxml2-vendor = "*"
-ros-kilted-controller-manager = "*"
-ros-kilted-ros2-controllers = "*"
-ros-kilted-robot-state-publisher = "*"
-ros-kilted-geometry-msgs = "*"
-ros-kilted-rviz2 = "*"
-ros-kilted-interactive-markers = "*"
-ros-kilted-tf2-eigen = "*"
-ros-kilted-sensor-msgs = "*"
-ros-kilted-topic-tools = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
+
+[feature.kilted.dev]
+# Add path dependencies to the package.xmls in the workspace
+ros-kilted-roboplan-ros-cpp = { path = "./roboplan_ros_cpp/package.xml" }
+ros-kilted-roboplan-ros-franka = { path = "./roboplan_ros_franka/package.xml" }
+ros-kilted-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
+ros-kilted-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
+
+# TODO: Once roboplan is stable enough we could just install those packages from Conda
+ros-kilted-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
+ros-kilted-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
+ros-kilted-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
+ros-kilted-toppra = { path = "./roboplan/external/toppra/cpp/package.xml" }
+ros-kilted-roboplan = { path = "./roboplan/roboplan/package.xml" }
+ros-kilted-roboplan-oink = { path = "./roboplan/roboplan_oink/package.xml" }
+ros-kilted-roboplan-example-models = { path = "./roboplan/roboplan_example_models/package.xml" }
+ros-kilted-roboplan-rrt = { path = "./roboplan/roboplan_rrt/package.xml" }
+ros-kilted-roboplan-simple-ik = { path = "./roboplan/roboplan_simple_ik/package.xml" }
 
 [feature.jazzy]
 channels = ["https://prefix.dev/robostack-jazzy"]
 
 [feature.jazzy.dependencies]
 ros-jazzy-ros-core = "*"
-ros-jazzy-trajectory-msgs = "*"
-ros-jazzy-yaml-cpp-vendor = "*"
-ros-jazzy-tinyxml2-vendor = "*"
-ros-jazzy-controller-manager = "*"
-ros-jazzy-ros2-controllers = "*"
-ros-jazzy-robot-state-publisher = "*"
-ros-jazzy-geometry-msgs = "*"
-ros-jazzy-rviz2 = "*"
-ros-jazzy-interactive-markers = "*"
-ros-jazzy-tf2-eigen = "*"
-ros-jazzy-sensor-msgs = "*"
-ros-jazzy-topic-tools = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
+
+[feature.jazzy.dev]
+# Add path dependencies to the package.xmls in the workspace
+ros-jazzy-roboplan-ros-cpp = { path = "./roboplan_ros_cpp/package.xml" }
+ros-jazzy-roboplan-ros-franka = { path = "./roboplan_ros_franka/package.xml" }
+ros-jazzy-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
+ros-jazzy-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
+
+# TODO: Once roboplan is stable enough we could just install those packages from Conda
+ros-jazzy-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
+ros-jazzy-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
+ros-jazzy-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
+ros-jazzy-toppra = { path = "./roboplan/external/toppra/cpp/package.xml" }
+ros-jazzy-roboplan = { path = "./roboplan/roboplan/package.xml" }
+ros-jazzy-roboplan-oink = { path = "./roboplan/roboplan_oink/package.xml" }
+ros-jazzy-roboplan-example-models = { path = "./roboplan/roboplan_example_models/package.xml" }
+ros-jazzy-roboplan-rrt = { path = "./roboplan/roboplan_rrt/package.xml" }
+ros-jazzy-roboplan-simple-ik = { path = "./roboplan/roboplan_simple_ik/package.xml" }
 
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]
 
 [feature.humble.dependencies]
 ros-humble-ros-core = "*"
-ros-humble-trajectory-msgs = "*"
-ros-humble-yaml-cpp-vendor = "*"
-ros-humble-tinyxml2-vendor = "*"
-ros-humble-controller-manager = "*"
-ros-humble-ros2-controllers = "*"
-ros-humble-robot-state-publisher = "*"
-ros-humble-geometry-msgs = "*"
-ros-humble-rviz2 = "*"
-ros-humble-interactive-markers = "*"
-ros-humble-tf2-eigen = "*"
-ros-humble-sensor-msgs = "*"
-ros-humble-topic-tools = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
 
+[feature.humble.dev]
+# Add path dependencies to the package.xmls in the workspace
+ros-humble-roboplan-ros-cpp = { path = "./roboplan_ros_cpp/package.xml" }
+ros-humble-roboplan-ros-franka = { path = "./roboplan_ros_franka/package.xml" }
+ros-humble-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
+ros-humble-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
+
+# TODO: Once roboplan is stable enough we could just install those packages from Conda
+ros-humble-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
+ros-humble-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
+ros-humble-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
+ros-humble-toppra = { path = "./roboplan/external/toppra/cpp/package.xml" }
+ros-humble-roboplan = { path = "./roboplan/roboplan/package.xml" }
+ros-humble-roboplan-oink = { path = "./roboplan/roboplan_oink/package.xml" }
+ros-humble-roboplan-example-models = { path = "./roboplan/roboplan_example_models/package.xml" }
+ros-humble-roboplan-rrt = { path = "./roboplan/roboplan_rrt/package.xml" }
+ros-humble-roboplan-simple-ik = { path = "./roboplan/roboplan_simple_ik/package.xml" }
+
 [environments]
-kilted = ["kilted"]
-jazzy = ["jazzy"]
-humble = ["humble"]
+kilted = { features = ["kilted"], solve-group = "kilted" }
+jazzy = { features = ["jazzy"], solve-group = "jazzy" }
+humble = { features = ["humble"], solve-group = "humble" }
