@@ -1,5 +1,3 @@
-#include "roboplan_ros_visualization/roboplan_visualizer.hpp"
-
 #include <pinocchio/algorithm/geometry.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 
@@ -7,25 +5,27 @@
 #include <hpp/fcl/shape/convex.h>
 #include <hpp/fcl/shape/geometric_shapes.h>
 
+#include <rclcpp/logging.hpp>
+
 #include <roboplan_ros_cpp/type_conversions.hpp>
+#include <roboplan_ros_visualization/roboplan_visualizer.hpp>
 
 namespace roboplan_ros_cpp {
 
 RoboplanVisualizer::RoboplanVisualizer(std::shared_ptr<const roboplan::Scene> scene,
-                                       const std::string& urdf_xml,
-                                       const std::vector<std::string>& package_paths,
-                                       const std::string& frame_id, const std::string& ns,
+                                       const std::string& urdf_xml, const std::string& frame_id,
+                                       const std::string& ns,
                                        const std::optional<std_msgs::msg::ColorRGBA>& color)
     : scene_(std::move(scene)), frame_id_(frame_id), ns_(ns), color_(color) {
   // Build a visual GeometryModel from the URDF.
   // Scene only holds the collision model, so we need this for rendering.
   const auto& model = scene_->getModel();
   std::istringstream urdf_stream(urdf_xml);
-  pinocchio::urdf::buildGeom(model, urdf_stream, pinocchio::VISUAL, visual_model_, package_paths);
+  pinocchio::urdf::buildGeom(model, urdf_stream, pinocchio::VISUAL, visual_model_);
 }
 
 visualization_msgs::msg::MarkerArray
-RoboplanVisualizer::visualize_configuration(const Eigen::VectorXd& q) const {
+RoboplanVisualizer::markers_from_configuration(const Eigen::VectorXd& q) const {
   visualization_msgs::msg::MarkerArray marker_array;
 
   const auto& model = scene_->getModel();
@@ -35,10 +35,10 @@ RoboplanVisualizer::visualize_configuration(const Eigen::VectorXd& q) const {
   pinocchio::updateGeometryPlacements(model, data, visual_model_, visual_data, q);
 
   for (std::size_t idx = 0; idx < visual_model_.geometryObjects.size(); ++idx) {
-    const auto& geom_obj = visual_model_.geometryObjects[idx];
-    const pinocchio::SE3& placement = visual_data.oMg[idx];
+    const auto& geom_obj = visual_model_.geometryObjects.at(idx);
+    const pinocchio::SE3& placement = visual_data.oMg.at(idx);
 
-    auto marker = createGeometryMarker(static_cast<int>(idx), geom_obj, placement);
+    auto marker = create_geometry_marker(static_cast<int>(idx), geom_obj, placement);
     if (marker) {
       marker_array.markers.push_back(std::move(*marker));
     }
@@ -60,8 +60,8 @@ void RoboplanVisualizer::set_color(const std_msgs::msg::ColorRGBA& color) { colo
 void RoboplanVisualizer::clear_color() { color_ = std::nullopt; }
 
 std::optional<visualization_msgs::msg::Marker>
-RoboplanVisualizer::createGeometryMarker(int marker_id, const pinocchio::GeometryObject& geom_obj,
-                                         const pinocchio::SE3& placement) const {
+RoboplanVisualizer::create_geometry_marker(int marker_id, const pinocchio::GeometryObject& geom_obj,
+                                           const pinocchio::SE3& placement) const {
 
   // The caller can change as needed
   visualization_msgs::msg::Marker marker;
@@ -122,7 +122,8 @@ RoboplanVisualizer::createGeometryMarker(int marker_id, const pinocchio::Geometr
     marker.scale.z = geom_obj.meshScale[2];
 
   } else {
-    // TODO: What should we do with these?
+    RCLCPP_WARN(rclcpp::get_logger("RoboplanVisualizer"), "Unsupported geometry type for %s",
+                geom_obj.name.c_str());
     return std::nullopt;
   }
 
@@ -131,7 +132,7 @@ RoboplanVisualizer::createGeometryMarker(int marker_id, const pinocchio::Geometr
     marker.mesh_use_embedded_materials = true;
   }
 
-  // Apply the geometry object's own colour (meshColor is Eigen::Vector4d)
+  // Apply the geometry object's own color
   if (geom_obj.meshColor.size() >= 4) {
     marker.color.r = static_cast<float>(geom_obj.meshColor[0]);
     marker.color.g = static_cast<float>(geom_obj.meshColor[1]);

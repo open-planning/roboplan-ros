@@ -36,13 +36,11 @@ def test_import():
 
 
 def test_visualize_configuration():
-    print("Constructing scene")
     scene = Scene(name="test", urdf=BOX_URDF, srdf=EMPTY_SRDF)
     viz = RoboplanVisualizer(scene=scene, urdf_xml=BOX_URDF)
 
     q = scene.getCurrentJointPositions()
-    print("Visualizing config scene")
-    marker_array = viz.visualize_configuration(q)
+    marker_array = viz.markers_from_configuration(q)
     assert (
         len(marker_array.markers) == 1
     ), f"Expected 1 marker, got {len(marker_array.markers)}"

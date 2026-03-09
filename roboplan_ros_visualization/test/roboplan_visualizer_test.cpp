@@ -61,7 +61,7 @@ TEST_F(RoboplanVisualizerTest, VisualizeFixedJointConfiguration) {
   RoboplanVisualizer viz(scene, BOX_URDF);
 
   const Eigen::VectorXd q = scene->getCurrentJointPositions();
-  const auto marker_array = viz.visualize_configuration(q);
+  const auto marker_array = viz.markers_from_configuration(q);
 
   // One visual geometry (the box) should produce one marker
   ASSERT_EQ(marker_array.markers.size(), 1u);
@@ -76,7 +76,7 @@ TEST_F(RoboplanVisualizerTest, VisualizeRevoluteJointConfiguration) {
   RoboplanVisualizer viz(scene, REVOLUTE_URDF);
 
   const Eigen::VectorXd q = scene->getCurrentJointPositions();
-  const auto marker_array = viz.visualize_configuration(q);
+  const auto marker_array = viz.markers_from_configuration(q);
 
   ASSERT_EQ(marker_array.markers.size(), 1u);
   EXPECT_EQ(marker_array.markers[0].type, visualization_msgs::msg::Marker::CYLINDER);

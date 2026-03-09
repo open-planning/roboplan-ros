@@ -30,25 +30,26 @@ NB_MODULE(bindings, m) {
   nb::class_<roboplan_ros_cpp::RoboplanVisualizer>(
       m, "RoboplanVisualizer",
       "Tool to build RViz MarkerArray messages from a RoboPlan scene and joint configuration.")
+      // Useful docs on custom constructors and why this is setup this way
+      // https://nanobind.readthedocs.io/en/latest/porting.html#custom-constructors
       .def(
           "__init__",
           [](roboplan_ros_cpp::RoboplanVisualizer* self,
              std::shared_ptr<const roboplan::Scene> scene, const std::string& urdf_xml,
-             const std::vector<std::string>& package_paths, const std::string& frame_id,
-             const std::string& ns, nb::handle py_color) {
+             const std::string& frame_id, const std::string& ns, nb::handle py_color) {
             std::optional<std_msgs::msg::ColorRGBA> color = std::nullopt;
             if (!py_color.is_none()) {
               color = pyToCppMsg<std_msgs::msg::ColorRGBA>(py_color);
             }
-            new (self) roboplan_ros_cpp::RoboplanVisualizer(std::move(scene), urdf_xml,
-                                                            package_paths, frame_id, ns, color);
+            new (self) roboplan_ros_cpp::RoboplanVisualizer(std::move(scene), urdf_xml, frame_id,
+                                                            ns, color);
           },
-          "scene"_a, "urdf_xml"_a, "package_paths"_a = std::vector<std::string>{},
-          "frame_id"_a = "world", "ns"_a = "/roboplan", "color"_a = nb::none())
+          "scene"_a, "urdf_xml"_a, "frame_id"_a = "world", "ns"_a = "/roboplan",
+          "color"_a = nb::none())
       .def(
-          "visualize_configuration",
+          "markers_from_configuration",
           [MarkerArray](roboplan_ros_cpp::RoboplanVisualizer& self, const Eigen::VectorXd& q) {
-            return cppToPyMsg(self.visualize_configuration(q), MarkerArray);
+            return cppToPyMsg(self.markers_from_configuration(q), MarkerArray);
           },
           "q"_a, "Compute marker array for the given joint configuration.")
       .def(
