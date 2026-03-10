@@ -2,7 +2,7 @@
 authors = ["Erik Holum <eholum@gmail.com>"]
 channels = ["conda-forge"]
 name = "roboplan-ros"
-platforms = ["linux-aarch64"]
+platforms = ["linux-64", "linux-aarch64"]
 version = "0.1.0"
 # For the pixi-build-ros backend
 preview = ["pixi-build"]
@@ -72,11 +72,7 @@ LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
 CXXFLAGS = "-fuse-ld=mold"
 
 [feature.kilted]
-channels = [
-  "https://prefix.dev/robostack-kilted",
-  # TODO: Remove this obviouly, just testing locally
-  "file:///home/parallels/ROS/robostack/ros-kilted/output"
-]
+channels = ["https://prefix.dev/robostack-kilted"]
 
 [feature.kilted.dependencies]
 ros-kilted-ros-base = "*"
@@ -140,21 +136,21 @@ ROS_DISTRO = "humble"
 
 [feature.humble.dev]
 # Add path dependencies to the package.xmls in the workspace
-# ros-humble-roboplan-ros-cpp = { path = "./roboplan_ros_cpp/package.xml" }
-# ros-humble-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
-# ros-humble-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
-# ros-humble-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_franka/package.xml" }
+ros-humble-roboplan-ros-cpp = { path = "./roboplan_ros_cpp/package.xml" }
+ros-humble-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
+ros-humble-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
+ros-humble-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_franka/package.xml" }
 
 # # TODO: Once roboplan is stable enough we could just install those packages from Conda
-# ros-humble-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
-# ros-humble-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
-# ros-humble-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
-# ros-humble-toppra = { path = "./roboplan/external/toppra/cpp/package.xml" }
-# ros-humble-roboplan = { path = "./roboplan/roboplan/package.xml" }
-# ros-humble-roboplan-oink = { path = "./roboplan/roboplan_oink/package.xml" }
-# ros-humble-roboplan-example-models = { path = "./roboplan/roboplan_example_models/package.xml" }
-# ros-humble-roboplan-rrt = { path = "./roboplan/roboplan_rrt/package.xml" }
-# ros-humble-roboplan-simple-ik = { path = "./roboplan/roboplan_simple_ik/package.xml" }
+ros-humble-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
+ros-humble-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
+ros-humble-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
+ros-humble-toppra = { path = "./roboplan/external/toppra/cpp/package.xml" }
+ros-humble-roboplan = { path = "./roboplan/roboplan/package.xml" }
+ros-humble-roboplan-oink = { path = "./roboplan/roboplan_oink/package.xml" }
+ros-humble-roboplan-example-models = { path = "./roboplan/roboplan_example_models/package.xml" }
+ros-humble-roboplan-rrt = { path = "./roboplan/roboplan_rrt/package.xml" }
+ros-humble-roboplan-simple-ik = { path = "./roboplan/roboplan_simple_ik/package.xml" }
 
 [environments]
 kilted = { features = ["kilted"] }
