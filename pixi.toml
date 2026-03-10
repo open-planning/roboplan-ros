@@ -43,16 +43,12 @@ viser = ">=1.0.11,<2"
 tyro = ">=0.9.32,<0.10"
 matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
+# We should install nanobind from pip rather than apt/rosdep
+nanobind = ">=2.8.0,<3"
 numpy = ">=1.26.4,<3"
 
 # For ROS, should be available across distros
 lttng-ust = ">=2.13.9,<3"
-
-# TODO: Usually installable in ROS dep but unavailable in robostack.
-# We could fix that: https://robostack.github.io/Contributing.html
-pinocchio = ">=3.7.0,<4"
-eigen = ">=3.4.0,<4"
-nanobind = ">=2.8.0,<3"
 # Ensure a compatible version for TOPP-RA's bindings
 pybind11 = ">=3.0.2,<4"
 
@@ -153,6 +149,7 @@ ros-humble-roboplan-rrt = { path = "./roboplan/roboplan_rrt/package.xml" }
 ros-humble-roboplan-simple-ik = { path = "./roboplan/roboplan_simple_ik/package.xml" }
 
 [environments]
-kilted = { features = ["kilted"] }
+# TODO: Uncomment after pin is available through pixi-build-ros
+# kilted = { features = ["kilted"] }
 jazzy = { features = ["jazzy"] }
-humble = { features = ["humble"] }
+# humble = { features = ["humble"] }
