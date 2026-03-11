@@ -28,7 +28,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros_distro: [kilted, jazzy, humble]
+        # TODO: pinocchio is only available on jazzy for the moment, so re-add once
+        # this and an equivailant are available on humble:
+        # https://github.com/RoboStack/ros-kilted/pull/54
+        # ros_distro: [kilted, jazzy, humble]
+        ros_distro: [kilted, jazzy]
 
     runs-on: ubuntu-latest
     steps:
