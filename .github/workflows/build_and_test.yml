@@ -32,7 +32,7 @@ jobs:
         # this and an equivailant are available on humble:
         # https://github.com/RoboStack/ros-kilted/pull/54
         # ros_distro: [kilted, jazzy, humble]
-        ros_distro: [jazzy]
+        ros_distro: [kilted, jazzy]
 
     runs-on: ubuntu-latest
     steps:

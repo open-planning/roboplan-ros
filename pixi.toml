@@ -149,7 +149,7 @@ ros-humble-roboplan-rrt = { path = "./roboplan/roboplan_rrt/package.xml" }
 ros-humble-roboplan-simple-ik = { path = "./roboplan/roboplan_simple_ik/package.xml" }
 
 [environments]
-# TODO: Uncomment after pin is available through pixi-build-ros
-# kilted = { features = ["kilted"] }
+kilted = { features = ["kilted"] }
 jazzy = { features = ["jazzy"] }
+# TODO: Uncomment after pin is available through pixi-build-ros
 # humble = { features = ["humble"] }
