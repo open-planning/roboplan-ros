@@ -53,12 +53,16 @@ colcon test
 The examples from the upstream repository should now be available, as well,
 
 ```bash
-python3 roboplan/bindings/examples/example_scene.py
+python3 roboplan/roboplan_examples/python/example_scene.py
 ```
 
 > [!IMPORTANT]
 > All ROS distros will share build/install directories by default.
 > Be sure to clear them out when switching between ROS versions or things will break.
+
+> [!NOTE]
+> The `pixi-build-ros` backend requires that all `package.xml` files be reference in the `[dev]` block of the `pixi.toml` file.
+> This is a slight annoyance due to the submodules, but many of those packages can and will be installed from Conda once RoboPlan is more stable.
 
 ### Docker Development
 
