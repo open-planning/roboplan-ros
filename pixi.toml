@@ -138,7 +138,7 @@ ros-humble-roboplan-ros-py = { path = "./roboplan_ros_py/package.xml" }
 ros-humble-roboplan-ros-visualization = { path = "./roboplan_ros_visualization/package.xml" }
 ros-humble-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_franka/package.xml" }
 
-# # TODO: Once roboplan is stable enough we could just install those packages from Conda
+# TODO: Once roboplan is stable enough we could just install those packages from Conda
 ros-humble-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
 ros-humble-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
 ros-humble-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
