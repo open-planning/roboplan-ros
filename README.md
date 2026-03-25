@@ -14,6 +14,7 @@ git clone --recursive https://github.com/open-planning/roboplan-ros
 
 ROS and the required dependencies are bundled together with [pixi](https://pixi.sh/latest/) and [robostack](https://robostack.github.io).
 Different versions of ROS (humble, jazzy, and kilted) are supported with pixi environments.
+The build relies on the [pixi-build-ros](https://prefix-dev.github.io/pixi-build-backends/backends/pixi-build-ros/#env) backend to manage ROS dependencies from the workspace.
 
 For instance, to build for kilted:
 
@@ -40,20 +41,28 @@ However, not that the build/install directories are broken out by ROS distributi
 pixi shell -e kilted
 
 # Build with the existing install dirs
-colcon build --build-base build_${ROS_DISTRO} --install-base install_${ROS_DISTRO}
+colcon build
 
 # Source it
-source install_${ROS_DISTRO}/setup.bash
+source install/setup.bash
 
 # Or test,
-colcon test --build-base build_${ROS_DISTRO} --install-base install_${ROS_DISTRO}
+colcon test
 ```
 
 The examples from the upstream repository should now be available, as well,
 
 ```bash
-python3 roboplan/bindings/examples/example_scene.py
+python3 roboplan/roboplan_examples/python/example_scene.py
 ```
+
+> [!IMPORTANT]
+> All ROS distros will share build/install directories by default.
+> Be sure to clear them out when switching between ROS versions or things will break.
+
+> [!NOTE]
+> The `pixi-build-ros` backend requires that all `package.xml` files be reference in the `[dev]` block of the `pixi.toml` file.
+> This is a slight annoyance due to the submodules, but many of those packages can and will be installed from Conda once RoboPlan is more stable.
 
 ### Docker Development
 
