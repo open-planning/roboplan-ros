@@ -46,6 +46,9 @@ NB_MODULE(bindings, m) {
             if (!py_color.is_none()) {
               color = pyToCppMsg<std_msgs::msg::ColorRGBA>(py_color);
             }
+            // nanobind will pre-allocate memory for the object, so we just construct the object
+            // directly there in this lambda. This is messy but ensures no duplication and correct
+            // ownership.
             new (self) roboplan_ros_cpp::RoboplanVisualizer(std::move(scene), urdf_xml, frame_id,
                                                             ns, color);
           },
