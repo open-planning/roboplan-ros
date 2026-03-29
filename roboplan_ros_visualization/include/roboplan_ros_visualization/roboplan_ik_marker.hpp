@@ -18,13 +18,13 @@
 
 namespace roboplan_ros_cpp {
 
-/// @brief Solves IK for a target pose within a joint group using an interactive marker.
-/// @details Provides an out of the box IMarker for use in combination with an interactive
+/// @brief Solves IK for a target pose within a joint group with interactive marker feedback.
+/// @details Can be used to generate IK solutions using feedback from an interactive
 /// marker server. The consumer is responsible for connecting this to the appropriate ROS
 /// infrastructure, as needed for the specific application.
 class RoboplanIKMarker {
 public:
-  /// @brief Construct the IK backend.
+  /// @brief Constructs the IK solver and marker.
   /// @param scene A fully configured RoboPlan Scene.
   /// @param joint_group The joint group name for the IK solver.
   /// @param base_link Base link of the IK chain.
@@ -39,8 +39,6 @@ public:
   visualization_msgs::msg::InteractiveMarker construct_imarker() const;
 
   /// @brief Process feedback from an InteractiveMarkerServer.
-  ///
-  /// Can be called by users on iMarker pose updates.
   /// @param feedback The feedback message from the interactive marker server.
   /// @return Joint positions if IK succeeded, std::nullopt otherwise.
   std::optional<Eigen::VectorXd>
@@ -55,7 +53,6 @@ public:
 private:
   /// @brief Shared ptr to avoid ownership issues between C++ and Python
   std::shared_ptr<const roboplan::Scene> scene_;
-
   std::string joint_group_;
   std::string base_link_;
   std::string tip_link_;
