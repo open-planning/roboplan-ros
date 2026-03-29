@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import threading
 import xacro
 import numpy as np
 
@@ -8,7 +9,11 @@ from ament_index_python.packages import get_package_share_directory
 
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import MultiThreadedExecutor
+from rclpy.executors import (
+    MultiThreadedExecutor,
+    SingleThreadedExecutor,
+    ExternalShutdownException,
+)
 from rclpy.qos import (
     QoSProfile,
     QoSReliabilityPolicy,
@@ -17,17 +22,17 @@ from rclpy.qos import (
 )
 from std_msgs.msg import ColorRGBA
 from visualization_msgs.msg import MarkerArray
+from interactive_markers import InteractiveMarkerServer
 
 from roboplan.core import Scene
 from roboplan.simple_ik import SimpleIkOptions
-from roboplan_ros_visualization.interactive_marker_ik import InteractiveMarkerIK
-from roboplan_ros_visualization.bindings import RoboplanVisualizer
+from roboplan_ros_visualization.bindings import RoboplanVisualizer, RoboplanIKMarker
 
 
 class InteractiveMarkerIKNode(Node):
     """
     ROS 2 node that provides an interactive marker for IK-based pose control.
-    Publishes joint states when IK solutions are found.
+    Publishes visualization markers when IK solutions are found.
     """
 
     def __init__(self):
@@ -104,7 +109,17 @@ class InteractiveMarkerIKNode(Node):
         options.max_iters = 100
         options.step_size = 0.25
 
-        # Setup the visualizer from the nanobind wrapper
+        # Setup the IK marker backend
+        self.get_logger().info("Creating interactive marker controller...")
+        self._ik_marker = RoboplanIKMarker(
+            scene=self.scene,
+            joint_group=self.joint_group,
+            base_link=self.base_link,
+            tip_link=self.tip_link,
+            options=options,
+        )
+
+        # Setup the visualizer
         self._visualizer = RoboplanVisualizer(
             scene=self.scene,
             urdf_xml=urdf_xml,
@@ -124,36 +139,46 @@ class InteractiveMarkerIKNode(Node):
             MarkerArray, "roboplan_ik/markers", qos
         )
 
-        # Create the interactive marker controller, which will publish solutions to the
-        # desired topic using the visualizer.
-        self.get_logger().info("Creating interactive marker controller...")
-        self.imarker_ik = InteractiveMarkerIK(
-            node=self,
-            scene=self.scene,
-            joint_group=self.joint_group,
-            base_link=self.base_link,
-            tip_link=self.tip_link,
-            options=options,
-            solve_callback=self._visualize_and_publish,
-            namespace="roboplan_ik",
+        # The interactive marker server needs its own node and executor to avoid
+        # latency from competing with other callbacks on the main executor.
+        self._marker_node = Node("imarker_server_node")
+        self._ik_server = InteractiveMarkerServer(self._marker_node, "roboplan_ik")
+        self._ik_server.insert(
+            self._ik_marker.construct_imarker(),
+            feedback_callback=self._on_feedback,
         )
+        self._ik_server.applyChanges()
+
+        self._marker_executor = SingleThreadedExecutor()
+        self._marker_executor.add_node(self._marker_node)
+        self._marker_thread = threading.Thread(
+            target=self._spin_marker_executor, daemon=True
+        )
+        self._marker_thread.start()
 
         self.get_logger().info(
             "Move the interactive marker in RViz to visualize IK solutions"
         )
 
-    def _visualize_and_publish(self, q):
+    def _spin_marker_executor(self):
+        try:
+            self._marker_executor.spin()
+        except ExternalShutdownException:
+            pass
+
+    def _on_feedback(self, feedback):
         """
-        Compute the marker locations and publish them.
+        Process interactive marker feedback, solve IK, and publish visualization.
         """
-        marker_array = self._visualizer.markers_from_configuration(q)
-        self._marker_pub.publish(marker_array)
+        q = self._ik_marker.process_feedback(feedback)
+        if q is not None:
+            marker_array = self._visualizer.markers_from_configuration(q)
+            self._marker_pub.publish(marker_array)
 
     def destroy_node(self):
-        """
-        Override the default to ensure a clean shutdown.
-        """
-        self.imarker_ik.shutdown()
+        self._marker_executor.shutdown()
+        self._marker_thread.join(timeout=0.25)
+        self._marker_node.destroy_node()
         super().destroy_node()
 
 
