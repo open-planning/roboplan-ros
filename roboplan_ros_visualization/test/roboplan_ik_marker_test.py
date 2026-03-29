@@ -5,7 +5,6 @@ from visualization_msgs.msg import InteractiveMarkerFeedback
 
 from roboplan.core import Scene
 from roboplan.example_models import get_package_models_dir, get_package_share_dir
-from roboplan.simple_ik import SimpleIkOptions
 from roboplan_ros_cpp.bindings import se3ToPose
 from roboplan_ros_visualization.bindings import RoboplanIKMarker
 
