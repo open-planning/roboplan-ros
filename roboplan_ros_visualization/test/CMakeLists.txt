@@ -11,7 +11,16 @@ target_link_libraries(
   GTest::gtest_main
   ament_index_cpp::ament_index_cpp
 )
-ament_add_gtest_test(test_type_conversions_cpp)
+
+ament_add_gtest_test(roboplan_ik_marker_test roboplan_ik_marker_test.cpp)
+add_executable(roboplan_ik_marker_test roboplan_ik_marker_test.cpp)
+set_property(TARGET roboplan_ik_marker_test PROPERTY CXX_STANDARD 20)
+target_link_libraries(
+  roboplan_ik_marker_test
+  roboplan_ros_visualization
+  GTest::gtest_main
+  ament_index_cpp::ament_index_cpp
+)
 
 ament_get_python_install_dir(PYTHON_INSTALL_DIR)
 ament_add_pytest_test(roboplan_visualizer_test_py roboplan_visualizer_test.py
