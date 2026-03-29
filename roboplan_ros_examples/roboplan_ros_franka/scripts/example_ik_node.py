@@ -162,6 +162,9 @@ class InteractiveMarkerIKNode(Node):
         )
 
     def _spin_marker_executor(self):
+        """
+        Helper function to spin the executor in a background thread.
+        """
         try:
             self._marker_executor.spin()
         except ExternalShutdownException:
@@ -177,6 +180,9 @@ class InteractiveMarkerIKNode(Node):
             self._marker_pub.publish(marker_array)
 
     def destroy_node(self):
+        """
+        Override the default to ensure a clean shutdown.
+        """
         self._marker_executor.shutdown()
         self._marker_thread.join(timeout=0.25)
         self._marker_node.destroy_node()
