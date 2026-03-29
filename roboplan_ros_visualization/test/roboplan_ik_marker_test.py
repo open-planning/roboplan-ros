@@ -4,71 +4,36 @@ import numpy as np
 from visualization_msgs.msg import InteractiveMarkerFeedback
 
 from roboplan.core import Scene
+from roboplan.example_models import get_package_models_dir, get_package_share_dir
+from roboplan.simple_ik import SimpleIkOptions
 from roboplan_ros_cpp.bindings import se3ToPose
 from roboplan_ros_visualization.bindings import RoboplanIKMarker
-from roboplan.simple_ik import SimpleIkOptions
-
-
-TWO_LINK_URDF = """<?xml version="1.0"?>
-<robot name="test_robot">
-  <link name="world"/>
-  <link name="link1">
-    <visual>
-      <geometry>
-        <cylinder radius="0.05" length="0.5"/>
-      </geometry>
-    </visual>
-  </link>
-  <link name="link2">
-    <visual>
-      <geometry>
-        <cylinder radius="0.05" length="0.5"/>
-      </geometry>
-    </visual>
-  </link>
-  <joint name="joint1" type="revolute">
-    <parent link="world"/>
-    <child link="link1"/>
-    <origin xyz="0 0 0.25" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <limit lower="-3.14" upper="3.14" effort="10" velocity="1"/>
-  </joint>
-  <joint name="joint2" type="revolute">
-    <parent link="link1"/>
-    <child link="link2"/>
-    <origin xyz="0 0 0.5" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
-    <limit lower="-3.14" upper="3.14" effort="10" velocity="1"/>
-  </joint>
-</robot>
-"""
-
-TWO_LINK_SRDF = """<?xml version="1.0"?>
-<robot name="test_robot">
-  <group name="arm">
-    <chain base_link="world" tip_link="link2"/>
-  </group>
-</robot>
-"""
 
 
 def test_process_feedback():
-    scene = Scene(name="test", urdf=TWO_LINK_URDF, srdf=TWO_LINK_SRDF)
-    options = SimpleIkOptions()
-    options.max_iters = 1000
+    models_dir = get_package_models_dir()
+    urdf_path = models_dir / "ur_robot_model" / "ur5_gripper.urdf"
+    srdf_path = models_dir / "ur_robot_model" / "ur5_gripper.srdf"
+    package_paths = [get_package_share_dir()]
+
+    # Just start right next to IK pose to make the IK trivial
+    scene = Scene("test", urdf_path, srdf_path, package_paths)
+    q_init = np.array(scene.getCurrentJointPositions())
+    q_init[:] = [0.0, -1.57, 1.57, -1.57, -1.57, 0.0]
+    scene.setJointPositions(q_init)
+
     ik = RoboplanIKMarker(
         scene=scene,
         joint_group="arm",
-        base_link="world",
-        tip_link="link2",
-        options=options,
+        base_link="base_link",
+        tip_link="tool0",
     )
 
     # Compute a reachable target via FK at a known configuration
-    q_target = scene.getCurrentJointPositions()
-    q_target[0] = 0.5
-    q_target[1] = 0.5
-    fk_target = scene.forwardKinematics(q_target, "link2")
+    q_target = np.array(scene.getCurrentJointPositions())
+    q_indices = scene.getJointGroupInfo("arm").q_indices
+    q_target[q_indices] = [0.0, -1.57, 1.57, -1.57, -1.57, 0.0]
+    fk_target = scene.forwardKinematics(q_target, "tool0")
     target_pose = se3ToPose(fk_target)
 
     # Solve via process_feedback
@@ -79,7 +44,7 @@ def test_process_feedback():
 
     # Verify FK of solution matches the target
     assert result is not None
-    fk_result = scene.forwardKinematics(result, "link2")
+    fk_result = scene.forwardKinematics(result, "tool0")
     assert abs(fk_result[0, 3] - target_pose.position.x) < 0.01
     assert abs(fk_result[1, 3] - target_pose.position.y) < 0.01
     assert abs(fk_result[2, 3] - target_pose.position.z) < 0.01
