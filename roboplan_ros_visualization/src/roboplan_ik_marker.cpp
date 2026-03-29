@@ -34,46 +34,6 @@ RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
   target_pose_ = roboplan_ros_cpp::se3ToPose(se3_pose);
 }
 
-std::optional<Eigen::VectorXd>
-RoboplanIKMarker::solve(const geometry_msgs::msg::Pose& target_pose) {
-  target_pose_ = target_pose;
-  return solve();
-}
-
-std::optional<Eigen::VectorXd> RoboplanIKMarker::solve() {
-  const Eigen::Matrix4d tform = roboplan_ros_cpp::poseToSE3(target_pose_);
-
-  roboplan::CartesianConfiguration goal;
-  goal.base_frame = base_link_;
-  goal.tip_frame = tip_link_;
-  goal.tform = tform;
-
-  roboplan::JointConfiguration seed;
-  seed.positions = last_joint_positions_;
-
-  roboplan::JointConfiguration solution;
-  const bool success = ik_solver_.solveIk(goal, seed, solution);
-
-  if (success) {
-    last_joint_positions_ = solution.positions;
-    return last_joint_positions_;
-  }
-
-  return std::nullopt;
-}
-
-void RoboplanIKMarker::set_target_pose(const geometry_msgs::msg::Pose& target_pose) {
-  target_pose_ = target_pose;
-}
-
-const geometry_msgs::msg::Pose& RoboplanIKMarker::target_pose() const { return target_pose_; }
-
-const Eigen::VectorXd& RoboplanIKMarker::last_joint_positions() const {
-  return last_joint_positions_;
-}
-
-void RoboplanIKMarker::set_joint_positions(const Eigen::VectorXd& q) { last_joint_positions_ = q; }
-
 visualization_msgs::msg::InteractiveMarker RoboplanIKMarker::construct_imarker() const {
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = base_link_;
@@ -134,7 +94,31 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
     return std::nullopt;
   }
 
-  return solve(feedback.pose);
+  const Eigen::Matrix4d tform = roboplan_ros_cpp::poseToSE3(feedback.pose);
+
+  roboplan::CartesianConfiguration goal;
+  goal.base_frame = base_link_;
+  goal.tip_frame = tip_link_;
+  goal.tform = tform;
+
+  roboplan::JointConfiguration seed;
+  seed.positions = last_joint_positions_;
+
+  roboplan::JointConfiguration solution;
+  const bool success = ik_solver_.solveIk(goal, seed, solution);
+
+  if (success) {
+    last_joint_positions_ = solution.positions;
+    return last_joint_positions_;
+  }
+
+  return std::nullopt;
 }
+
+const Eigen::VectorXd& RoboplanIKMarker::last_joint_positions() const {
+  return last_joint_positions_;
+}
+
+void RoboplanIKMarker::set_joint_positions(const Eigen::VectorXd& q) { last_joint_positions_ = q; }
 
 }  // namespace roboplan_ros_cpp

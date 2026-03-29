@@ -34,31 +34,6 @@ public:
                    const std::string& base_link, const std::string& tip_link,
                    const roboplan::SimpleIkOptions& options = roboplan::SimpleIkOptions());
 
-  /// @brief Set the target pose and solve IK.
-  ///
-  /// Updates the internal target pose and runs the IK solver using the
-  /// last successful joint positions as the seed state.
-  /// @param target_pose The desired end-effector pose.
-  /// @return Joint positions if a solution was found, std::nullopt otherwise.
-  std::optional<Eigen::VectorXd> solve(const geometry_msgs::msg::Pose& target_pose);
-
-  /// @brief Solve IK for the current target pose without updating it.
-  /// @return Joint positions if a solution was found, std::nullopt otherwise.
-  std::optional<Eigen::VectorXd> solve();
-
-  /// @brief Set the target pose without solving.
-  /// @param target_pose The desired end-effector pose.
-  void set_target_pose(const geometry_msgs::msg::Pose& target_pose);
-
-  /// @brief Get the current target pose.
-  const geometry_msgs::msg::Pose& target_pose() const;
-
-  /// @brief Get the last successful joint positions (or the initial seed).
-  const Eigen::VectorXd& last_joint_positions() const;
-
-  /// @brief Sets last joint positions, which are then used as a seed for the next solve.
-  void set_joint_positions(const Eigen::VectorXd& q);
-
   /// @brief Build an InteractiveMarker message for the current target pose.
   /// @return A configured InteractiveMarker with 6-DOF controls.
   visualization_msgs::msg::InteractiveMarker construct_imarker() const;
@@ -70,6 +45,12 @@ public:
   /// @return Joint positions if IK succeeded, std::nullopt otherwise.
   std::optional<Eigen::VectorXd>
   process_feedback(const visualization_msgs::msg::InteractiveMarkerFeedback& feedback);
+
+  /// @brief Get the last successful joint positions (or the initial seed).
+  const Eigen::VectorXd& last_joint_positions() const;
+
+  /// @brief Sets last joint positions, which are then used as a seed for the next solve.
+  void set_joint_positions(const Eigen::VectorXd& q);
 
 private:
   /// @brief Shared ptr to avoid ownership issues between C++ and Python
