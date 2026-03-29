@@ -8,13 +8,9 @@ RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
                                    const std::string& tip_link,
                                    const roboplan::SimpleIkOptions& options)
     : scene_(std::move(scene)), joint_group_(joint_group), base_link_(base_link),
-      tip_link_(tip_link), ik_solver_(std::const_pointer_cast<roboplan::Scene>(scene_), [&]() {
-        auto opts = options;
-        if (opts.group_name.empty()) {
-          opts.group_name = joint_group;
-        }
-        return opts;
-      }()) {
+      tip_link_(tip_link) {
+  ik_solver_ = std::make_unique<roboplan::SimpleIk>(
+      std::const_pointer_cast<roboplan::Scene>(scene_), options);
 
   const auto joint_group_result = scene_->getJointGroupInfo(joint_group_);
   if (!joint_group_result.has_value()) {
@@ -111,7 +107,7 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
   seed.positions = group_positions;
 
   roboplan::JointConfiguration solution;
-  const bool success = ik_solver_.solveIk(goal, seed, solution);
+  const bool success = ik_solver_->solveIk(goal, seed, solution);
 
   if (success) {
     // Then we need to expand back to the full state

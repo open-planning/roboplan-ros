@@ -64,7 +64,7 @@ private:
   Eigen::VectorXi q_indices_;
 
   /// @brief The underlying IK solver
-  roboplan::SimpleIk ik_solver_;
+  std::unique_ptr<roboplan::SimpleIk> ik_solver_;
 
   /// @brief Last successful joint solution, used as seed for next solve
   Eigen::VectorXd last_joint_positions_;
