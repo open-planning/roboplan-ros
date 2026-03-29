@@ -91,9 +91,6 @@ target_link_libraries(roboplan_ros_visualization_bindings PRIVATE
   ${rosidl_generator_cpp_LIBRARIES}
   tl_expected::tl_expected
 )
-
-# This package has a python module as well, so this install that first and then
-# install the bindings a sub-package.
 ament_python_install_package(${PROJECT_NAME})
 ament_get_python_install_dir(PYTHON_INSTALL_DIR)
 set_target_properties(roboplan_ros_visualization_bindings PROPERTIES
