@@ -102,14 +102,22 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
   goal.tip_frame = tip_link_;
   goal.tform = tform;
 
+  // Extract only the group joints for the seed
   roboplan::JointConfiguration seed;
-  seed.positions = last_joint_positions_;
+  Eigen::VectorXd group_positions(q_indices_.size());
+  for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
+    group_positions[i] = last_joint_positions_[q_indices_[i]];
+  }
+  seed.positions = group_positions;
 
   roboplan::JointConfiguration solution;
   const bool success = ik_solver_.solveIk(goal, seed, solution);
 
   if (success) {
-    last_joint_positions_ = solution.positions;
+    // Then we need to expand back to the full state
+    for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
+      last_joint_positions_[q_indices_[i]] = solution.positions[i];
+    }
     return last_joint_positions_;
   }
 
