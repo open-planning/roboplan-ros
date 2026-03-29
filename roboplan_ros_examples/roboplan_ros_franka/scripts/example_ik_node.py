@@ -140,7 +140,8 @@ class InteractiveMarkerIKNode(Node):
         )
 
         # The interactive marker server needs its own node and executor to avoid
-        # latency from competing with other callbacks on the main executor.
+        # latency from competing with other callbacks on the main executor. This
+        # is annoying but it works.
         self._marker_node = Node("imarker_server_node")
         self._ik_server = InteractiveMarkerServer(self._marker_node, "roboplan_ik")
         self._ik_server.insert(
