@@ -27,3 +27,9 @@ ament_add_pytest_test(roboplan_visualizer_test_py roboplan_visualizer_test.py
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   APPEND_ENV PYTHONPATH=${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTALL_DIR}
 )
+
+ament_get_python_install_dir(PYTHON_INSTALL_DIR)
+ament_add_pytest_test(roboplan_ik_marker_test roboplan_ik_marker_test.py
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  APPEND_ENV PYTHONPATH=${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTALL_DIR}
+)

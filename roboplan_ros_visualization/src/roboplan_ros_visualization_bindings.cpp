@@ -8,6 +8,7 @@
 #include <roboplan_ros_cpp/roboplan_ros_cpp_bindings.hpp>
 #include <roboplan_ros_cpp/type_conversions.hpp>
 
+#include <roboplan_ros_visualization/roboplan_ik_marker.hpp>
 #include <roboplan_ros_visualization/roboplan_visualizer.hpp>
 
 namespace nb = nanobind;
@@ -22,6 +23,10 @@ NB_MODULE(bindings, m) {
   // Pre-import Python messages to avoid repeated lookups
   nb::object MarkerArray = nb::module_::import_("visualization_msgs.msg").attr("MarkerArray");
   nb::object ColorRGBA = nb::module_::import_("std_msgs.msg").attr("ColorRGBA");
+  nb::object InteractiveMarker =
+      nb::module_::import_("visualization_msgs.msg").attr("InteractiveMarker");
+  nb::object InteractiveMarkerFeedback =
+      nb::module_::import_("visualization_msgs.msg").attr("InteractiveMarkerFeedback");
 
   /// IMPORTANT: We use a shared_ptr to manage ownership of the python Scene object between
   /// the python and C++ processes. This is critical! Otherwise problems with deconstruction
@@ -66,4 +71,43 @@ NB_MODULE(bindings, m) {
           "color"_a, "Set a color override for all geometry markers.")
       .def("clear_color", &roboplan_ros_cpp::RoboplanVisualizer::clear_color,
            "Remove the color override, reverting to per-geometry colors.");
+
+  nb::class_<roboplan_ros_cpp::RoboplanIKMarker>(
+      m, "RoboplanIKMarker",
+      "IK solver backend with interactive marker support for 6-DOF pose control.")
+      .def(
+          "__init__",
+          [](roboplan_ros_cpp::RoboplanIKMarker* self, std::shared_ptr<const roboplan::Scene> scene,
+             const std::string& joint_group, const std::string& base_link,
+             const std::string& tip_link, const roboplan::SimpleIkOptions& options) {
+            new (self) roboplan_ros_cpp::RoboplanIKMarker(std::move(scene), joint_group, base_link,
+                                                          tip_link, options);
+          },
+          "scene"_a, "joint_group"_a, "base_link"_a, "tip_link"_a,
+          "options"_a = roboplan::SimpleIkOptions())
+      .def(
+          "construct_imarker",
+          [InteractiveMarker](const roboplan_ros_cpp::RoboplanIKMarker& self) {
+            return cppToPyMsg(self.construct_imarker(), InteractiveMarker);
+          },
+          "Build an InteractiveMarker message for the current target pose.")
+      .def(
+          "process_feedback",
+          [InteractiveMarkerFeedback](roboplan_ros_cpp::RoboplanIKMarker& self,
+                                      nb::handle py_feedback) {
+            auto feedback =
+                pyToCppMsg<visualization_msgs::msg::InteractiveMarkerFeedback>(py_feedback);
+            auto result = self.process_feedback(feedback);
+            if (result.has_value()) {
+              return nb::cast(*result);
+            }
+            return nb::cast(nb::none());
+          },
+          "feedback"_a,
+          "Process InteractiveMarkerFeedback. Returns joint positions on success, or else None.")
+      .def_prop_ro("last_joint_positions",
+                   &roboplan_ros_cpp::RoboplanIKMarker::last_joint_positions,
+                   "The last successful joint positions (or initial seed).")
+      .def("set_joint_positions", &roboplan_ros_cpp::RoboplanIKMarker::set_joint_positions, "q"_a,
+           "Set the seed joint positions for the next solve.");
 }

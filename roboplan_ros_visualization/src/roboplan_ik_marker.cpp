@@ -94,7 +94,8 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
     return std::nullopt;
   }
 
-  const Eigen::Matrix4d tform = roboplan_ros_cpp::poseToSE3(feedback.pose);
+  target_pose_ = feedback.pose;
+  const Eigen::Matrix4d tform = roboplan_ros_cpp::poseToSE3(target_pose_);
 
   roboplan::CartesianConfiguration goal;
   goal.base_frame = base_link_;
