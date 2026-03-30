@@ -34,8 +34,7 @@ public:
                      const std::optional<std_msgs::msg::ColorRGBA>& color = std::nullopt);
 
   /// @brief Compute visualization markers for the given joint configuration.
-  ///
-  /// Runs Pinocchio geometry placement updates and returns a MarkerArray that
+  /// @details Runs Pinocchio geometry placement updates and returns a MarkerArray that
   /// the caller can publish however they like.
   /// @param q Joint positions (size must match the scene model's nq).
   /// @return MarkerArray with one marker per supported visual geometry.

@@ -53,8 +53,14 @@ public:
 private:
   /// @brief Shared ptr to avoid ownership issues between C++ and Python
   std::shared_ptr<const roboplan::Scene> scene_;
+
+  /// @brief The name of the joint group in the scene
   std::string joint_group_;
+
+  /// @brief The base link used for the IK solver, and frame for the marker header
   std::string base_link_;
+
+  ///@ brief The tip link of the IK solver chain.
   std::string tip_link_;
 
   /// @brief Joint names for the active group

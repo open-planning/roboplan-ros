@@ -22,7 +22,7 @@ RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
   joint_names_.clear();
   joint_names_.reserve(q_indices_.size());
   for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
-    joint_names_.push_back(all_joint_names.at(q_indices_[i]));
+    joint_names_.push_back(all_joint_names.at(q_indices_(i)));
   }
 
   last_joint_positions_ = scene_->getCurrentJointPositions();
@@ -102,7 +102,7 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
   roboplan::JointConfiguration seed;
   Eigen::VectorXd group_positions(q_indices_.size());
   for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
-    group_positions[i] = last_joint_positions_[q_indices_[i]];
+    group_positions(i) = last_joint_positions_(q_indices_(i));
   }
   seed.positions = group_positions;
 
@@ -112,7 +112,7 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
   if (success) {
     // Then we need to expand back to the full state
     for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
-      last_joint_positions_[q_indices_[i]] = solution.positions[i];
+      last_joint_positions_(q_indices_(i)) = solution.positions(i);
     }
     return last_joint_positions_;
   }
