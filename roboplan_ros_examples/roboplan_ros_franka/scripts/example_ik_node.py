@@ -109,16 +109,6 @@ class InteractiveMarkerIKNode(Node):
         options.max_iters = 100
         options.step_size = 0.25
 
-        # Setup the IK marker backend
-        self.get_logger().info("Creating interactive marker controller...")
-        self._ik_marker = RoboplanIKMarker(
-            scene=self.scene,
-            joint_group=self.joint_group,
-            base_link=self.base_link,
-            tip_link=self.tip_link,
-            options=options,
-        )
-
         # Setup the visualizer
         self._visualizer = RoboplanVisualizer(
             scene=self.scene,
@@ -128,7 +118,7 @@ class InteractiveMarkerIKNode(Node):
             color=ColorRGBA(r=0.0, g=0.0, b=1.0, a=0.5),
         )
 
-        # Create the marker publisher
+        # Create the IK markers publisher
         qos = QoSProfile(
             depth=1,
             reliability=QoSReliabilityPolicy.BEST_EFFORT,
@@ -139,9 +129,19 @@ class InteractiveMarkerIKNode(Node):
             MarkerArray, "roboplan_ik/markers", qos
         )
 
-        # The interactive marker server needs its own node and executor to avoid
-        # latency from competing with other callbacks on the main executor. This
-        # is annoying but it works.
+        # Setup the IK marker backend
+        self.get_logger().info("Creating interactive marker controller...")
+        self._ik_marker = RoboplanIKMarker(
+            scene=self.scene,
+            joint_group=self.joint_group,
+            base_link=self.base_link,
+            tip_link=self.tip_link,
+            options=options,
+        )
+
+        # We can't put the imarker server's callbacks into a separate callback group,
+        # so instead we give it its own node and executor to avoid bottlenecks from
+        # competing with other callbacks on the main executor.
         self._marker_node = Node("imarker_server_node")
         self._ik_server = InteractiveMarkerServer(self._marker_node, "roboplan_ik")
         self._ik_server.insert(
