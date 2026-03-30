@@ -7,8 +7,11 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(interactive_markers REQUIRED)
 find_package(roboplan REQUIRED)
+find_package(roboplan_simple_ik REQUIRED)
 find_package(roboplan_ros_cpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -16,6 +19,7 @@ find_package(tl_expected REQUIRED)
 
 add_library(roboplan_ros_visualization SHARED
     src/roboplan_visualizer.cpp
+    src/roboplan_ik_marker.cpp
 )
 target_include_directories(roboplan_ros_visualization PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -24,6 +28,7 @@ target_include_directories(roboplan_ros_visualization PUBLIC
 target_link_libraries(roboplan_ros_visualization
   PUBLIC
     roboplan::roboplan
+    roboplan_simple_ik::roboplan_simple_ik
     roboplan_ros_cpp::roboplan_ros_cpp
     pinocchio::pinocchio
     ${tf2_eigen_TARGETS}
@@ -31,6 +36,7 @@ target_link_libraries(roboplan_ros_visualization
     ${sensor_msgs_TARGETS}
     ${visualization_msgs_TARGETS}
     ${builtin_interfaces_TARGETS}
+    ${interactive_markers_TARGETS}
 )
 set_property(TARGET roboplan_ros_visualization PROPERTY CXX_STANDARD 20)
 ament_export_dependencies(
@@ -85,9 +91,6 @@ target_link_libraries(roboplan_ros_visualization_bindings PRIVATE
   ${rosidl_generator_cpp_LIBRARIES}
   tl_expected::tl_expected
 )
-
-# This package has a python module as well, so this install that first and then
-# install the bindings a sub-package.
 ament_python_install_package(${PROJECT_NAME})
 ament_get_python_install_dir(PYTHON_INSTALL_DIR)
 set_target_properties(roboplan_ros_visualization_bindings PROPERTIES

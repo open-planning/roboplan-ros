@@ -66,19 +66,19 @@ find_package(nanobind CONFIG REQUIRED)
 
 # Compile the nanobind python bindings for type conversions.
 nanobind_add_module(
-  bindings
+  roboplan_ros_cpp_bindings
   STABLE_ABI
   NB_STATIC
   NB_SUPPRESS_WARNINGS
   src/roboplan_ros_cpp_bindings.cpp
 )
-target_include_directories(bindings PUBLIC
+target_include_directories(roboplan_ros_cpp_bindings PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
   ${rosidl_generator_cpp_INCLUDE_DIRS}
 )
-set_property(TARGET bindings PROPERTY CXX_STANDARD 20)
-target_link_libraries(bindings PRIVATE
+set_property(TARGET roboplan_ros_cpp_bindings PROPERTY CXX_STANDARD 20)
+target_link_libraries(roboplan_ros_cpp_bindings PRIVATE
   roboplan_ros_cpp
   roboplan::roboplan
   roboplan_bindings::roboplan_bindings_utils
@@ -86,13 +86,11 @@ target_link_libraries(bindings PRIVATE
   tl_expected::tl_expected
 )
 ament_python_install_package(${PROJECT_NAME})
-ament_get_python_install_dir(PYTHON_INSTALL_DIR)
-install(TARGETS bindings
-  LIBRARY DESTINATION "${PYTHON_INSTALL_DIR}/roboplan_ros_cpp"
+set_target_properties(roboplan_ros_cpp_bindings PROPERTIES
+  OUTPUT_NAME "bindings"
 )
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/__init__.py "")
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/__init__.py
-  DESTINATION "${PYTHON_INSTALL_DIR}/roboplan_ros_cpp"
+install(TARGETS roboplan_ros_cpp_bindings
+  LIBRARY DESTINATION "${PYTHON_INSTALL_DIR}/roboplan_ros_cpp"
 )
 
 # Add the unit tests, if enabled.

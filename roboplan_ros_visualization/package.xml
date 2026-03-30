@@ -25,6 +25,8 @@
 
   <exec_depend>rviz2</exec_depend>
 
+  <test_depend>roboplan_bindings</test_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
