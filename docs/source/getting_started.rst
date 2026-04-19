@@ -79,7 +79,7 @@ The examples from the upstream repository should also be available, as well:
 
 
 **NOTE:** All ROS distros will share build/install directories by default.
-Be sure to clear them out when switching between ROS versions or things will break.
+Be sure to ``rm -rf build/* install/*`` when switching between ROS versions or things will break.
 
 **NOTE:** The ``pixi-build-ros`` backend requires that all ``package.xml`` files be referenced in the ``[dev]`` block of the ``pixi.toml`` file.
 For now, this includes the packages in the ``roboplan`` submodule.
