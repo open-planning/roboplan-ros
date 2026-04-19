@@ -82,7 +82,8 @@ The examples from the upstream repository should also be available, as well:
 Be sure to clear them out when switching between ROS versions or things will break.
 
 **NOTE:** The ``pixi-build-ros`` backend requires that all ``package.xml`` files be referenced in the ``[dev]`` block of the ``pixi.toml`` file.
-This is a slight annoyance due to the submodules, but many of those packages will be installed from Conda once RoboPlan is more stable.
+For now, this includes the packages in the ``roboplan`` submodule.
+This could be resolved with `pixi add roboplan-python`, but for now we stick with the source build for development purposes.
 
 ---
 
