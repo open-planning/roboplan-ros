@@ -16,7 +16,7 @@
 #include <visualization_msgs/msg/interactive_marker_feedback.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 
-namespace roboplan_ros_cpp {
+namespace roboplan_ros_visualization {
 
 /// @brief Solves IK for a target pose within a joint group with interactive marker feedback.
 /// @details Can be used to generate IK solutions using feedback from an interactive
@@ -79,4 +79,4 @@ private:
   geometry_msgs::msg::Pose target_pose_;
 };
 
-}  // namespace roboplan_ros_cpp
+}  // namespace roboplan_ros_visualization
