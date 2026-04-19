@@ -53,11 +53,10 @@ Once set up, you can run the ``pixi`` tasks as follows.
 
 Once the workspace is built, it can be used as a "normal" ROS 2 workspace.
 That is, the workspace can be sourced and used as expected.
-However, not that the build/install directories are broken out by ROS distribution, so those arguments MUST be included when compiling.
 
 ::
 
-    # Activate the kilted environment
+    # Activate the jazzy environment
     pixi shell -e jazzy
 
     # Build with the existing install dirs
@@ -72,7 +71,7 @@ However, not that the build/install directories are broken out by ROS distributi
     # Or launch an example
     ros2 launch roboplan_ros_franka franka_example_ik.launch.py
 
-The examples from the upstream repository should now be available, as well,
+The examples from the upstream repository should now be available, as well:
 
 ::
 
@@ -82,8 +81,8 @@ The examples from the upstream repository should now be available, as well,
 **NOTE:** All ROS distros will share build/install directories by default.
 Be sure to clear them out when switching between ROS versions or things will break.
 
-**NOTE:** The ``pixi-build-ros`` backend requires that all ``package.xml`` files be reference in the ``[dev]`` block of the ``pixi.toml`` file.
-This is a slight annoyance due to the submodules, but many of those packages can and will be installed from Conda once RoboPlan is more stable.
+**NOTE:** The ``pixi-build-ros`` backend requires that all ``package.xml`` files be referenced in the ``[dev]`` block of the ``pixi.toml`` file.
+This is a slight annoyance due to the submodules, but many of those packages will be installed from Conda once RoboPlan is more stable.
 
 ---
 
