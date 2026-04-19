@@ -5,7 +5,7 @@
 #include <roboplan/core/scene.hpp>
 #include <roboplan_ros_visualization/roboplan_visualizer.hpp>
 
-namespace roboplan_ros_cpp {
+namespace roboplan_ros_visualization {
 
 static const std::string BOX_URDF = R"(<?xml version="1.0"?>
 <robot name="test_robot">
@@ -89,4 +89,4 @@ TEST_F(RoboplanVisualizerTest, VisualizeRevoluteJointConfiguration) {
   EXPECT_EQ(marker_array_new.markers[0].action, visualization_msgs::msg::Marker::DELETEALL);
 }
 
-}  // namespace roboplan_ros_cpp
+}  // namespace roboplan_ros_visualization
