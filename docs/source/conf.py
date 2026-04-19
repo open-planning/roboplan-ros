@@ -55,6 +55,7 @@ exclude_patterns: list[str] = []
 
 # Mock imports for external dependencies.
 autodoc_mock_imports = [
+    "numpy",
     "rclpy",
     "roboplan",
     "std_msgs",
