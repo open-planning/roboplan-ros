@@ -27,7 +27,6 @@ RUN pip3 install \
         matplotlib \
         "numpy<2.0.0" \
         opencv-contrib-python-headless \
-        pytest \
         typing_extensions==4.10.0 \
         tyro \
         "viser>=1.0.1"
