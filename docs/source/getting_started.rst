@@ -71,7 +71,7 @@ That is, the workspace can be sourced and used as expected.
     # Or launch an example
     ros2 launch roboplan_ros_franka franka_example_ik.launch.py
 
-The examples from the upstream repository should now be available, as well:
+The examples from the upstream repository should also be available, as well:
 
 ::
 
@@ -125,7 +125,7 @@ Lastly, as a ``colcon`` package, the wrappers can be compiled in any valid ROS 2
 
 ::
 
-    pip install nanobind
+    pip3 install nanobind
 
 Source your favorite ROS distro and build the workspace.
 

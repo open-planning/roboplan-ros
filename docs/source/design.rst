@@ -14,7 +14,7 @@ With that, we have the following additional tenets for the ROS ecosystem:
 No nodes
 --------
 
-ROS 2 nodes inherently limit the execution model, lifecycle, parameter handling, and threading an application.
+ROS 2 nodes inherently limit the execution model, lifecycle, parameter handling, and threading in an application.
 These choices should always be left to the application developer, not the library.
 While we have a dependency on ROS 2 middleware, we will not commit to managing monolithic ROS 2 nodes that provide access to all of RoboPlan's capabilities.
 
