@@ -1,7 +1,7 @@
 #include <roboplan_ros_cpp/type_conversions.hpp>
 #include <roboplan_ros_visualization/roboplan_ik_marker.hpp>
 
-namespace roboplan_ros_cpp {
+namespace roboplan_ros_visualization {
 
 RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
                                    const std::string& joint_group, const std::string& base_link,
@@ -126,4 +126,4 @@ const Eigen::VectorXd& RoboplanIKMarker::last_joint_positions() const {
 
 void RoboplanIKMarker::set_joint_positions(const Eigen::VectorXd& q) { last_joint_positions_ = q; }
 
-}  // namespace roboplan_ros_cpp
+}  // namespace roboplan_ros_visualization

@@ -13,7 +13,7 @@
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
-namespace roboplan_ros_cpp {
+namespace roboplan_ros_visualization {
 
 /// @brief Computes RViz visualization markers for a robot configuration.
 ///
@@ -75,4 +75,4 @@ private:
   std::optional<std_msgs::msg::ColorRGBA> color_;
 };
 
-}  // namespace roboplan_ros_cpp
+}  // namespace roboplan_ros_visualization

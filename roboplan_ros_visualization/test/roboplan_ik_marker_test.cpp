@@ -8,7 +8,7 @@
 #include <roboplan_ros_cpp/type_conversions.hpp>
 #include <roboplan_ros_visualization/roboplan_ik_marker.hpp>
 
-namespace roboplan_ros_cpp {
+namespace roboplan_ros_visualization {
 
 static const std::string TWO_LINK_URDF = R"(<?xml version="1.0"?>
 <robot name="test_robot">
@@ -91,4 +91,4 @@ TEST_F(RoboplanIkMarkerTest, MakeInteractiveMarkerDefaultFrame) {
   EXPECT_NEAR(fk(2, 3), target.position.z, 0.01);
 }
 
-}  // namespace roboplan_ros_cpp
+}  // namespace roboplan_ros_visualization

@@ -16,8 +16,6 @@ build = { cmd = ["colcon", "build"] }
 test = { cmd = [
   "colcon",
   "test",
-  "--packages-skip",
-  "toppra",
 ]}
 test-result = {cmd = [
   "colcon",
@@ -49,9 +47,6 @@ numpy = ">=1.26.4,<3"
 
 # For ROS, should be available across distros
 lttng-ust = ">=2.13.9,<3"
-# Ensure compatible versions for TOPP-RA deps
-pybind11 = ">=3.0.2,<4"
-eigen = ">=3.4.0,<4"
 
 [pypi-dependencies]
 pycollada = ">=0.9.2, <0.10"
@@ -88,7 +83,6 @@ ros-kilted-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_
 ros-kilted-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
 ros-kilted-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
 ros-kilted-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
-ros-kilted-toppra = { path = "./roboplan/external/toppra/cpp/package.xml" }
 ros-kilted-roboplan = { path = "./roboplan/roboplan/package.xml" }
 ros-kilted-roboplan-oink = { path = "./roboplan/roboplan_oink/package.xml" }
 ros-kilted-roboplan-example-models = { path = "./roboplan/roboplan_example_models/package.xml" }
@@ -115,7 +109,6 @@ ros-jazzy-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_f
 ros-jazzy-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
 ros-jazzy-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
 ros-jazzy-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
-ros-jazzy-toppra = { path = "./roboplan/external/toppra/cpp/package.xml" }
 ros-jazzy-roboplan = { path = "./roboplan/roboplan/package.xml" }
 ros-jazzy-roboplan-oink = { path = "./roboplan/roboplan_oink/package.xml" }
 ros-jazzy-roboplan-example-models = { path = "./roboplan/roboplan_example_models/package.xml" }
@@ -142,7 +135,6 @@ ros-humble-roboplan-ros-franka = { path = "./roboplan_ros_examples/roboplan_ros_
 ros-humble-roboplan-toppra = { path = "./roboplan/roboplan_toppra/package.xml" }
 ros-humble-roboplan-bindings = { path = "./roboplan/bindings/package.xml" }
 ros-humble-roboplan-examples = { path = "./roboplan/roboplan_examples/package.xml" }
-ros-humble-toppra = { path = "./roboplan/external/toppra/cpp/package.xml" }
 ros-humble-roboplan = { path = "./roboplan/roboplan/package.xml" }
 ros-humble-roboplan-oink = { path = "./roboplan/roboplan_oink/package.xml" }
 ros-humble-roboplan-example-models = { path = "./roboplan/roboplan_example_models/package.xml" }

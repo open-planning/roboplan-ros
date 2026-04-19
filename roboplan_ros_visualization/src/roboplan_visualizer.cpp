@@ -10,7 +10,7 @@
 #include <roboplan_ros_cpp/type_conversions.hpp>
 #include <roboplan_ros_visualization/roboplan_visualizer.hpp>
 
-namespace roboplan_ros_cpp {
+namespace roboplan_ros_visualization {
 
 RoboplanVisualizer::RoboplanVisualizer(std::shared_ptr<const roboplan::Scene> scene,
                                        const std::string& urdf_xml, const std::string& frame_id,
@@ -148,4 +148,4 @@ RoboplanVisualizer::create_geometry_marker(int marker_id, const pinocchio::Geome
   return marker;
 }
 
-}  // namespace roboplan_ros_cpp
+}  // namespace roboplan_ros_visualization

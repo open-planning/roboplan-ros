@@ -18,6 +18,7 @@ import subprocess
 sys.path.insert(0, os.path.abspath("../../roboplan_ros_cpp"))
 sys.path.insert(0, os.path.abspath("../../roboplan_ros_py"))
 sys.path.insert(0, os.path.abspath("../../roboplan_ros_visualization"))
+sys.path.insert(0, os.path.abspath("../../roboplan_ros_examples"))
 
 # -- Project information -----------------------------------------------------
 
@@ -54,6 +55,7 @@ exclude_patterns: list[str] = []
 
 # Mock imports for external dependencies.
 autodoc_mock_imports = [
+    "numpy",
     "rclpy",
     "roboplan",
     "std_msgs",
@@ -63,7 +65,6 @@ autodoc_mock_imports = [
     "interactive_markers",
     "tf2_ros",
     "pinocchio",
-    "roboplan_ros_cpp.bindings",
 ]
 autoapi_options = [
     "members",
@@ -75,7 +76,6 @@ autoapi_type = "python"
 autoapi_add_toctree_entry = False
 autoapi_dirs = [
     "../../roboplan_ros_py/roboplan_ros_py",
-    "../../roboplan_ros_visualization/roboplan_ros_visualization",
 ]
 autodoc_typehints = "description"
 
@@ -92,7 +92,11 @@ breathe_default_project = "roboplan-ros"
 breathe_projects = {}
 breathe_projects_source = {}
 
-for package in ["roboplan_ros_cpp"]:
+# TODO: handle nanobind stubs?
+for package in [
+    "roboplan_ros_cpp",
+    "roboplan_ros_visualization",
+]:
     # Generate Doxygen XML and add it to the breathe projects.
     subprocess.call(f"cd ../../{package}/docs; rm -rf html/ xml/; doxygen", shell=True)
     breathe_projects[package] = os.path.abspath(f"../../{package}/docs/xml")
