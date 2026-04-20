@@ -81,7 +81,7 @@ autoapi_dirs = [
     "../../roboplan_ros_py/roboplan_ros_py",
     "../../roboplan_ros_cpp/roboplan_ros_cpp",
 ]
-autoapi_python_class_content = "init"
+autoapi_python_class_content = "both"
 autodoc_typehints = "description"
 
 # -- Options for HTML output -------------------------------------------------
