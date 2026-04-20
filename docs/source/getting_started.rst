@@ -42,13 +42,14 @@ Once set up, you can run the ``pixi`` tasks as follows.
     # Setup the environment
     pixi run -e jazzy setup-colcon
 
-    # Build
+    # Build (optionally with symlink installs)
     pixi run -e jazzy build
+    pixi run -e jazzy build-symlink
 
     # Run tests, must manually run build prior to executing
     pixi run -e jazzy test
 
-    # Show tests results
+    # Show test results
     pixi run -e jazzy test-result
 
 Once the workspace is built, it can be used as a "normal" ROS 2 workspace.

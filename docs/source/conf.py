@@ -36,6 +36,7 @@ version = release = "0.2.0"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "autoapi.extension",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
@@ -46,7 +47,7 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-# templates_path = ["_templates"]
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -65,6 +66,8 @@ autodoc_mock_imports = [
     "interactive_markers",
     "tf2_ros",
     "pinocchio",
+    "roboplan_ros_cpp.bindings",
+    "roboplan_ros_visualization.bindings",
 ]
 autoapi_options = [
     "members",
@@ -73,10 +76,14 @@ autoapi_options = [
     "show-module-summary",
 ]
 autoapi_type = "python"
-autoapi_add_toctree_entry = False
+autoapi_template_dir = "_templates/autoapi"
+autoapi_add_toctree_entry = True
 autoapi_dirs = [
     "../../roboplan_ros_py/roboplan_ros_py",
+    "../../roboplan_ros_cpp/roboplan_ros_cpp",
+    "../../roboplan_ros_visualization/roboplan_ros_visualization",
 ]
+autoapi_python_class_content = "both"
 autodoc_typehints = "description"
 
 # -- Options for HTML output -------------------------------------------------
@@ -92,7 +99,6 @@ breathe_default_project = "roboplan-ros"
 breathe_projects = {}
 breathe_projects_source = {}
 
-# TODO: handle nanobind stubs?
 for package in [
     "roboplan_ros_cpp",
     "roboplan_ros_visualization",

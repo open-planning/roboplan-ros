@@ -13,6 +13,7 @@ colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-r
 colcon mixin update default
 """ }
 build = { cmd = ["colcon", "build"] }
+build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
 test = { cmd = [
   "colcon",
   "test",
