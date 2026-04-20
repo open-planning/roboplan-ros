@@ -107,4 +107,35 @@ if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
+# Generate Python stub files from the bindings.
+option(GENERATE_PYTHON_STUBS "Generate the Python stubs associated with the bindings" ON)
+if(GENERATE_PYTHON_STUBS)
+  nanobind_add_stub(
+    roboplan_ros_visualization_bindings_stub
+    MODULE bindings
+    RECURSIVE
+    OUTPUT bindings.pyi
+    MARKER_FILE py.typed
+    PYTHON_PATH $<TARGET_FILE_DIR:roboplan_ros_visualization_bindings>
+    DEPENDS roboplan_ros_visualization_bindings
+  )
+
+  if(PYTHON_INSTALL_DIR)
+      set(PYTHON_STUB_INSTALL_DIR "${PYTHON_INSTALL_DIR}/roboplan_ros_visualization")
+  else()
+      set(PYTHON_STUB_INSTALL_DIR "roboplan_ros_visualization")
+  endif()
+  install(
+    FILES
+      "${CMAKE_CURRENT_BINARY_DIR}/bindings.pyi"
+      "${CMAKE_CURRENT_BINARY_DIR}/py.typed"
+    DESTINATION "${PYTHON_STUB_INSTALL_DIR}"
+    # Copy the stub files to the source folder for docs and versioning.
+    # For now, this step has to be run manually when submitting changes.
+    # There is a CI action that generates this and finds mismatches,
+    # prompting the user to regenerate it on their own.
+    DESTINATION "${CMAKE_SOURCE_DIR}/roboplan_ros_visualization/"
+  )
+endif()
+
 ament_package()

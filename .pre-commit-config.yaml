@@ -78,5 +78,6 @@ repos:
 exclude: |
   (?x)^(
     roboplan/.*|
-    roboplan_ros_cpp/roboplan_ros_cpp/.*
+    roboplan_ros_cpp/roboplan_ros_cpp/.*|
+    roboplan_ros_visualization/roboplan_ros_visualization/.*
   )$
