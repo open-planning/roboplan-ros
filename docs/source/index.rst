@@ -19,4 +19,3 @@ Quick Links:
    design
    getting_started
    api_cpp
-   api_py

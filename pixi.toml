@@ -13,6 +13,7 @@ colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-r
 colcon mixin update default
 """ }
 build = { cmd = ["colcon", "build"] }
+build-no-symlink = { cmd = ["colcon", "build", "--cmake-args", "-DAMENT_CMAKE_SYMLINK_INSTALL=FALSE"] }
 test = { cmd = [
   "colcon",
   "test",
