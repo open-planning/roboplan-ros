@@ -67,6 +67,7 @@ autodoc_mock_imports = [
     "tf2_ros",
     "pinocchio",
     "roboplan_ros_cpp.bindings",
+    "roboplan_ros_visualization.bindings",
 ]
 autoapi_options = [
     "members",
@@ -80,6 +81,7 @@ autoapi_add_toctree_entry = True
 autoapi_dirs = [
     "../../roboplan_ros_py/roboplan_ros_py",
     "../../roboplan_ros_cpp/roboplan_ros_cpp",
+    "../../roboplan_ros_visualization/roboplan_ros_visualization",
 ]
 autoapi_python_class_content = "both"
 autodoc_typehints = "description"
