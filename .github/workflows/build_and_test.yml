@@ -74,10 +74,14 @@ jobs:
             "
       - name: Check bindings stub files
         run: |
-          if ! git diff --exit-code --shortstat -- 'roboplan_ros_cpp/roboplan_ros_cpp/*.pyi'; then
-            echo "::error::The .pyi stub files are out of sync with the source code. Make sure to rebuild the Python bindings without symlink builds using 'pixi run -e ${ROS_DISTRO} build' and commit the changes."
+          STUB_PATHS="
+            roboplan_ros_cpp/roboplan_ros_cpp/*.pyi
+            roboplan_ros_visualization/roboplan_ros_visualization/*.pyi
+          "
+          if ! git diff --exit-code --shortstat -- $STUB_PATHS; then
+            echo "::error::The .pyi stub files are out of sync with the source code. Make sure to rebuild the Python bindings with 'pixi run -e ${ROS_DISTRO} build' and commit the changes."
             echo "Git Diff:"
-            git diff -- 'roboplan_ros_cpp/roboplan_ros_cpp/*.pyi'
+            git diff -- $STUB_PATHS
             exit 1
           fi
           echo "✅ .pyi stub files look good!"
