@@ -33,6 +33,14 @@ target_link_libraries(roboplan_ros_cpp
     ${trajectory_msgs_TARGETS}
     ${builtin_interfaces_TARGETS}
 )
+# Temp fix for: https://github.com/RoboStack/ros-kilted/issues/76
+# Manually link against python to ensure it is loaded in the process.
+find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+target_link_libraries(roboplan_ros_cpp PRIVATE
+  "-Wl,--no-as-needed"
+  Python::Python
+  "-Wl,--as-needed"
+)
 set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
 ament_export_dependencies(
   roboplan
@@ -52,7 +60,6 @@ install(
 install(DIRECTORY include/ DESTINATION include)
 
 # For nanobind python bindings
-find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
 find_package(roboplan_bindings REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
