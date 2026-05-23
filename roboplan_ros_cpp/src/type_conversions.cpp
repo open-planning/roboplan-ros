@@ -19,9 +19,9 @@ buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointSt
   JointStateConverterMap conversion_map;
   conversion_map.nq = model.nq;
   conversion_map.nv = model.nv;
-  conversion_map.mappings.reserve(scene.getActuatedJointNames().size());
+  conversion_map.mappings.reserve(scene.getJointNames().size());
 
-  // For each joint name, determine type and its location in the Scene's configuration,
+  // For each actuated joint name, determine type and its location in the Scene's configuration,
   // and put it into the mapping.
   for (const auto& joint_name : scene.getJointNames()) {
     const auto joint_info = scene.getJointInfo(joint_name);
@@ -29,11 +29,6 @@ buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointSt
       return tl::make_unexpected("Failed to get joint info for: " + joint_name);
     }
     const auto& info = joint_info.value();
-
-    // No need to handle mimic joints
-    if (info.mimic_info) {
-      continue;
-    }
 
     // TODO: This might not actually be worth failing for
     auto it = ros_map.find(joint_name);
@@ -61,10 +56,10 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
   const auto& model = scene.getModel();
 
   sensor_msgs::msg::JointState msg;
-  msg.name.reserve(scene.getActuatedJointNames().size());
-  msg.position.reserve(scene.getActuatedJointNames().size());
-  msg.velocity.reserve(scene.getActuatedJointNames().size());
-  msg.effort.reserve(scene.getActuatedJointNames().size());
+  msg.name.reserve(scene.getJointNames().size());
+  msg.position.reserve(scene.getJointNames().size());
+  msg.velocity.reserve(scene.getJointNames().size());
+  msg.effort.reserve(scene.getJointNames().size());
 
   for (const auto& joint_name : scene.getJointNames()) {
     const auto joint_info = scene.getJointInfo(joint_name);
@@ -72,9 +67,6 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
       return tl::make_unexpected("Failed to get joint info: " + joint_name);
     }
     const auto& info = joint_info.value();
-    if (info.mimic_info) {
-      continue;
-    }
 
     const auto joint_id = model.getJointId(joint_name);
     const auto q_idx = model.idx_qs.at(joint_id);
@@ -135,7 +127,6 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
     }
   }
 
-  scene.applyMimics(config.positions);
   return config;
 }
 

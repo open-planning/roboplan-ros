@@ -48,7 +48,7 @@ def test_convert_joint_state():
     scene.setRngSeed(1234)
 
     joint_state = JointState()
-    joint_state.name = scene.getActuatedJointNames()
+    joint_state.name = scene.getJointNames()
     conversion_map = buildConversionMap(scene, joint_state)
 
     # Setup a joint configuration

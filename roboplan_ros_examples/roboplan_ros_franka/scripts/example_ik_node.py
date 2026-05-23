@@ -97,8 +97,7 @@ class InteractiveMarkerIKNode(Node):
                 0.0,
                 1.571,
                 0.785,
-                0,
-                0,
+                0,  # fr3_finger_joint1 only (joint2 is mimic joint)
             ]
         )
         self.scene.setJointPositions(self.latest_joint_positions)
