@@ -56,7 +56,7 @@ TEST_F(TypeConversionsTest, TestConvertJointState) {
   auto scene = roboplan::Scene("test_scene", urdf_path, srdf_path);
   scene.setRngSeed(1234);
   sensor_msgs::msg::JointState joint_state;
-  joint_state.name = scene.getActuatedJointNames();
+  joint_state.name = scene.getJointNames();
 
   // Build the conversion map
   auto conversion_map_maybe = buildConversionMap(scene, joint_state);
@@ -74,7 +74,7 @@ TEST_F(TypeConversionsTest, TestConvertJointState) {
   const auto ros_joint_state_maybe = roboplan_ros_cpp::toJointState(joint_configuration, scene);
   ASSERT_TRUE(ros_joint_state_maybe.has_value());
   const auto ros_joint_state = ros_joint_state_maybe.value();
-  ASSERT_EQ(ros_joint_state.name.size(), 2);
+  ASSERT_EQ(ros_joint_state.name.size(), 2u);
 
   const auto check_joint_configuration_maybe =
       roboplan_ros_cpp::fromJointState(ros_joint_state, scene, conversion_map);
