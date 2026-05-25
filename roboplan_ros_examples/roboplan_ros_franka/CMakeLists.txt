@@ -13,7 +13,7 @@ install(DIRECTORY config launch
         DESTINATION share/${PROJECT_NAME})
 
 install(PROGRAMS
-        scripts/example_ik_node.py
+        scripts/plan_and_execute_node.py
         DESTINATION lib/${PROJECT_NAME}
 )
 

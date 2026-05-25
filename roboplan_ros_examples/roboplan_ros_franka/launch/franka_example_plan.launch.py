@@ -35,7 +35,7 @@ def generate_launch_description():
     nodes = [
         Node(
             package="roboplan_ros_franka",
-            executable="example_ik_node.py",
+            executable="plan_and_execute_node.py",
             output="screen",
         ),
     ]
