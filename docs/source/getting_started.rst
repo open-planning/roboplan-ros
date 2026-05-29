@@ -70,7 +70,7 @@ That is, the workspace can be sourced and used as expected.
     colcon test
 
     # Or launch an example
-    ros2 launch roboplan_ros_franka franka_example_ik.launch.py
+    ros2 launch roboplan_ros_franka franka_example_planning.launch.yaml
 
 The examples from the upstream repository should also be available, as well:
 

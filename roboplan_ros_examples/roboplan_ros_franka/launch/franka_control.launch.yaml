@@ -1,0 +1,42 @@
+launch:
+
+  - arg:
+      name: rviz_config
+      default: $(find-pkg-share roboplan_ros_franka)/config/franka_config.rviz
+      description: "Specify an rviz configuration file."
+
+  - node:
+      pkg: robot_state_publisher
+      exec: robot_state_publisher
+      output: screen
+      param:
+        - name: robot_description
+          value: $(command "xacro $(find-pkg-share roboplan_example_models)/models/franka_robot_model/fr3.urdf")
+
+  - node:
+      pkg: controller_manager
+      exec: ros2_control_node
+      output: screen
+      param:
+        - from: $(find-pkg-share roboplan_ros_franka)/config/ros2_controllers.yaml
+        - name: robot_description
+          value: $(command "xacro $(find-pkg-share roboplan_example_models)/models/franka_robot_model/fr3.urdf")
+
+  - node:
+      pkg: controller_manager
+      exec: spawner
+      output: screen
+      args: "joint_state_broadcaster"
+
+  - node:
+      pkg: controller_manager
+      exec: spawner
+      output: screen
+      args: "fr3_arm_controller"
+
+  - node:
+      pkg: rviz2
+      exec: rviz2
+      name: rviz2
+      output: log
+      args: "-d $(var rviz_config)"
