@@ -172,7 +172,6 @@ class PlanAndExecuteNode(Node):
         self._joint_group = self.get_parameter("joint_group").value
         self._base_link = self.get_parameter("base_link").value
         self._tip_link = self.get_parameter("tip_link").value
-        self._include_shortcutting = self.get_parameter("include_shortcutting").value
 
         # Get robot description files and setup the scene
         pkg_share_dir = get_package_share_directory(robot_description_package)
@@ -207,7 +206,7 @@ class PlanAndExecuteNode(Node):
                 durability=QoSDurabilityPolicy.VOLATILE,
             ),
         )
-        self._latest_joint_state = None
+        self._last_joint_state = None
         self._conversion_map = None
         self._q_indices = self._scene.getJointGroupInfo(self._joint_group).q_indices
 
@@ -355,6 +354,10 @@ class PlanAndExecuteNode(Node):
             response.success = False
             response.message = "No target set. Move the interactive marker first."
             return response
+        if self._last_joint_state is None:
+            response.success = False
+            response.message = "No joint states received, robot in unknown pose."
+            return response
 
         # Update to the latest position of the robot
         joint_config = fromJointState(
@@ -466,7 +469,6 @@ class PlanAndExecuteNode(Node):
             response.message = "Reset node to current state."
             self.get_logger().info(response.message)
         except Exception as e:
-            self.reset()
             response.success = False
             response.message = f"Failed to reset the node: {e}"
             self.get_logger().info(response.message)
@@ -474,6 +476,8 @@ class PlanAndExecuteNode(Node):
 
     def reset(self):
         """Clears all plans and resets to a hardware state."""
+        if self._last_joint_state is None:
+            raise RuntimeError("No joint states received, cannot reset to hw state.")
 
         # Reset joint positions to the latest joint state
         joint_config = fromJointState(
