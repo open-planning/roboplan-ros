@@ -1,0 +1,14 @@
+launch:
+
+# Include the control launch file with custom rviz config
+  - include:
+      file: $(find-pkg-share roboplan_ros_franka)/launch/franka_control.launch.yaml
+      arg:
+        - name: rviz_config
+          value: $(find-pkg-share roboplan_ros_franka)/config/franka_ik_config.rviz
+
+# IK planning and execution node
+  - node:
+      pkg: roboplan_ros_franka
+      exec: plan_and_execute_node.py
+      output: screen
