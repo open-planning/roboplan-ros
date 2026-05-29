@@ -1,3 +1,5 @@
+.. _design_philosophy:
+
 Design Philosophy
 =================
 

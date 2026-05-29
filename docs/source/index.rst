@@ -8,6 +8,7 @@ Quick Links:
 
 - :doc:`design`
 - :doc:`getting_started`
+- :doc:`examples`
 - `GitHub Repository <https://github.com/open-planning/roboplan-ros>`_
 - `Discord Server <https://discord.gg/VjbdJnbk9n>`_
 
@@ -23,4 +24,5 @@ Quick Links:
 
    design
    getting_started
+   examples
    api_cpp
