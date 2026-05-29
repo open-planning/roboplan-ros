@@ -51,6 +51,7 @@ from roboplan_ros_cpp.bindings import (
     toJointTrajectory,
     se3ToPose,
 )
+from roboplan_ros_py.trajectory_publisher import TrajectoryPublisher
 
 
 def spin_executor(executor):
@@ -61,63 +62,6 @@ def spin_executor(executor):
         pass
     except KeyboardInterrupt:
         pass
-
-
-class TrajectoryPlayer:
-    """Utility for publishing RoboPlan trajectories using iMarkers and a ROS timer."""
-
-    def __init__(self, node, scene, visualizer, marker_pub, q_indices):
-        self._node = node
-        self._scene = scene
-        self._visualizer = visualizer
-        self._marker_pub = marker_pub
-        self._q_indices = q_indices
-
-        # Constructed on publishing start
-        self._timer = None
-        self._positions = None
-        self._index = 0
-        self._q_full = None
-        self._on_complete = None
-
-    def play(self, trajectory, dt=0.01, on_complete=None):
-        """
-        Start publishing points in the provided trajectory.
-
-        The playback rate is determined by the time spacing between the
-        first two points in the trajectory, which should be consistent.
-
-        Args:
-            trajectory: A roboplan JointTrajectory.
-            dt: Trajectory time point deltas
-            on_complete: Optional callback invoked when playback finishes.
-        """
-        self.stop()
-        self._positions = trajectory.positions
-        self._index = 0
-        self._q_full = np.array(self._scene.getCurrentJointPositions())
-        self._on_complete = on_complete
-
-        self._timer = self._node.create_timer(dt, self._tick)
-
-    def stop(self):
-        if self._timer is not None:
-            self._timer.cancel()
-            self._node.destroy_timer(self._timer)
-            self._timer = None
-
-    def _tick(self):
-        if self._index >= len(self._positions):
-            self.stop()
-            if self._on_complete:
-                self._on_complete()
-            return
-
-        self._q_full[self._q_indices] = self._positions[self._index]
-        self._marker_pub.publish(
-            self._visualizer.markers_from_configuration(self._q_full)
-        )
-        self._index += 1
 
 
 class PlanAndExecuteNode(Node):
@@ -319,8 +263,7 @@ class PlanAndExecuteNode(Node):
         self._traj_marker_pub = self.create_publisher(
             MarkerArray, "roboplan_trajectory/markers", qos
         )
-        self._player = TrajectoryPlayer(
-            self,
+        self._player = TrajectoryPublisher(
             self._scene,
             self._traj_visualizer,
             self._traj_marker_pub,
@@ -438,7 +381,6 @@ class PlanAndExecuteNode(Node):
         result_future.add_done_callback(self._execute_result)
 
     def _execute_feedback(self, feedback_msg):
-        # Optional: log progress, update visualization, etc.
         pass
 
     def _execute_result(self, future):
