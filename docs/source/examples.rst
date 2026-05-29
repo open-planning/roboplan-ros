@@ -15,11 +15,11 @@ This example demonstrates a complete plan-preview-execute loop using RRT motion 
 
 The example uses an interactive marker in RViz along with ROS ``Trigger`` services to:
 
-1. **Set a target pose** by dragging the interactive marker in the RViz panel, right click
+1. **Set a target pose** by dragging the interactive marker in the RViz panel.
 2. **Plan** a trajectory by right clicking and pressing "Plan", or by calling the ``/plan_and_execute_node/plan`` service.
 3. **Preview** the planned trajectory by pressing "Preview", or by calling the ``/plan_and_execute_node/preview`` service.
 4. **Execute** the trajectory by pressing "Execute", or by calling the ``/plan_and_execute_node/execute`` service.
-  This wraps a call to the underlying Joint Traectory Controller.
+   This wraps a call to the FR3's ``JointTraectoryController``.
 5. **Reset** the iMarker by pressing "Reset", or by calling the ``/plan_and_execute_node/reset`` service.
 
 To launch the demo,
