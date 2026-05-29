@@ -469,7 +469,9 @@ class PlanAndExecuteNode(Node):
 
     def destroy_node(self):
         self._player.stop()
+        self._js_executor.shutdown()
         self._marker_executor.shutdown()
+        self._js_thread.join(timeout=0.25)
         self._marker_thread.join(timeout=0.25)
         self._marker_node.destroy_node()
         super().destroy_node()
