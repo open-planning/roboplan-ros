@@ -38,6 +38,7 @@ from visualization_msgs.msg import MarkerArray
 from interactive_markers import InteractiveMarkerServer
 from std_srvs.srv import Trigger
 from sensor_msgs.msg import JointState
+from interactive_markers import MenuHandler
 
 from roboplan.core import JointConfiguration, PathShortcutter, Scene
 from roboplan.simple_ik import SimpleIkOptions
@@ -285,6 +286,15 @@ class PlanAndExecuteNode(Node):
         )
         self._marker_thread.start()
 
+        # Add menu to the iMarker for service access
+        menu = MenuHandler()
+        menu.insert("Plan", callback=self._on_plan_menu)
+        menu.insert("Preview", callback=self._on_preview_menu)
+        menu.insert("Execute", callback=self._on_execute_menu)
+        menu.insert("Reset", callback=self._on_reset_menu)
+        menu.apply(self._ik_server, "ik_target")
+        self._ik_server.applyChanges()
+
         # IK determined target pose in blue
         self._ik_visualizer = RoboplanVisualizer(
             scene=self._scene,
@@ -349,17 +359,10 @@ class PlanAndExecuteNode(Node):
                 self._ik_visualizer.markers_from_configuration(q)
             )
 
-    def _on_plan(self, request, response):
+    def _plan(self):
         if self._target_q is None:
-            response.success = False
-            response.message = "No target set. Move the interactive marker first."
-            return response
-        if self._last_joint_state is None:
-            response.success = False
-            response.message = "No joint states received, robot in unknown pose."
-            return response
+            return False, "No target set. Move the interactive marker first."
 
-        # Update to the latest position of the robot
         joint_config = fromJointState(
             self._last_joint_state, self._scene, self._conversion_map
         )
@@ -375,9 +378,7 @@ class PlanAndExecuteNode(Node):
         path = self._rrt.plan(start, goal)
 
         if path is None:
-            response.success = False
-            response.message = "Planning failed."
-            return response
+            return False, "Planning failed."
 
         if self._include_shortcutting:
             path = self._shortcutter.shortcut(
@@ -391,18 +392,14 @@ class PlanAndExecuteNode(Node):
             path, self._traj_dt, SplineFittingMode.Hermite
         )
 
-        response.success = True
-        response.message = (
-            f"Planned trajectory with {len(self._planned_traj.positions)} points"
+        return (
+            True,
+            f"Planned trajectory with {len(self._planned_traj.positions)} points",
         )
-        self.get_logger().info(response.message)
-        return response
 
-    def _on_preview(self, request, response):
+    def _preview(self):
         if self._planned_traj is None:
-            response.success = False
-            response.message = "No trajectory to preview. Plan first."
-            return response
+            return False, "No trajectory to preview. Plan first."
 
         self.get_logger().info("Previewing trajectory...")
         self._player.play(
@@ -410,21 +407,14 @@ class PlanAndExecuteNode(Node):
             self._traj_dt,
             on_complete=lambda: self.get_logger().info("Preview complete."),
         )
+        return True, "Playback started."
 
-        response.success = True
-        response.message = "Playback started."
-        return response
-
-    def _on_execute(self, request, response):
+    def _execute(self):
         if self._planned_traj is None:
-            response.success = False
-            response.message = "No trajectory to execute. Plan first."
-            return response
+            return False, "No trajectory to execute. Plan first."
 
         if not self._execute_client.wait_for_server(timeout_sec=2.0):
-            response.success = False
-            response.message = "Action server not available."
-            return response
+            return False, "Action server not available."
 
         goal = FollowJointTrajectory.Goal()
         goal.trajectory = toJointTrajectory(self._planned_traj)
@@ -435,9 +425,7 @@ class PlanAndExecuteNode(Node):
         )
         future.add_done_callback(self._execute_goal_response)
 
-        response.success = True
-        response.message = "Trajectory sent for execution."
-        return response
+        return True, "Trajectory sent for execution."
 
     def _execute_goal_response(self, future):
         goal_handle = future.result()
@@ -462,19 +450,7 @@ class PlanAndExecuteNode(Node):
                 f"Trajectory execution failed with error code: {result.error_code}"
             )
 
-    def _on_reset(self, request, response):
-        try:
-            self.reset()
-            response.success = True
-            response.message = "Reset node to current state."
-            self.get_logger().info(response.message)
-        except Exception as e:
-            response.success = False
-            response.message = f"Failed to reset the node: {e}"
-            self.get_logger().info(response.message)
-        return response
-
-    def reset(self):
+    def _reset(self):
         """Clears all plans and resets to a hardware state."""
         if self._last_joint_state is None:
             raise RuntimeError("No joint states received, cannot reset to hw state.")
@@ -503,6 +479,51 @@ class PlanAndExecuteNode(Node):
         self._target_q = None
         self._planned_traj = None
         self._traj_marker_pub.publish(self._traj_visualizer.clear_markers())
+
+    # Menu callbacks
+    def _on_plan_menu(self, feedback):
+        _, msg = self._plan()
+        self.get_logger().info(msg)
+
+    def _on_preview_menu(self, feedback):
+        _, msg = self._preview()
+        self.get_logger().info(msg)
+
+    def _on_execute_menu(self, feedback):
+        _, msg = self._execute()
+        self.get_logger().info(msg)
+
+    def _on_reset_menu(self, feedback):
+        try:
+            self._reset()
+            self.get_logger().info("Reset node to current state.")
+        except Exception as e:
+            self.get_logger().error(f"Failed to reset the node: {e}")
+
+    # Trigger service callbacks
+    def _on_plan(self, request, response):
+        response.success, response.message = self._plan()
+        return response
+
+    def _on_preview(self, request, response):
+        response.success, response.message = self._preview()
+        return response
+
+    def _on_execute(self, request, response):
+        response.success, response.message = self._execute()
+        return response
+
+    def _on_reset(self, request, response):
+        try:
+            self._reset()
+            response.success = True
+            response.message = "Reset node to current state."
+            self.get_logger().info(response.message)
+        except Exception as e:
+            response.success = False
+            response.message = f"Failed to reset the node: {e}"
+            self.get_logger().info(response.message)
+        return response
 
     def destroy_node(self):
         self._player.stop()
