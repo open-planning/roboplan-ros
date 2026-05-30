@@ -36,7 +36,7 @@ sccache = ">=0.10.0,<0.11"
 # Common roboplan base deps
 python = ">=3.11,<3.13"
 gtest = ">=1.17.0,<2"
-viser = ">=1.0.21,<1.0.25"
+viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
 tyro = ">=0.9.32,<0.10"
 matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
