@@ -23,7 +23,8 @@ NB_MODULE(bindings, m) {
   // Ensure dependent nanobind modules are loaded first so their types are registered.
   // Otherwise we end up with bad casts when importing everything at once without pre-importing
   // the deps.
-  nb::module_::import_("roboplan.roboplan_ext.core");
+  nb::module_::import_("roboplan.core");
+  nb::module_::import_("roboplan.simple_ik._simple_ik_ext");
   nb::module_::import_("roboplan_ros_cpp.bindings");
 
   // Pre-import Python messages to avoid repeated lookups

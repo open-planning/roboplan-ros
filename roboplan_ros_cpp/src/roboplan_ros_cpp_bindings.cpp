@@ -7,7 +7,7 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 
-#include <utils/expected.hpp>
+#include <roboplan_bindings/expected.hpp>
 
 #include "roboplan_ros_cpp/roboplan_ros_cpp_bindings.hpp"
 #include "roboplan_ros_cpp/type_conversions.hpp"
