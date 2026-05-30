@@ -58,7 +58,6 @@ install(DIRECTORY include/ DESTINATION include)
 
 # For nanobind python bindings
 find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
-find_package(roboplan_bindings REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_generator_cpp REQUIRED)
@@ -87,7 +86,6 @@ target_link_libraries(roboplan_ros_visualization_bindings PRIVATE
   roboplan_ros_visualization
   roboplan_ros_cpp::roboplan_ros_cpp
   roboplan::roboplan
-  roboplan_bindings::roboplan_bindings_utils
   ${rosidl_generator_cpp_LIBRARIES}
   tl_expected::tl_expected
 )
@@ -108,8 +106,17 @@ if(BUILD_TESTING)
 endif()
 
 # Generate Python stub files from the bindings.
+# Older nanobind versions (which can come from rosdep on certain distros) do not provide
+# nanobind_add_stub, so skip generation rather than failing the configure step.
+# See https://github.com/ros/rosdistro/pull/49894 for more details.
 option(GENERATE_PYTHON_STUBS "Generate the Python stubs associated with the bindings" ON)
-if(GENERATE_PYTHON_STUBS)
+if(GENERATE_PYTHON_STUBS AND NOT COMMAND nanobind_add_stub)
+  message(WARNING
+    "Skipping Python stub generation: the installed nanobind version does not "
+    "provide nanobind_add_stub. Upgrade nanobind to generate stubs.")
+endif()
+
+if(GENERATE_PYTHON_STUBS AND COMMAND nanobind_add_stub)
   nanobind_add_stub(
     roboplan_ros_visualization_bindings_stub
     MODULE bindings
