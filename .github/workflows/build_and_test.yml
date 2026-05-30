@@ -43,6 +43,9 @@ jobs:
         with:
           context: .
           file: .docker/Dockerfile.pixi
+          build-args: |
+            ROS_DISTRO=${{ matrix.ros_distro }}
+            GENERATE_PYTHON_STUBS=${{ matrix.ros_distro == 'humble' && 'OFF' || 'ON' }}
           push: false
           load: true
           tags: roboplan-ros-pixi:ci

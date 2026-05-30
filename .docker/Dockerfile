@@ -1,4 +1,5 @@
 ARG ROS_DISTRO=jazzy
+ARG GENERATE_PYTHON_STUBS=ON
 
 # Preserve rosdep installs separate from source. Maintains caches as long as rosdeps do not change.
 FROM alpine:latest AS package-manifests
@@ -43,7 +44,7 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
 # Copy in remaining source and build
 COPY . src/roboplan_ros
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && colcon build --cmake-args -DBUILD_TESTING=ON
+    && colcon build --cmake-args -DBUILD_TESTING=ON -DGENERATE_PYTHON_STUBS=${GENERATE_PYTHON_STUBS}
 
 # Set up entrypoint and working folder.
 WORKDIR /workspace/roboplan_ws
