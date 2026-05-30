@@ -135,9 +135,6 @@ channels = ["https://prefix.dev/robostack-humble"]
 [feature.humble.dependencies]
 ros-humble-ros-base = "*"
 
-[feature.humble.activation.env]
-ROS_DISTRO = "humble"
-
 # RoboPlan and RoboPlan ROS dependencies
 ros-humble-builtin-interfaces = "*"
 ros-humble-coal = "*"
@@ -161,6 +158,9 @@ ros-humble-urdfdom = "*"
 ros-humble-visualization-msgs = "*"
 ros-humble-xacro = "*"
 ros-humble-yaml-cpp-vendor = "*"
+
+[feature.humble.activation.env]
+ROS_DISTRO = "humble"
 
 [environments]
 kilted = { features = ["kilted"] }
