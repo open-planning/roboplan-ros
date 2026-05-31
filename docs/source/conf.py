@@ -15,10 +15,14 @@ import subprocess
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-sys.path.insert(0, os.path.abspath("../../roboplan_ros_cpp"))
-sys.path.insert(0, os.path.abspath("../../roboplan_ros_py"))
-sys.path.insert(0, os.path.abspath("../../roboplan_ros_visualization"))
-sys.path.insert(0, os.path.abspath("../../roboplan_ros_examples"))
+autoapi_dirs = [
+    "../../roboplan_ros_cpp/bindings/python",
+    "../../roboplan_ros_visualization/bindings/python",
+    "../../roboplan_ros_py/roboplan_ros_py",
+]
+
+for autoapi_dir in autoapi_dirs:
+    sys.path.insert(0, autoapi_dir)
 
 # -- Project information -----------------------------------------------------
 
@@ -66,8 +70,6 @@ autodoc_mock_imports = [
     "interactive_markers",
     "tf2_ros",
     "pinocchio",
-    "roboplan_ros_cpp.bindings",
-    "roboplan_ros_visualization.bindings",
 ]
 autoapi_options = [
     "members",
@@ -78,11 +80,6 @@ autoapi_options = [
 autoapi_type = "python"
 autoapi_template_dir = "_templates/autoapi"
 autoapi_add_toctree_entry = True
-autoapi_dirs = [
-    "../../roboplan_ros_py/roboplan_ros_py",
-    "../../roboplan_ros_cpp/roboplan_ros_cpp",
-    "../../roboplan_ros_visualization/roboplan_ros_visualization",
-]
 autoapi_python_class_content = "both"
 autodoc_typehints = "description"
 
