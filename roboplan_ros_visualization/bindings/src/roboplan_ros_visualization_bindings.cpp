@@ -5,8 +5,8 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
-#include <roboplan_ros_cpp/roboplan_ros_cpp_bindings.hpp>
 #include <roboplan_ros_cpp/type_conversions.hpp>
+#include <roboplan_ros_cpp_bindings/roboplan_ros_cpp_bindings.hpp>
 
 #include <roboplan_ros_visualization/roboplan_ik_marker.hpp>
 #include <roboplan_ros_visualization/roboplan_visualizer.hpp>
@@ -18,14 +18,14 @@ using namespace nb::literals;
 /// @details Pulls in the roboplan and roboplan_ros_cpp bindings as necessary,
 /// and installs the packages here into a "bindings" subpackage of the existing
 /// python package.
-NB_MODULE(bindings, m) {
+NB_MODULE(_visualization_ext, m) {
 
   // Ensure dependent nanobind modules are loaded first so their types are registered.
   // Otherwise we end up with bad casts when importing everything at once without pre-importing
   // the deps.
   nb::module_::import_("roboplan.core");
   nb::module_::import_("roboplan.simple_ik");
-  nb::module_::import_("roboplan_ros_cpp.bindings");
+  nb::module_::import_("roboplan_ros.cpp");
 
   // Pre-import Python messages to avoid repeated lookups
   nb::object MarkerArray = nb::module_::import_("visualization_msgs.msg").attr("MarkerArray");

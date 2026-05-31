@@ -44,8 +44,8 @@ from roboplan.core import JointConfiguration, PathShortcutter, Scene
 from roboplan.simple_ik import SimpleIkOptions
 from roboplan.rrt import RRT, RRTOptions
 from roboplan.toppra import PathParameterizerTOPPRA, SplineFittingMode
-from roboplan_ros_visualization.bindings import RoboplanVisualizer, RoboplanIKMarker
-from roboplan_ros_cpp.bindings import (
+from roboplan_ros.visualization import RoboplanVisualizer, RoboplanIKMarker
+from roboplan_ros.cpp import (
     buildConversionMap,
     fromJointState,
     toJointTrajectory,

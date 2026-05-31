@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from roboplan.core import Scene
-from roboplan_ros_visualization.bindings import RoboplanVisualizer
+from roboplan_ros.visualization import RoboplanVisualizer
 
 
 BOX_URDF = """<?xml version="1.0"?>
@@ -30,9 +30,9 @@ EMPTY_SRDF = """<?xml version="1.0"?>
 
 
 def test_import():
-    from roboplan_ros_visualization import bindings
+    from roboplan_ros import visualization
 
-    assert hasattr(bindings, "RoboplanVisualizer")
+    assert hasattr(visualization, "RoboplanVisualizer")
 
 
 def test_visualize_configuration():
