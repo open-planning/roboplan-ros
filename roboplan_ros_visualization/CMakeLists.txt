@@ -73,7 +73,6 @@ nanobind_add_module(
   roboplan_ros_visualization_bindings
   STABLE_ABI
   NB_STATIC
-  NB_SUPPRESS_WARNINGS
   src/roboplan_ros_visualization_bindings.cpp
 )
 target_include_directories(roboplan_ros_visualization_bindings PUBLIC
