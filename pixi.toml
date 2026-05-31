@@ -12,10 +12,7 @@ colcon mixin update default
 """ }
 build = { cmd = ["colcon", "build"] }
 build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
-test = { cmd = [
-  "colcon",
-  "test",
-]}
+test = { cmd = ["colcon", "test"] }
 test-result = {cmd = [
   "colcon",
   "test-result",
@@ -50,6 +47,9 @@ nodeenv = ">=1.10.0, <2"
 
 # For ROS, should be available across distros
 lttng-ust = ">=2.13.9,<3"
+
+[activation]
+scripts = ["install/setup.sh"]
 
 [activation.env]
 # Prioritize pixi installed packages
