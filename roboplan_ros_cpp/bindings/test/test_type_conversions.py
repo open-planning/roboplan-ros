@@ -9,7 +9,7 @@ from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose, TransformStamped
 
 from roboplan.core import Scene, JointConfiguration, JointTrajectory
-from roboplan_ros_cpp.bindings import (
+from roboplan_ros.cpp import (
     buildConversionMap,
     toJointState,
     fromJointState,
