@@ -111,7 +111,7 @@ NB_MODULE(bindings, m) {
                 pyToCppMsg<visualization_msgs::msg::InteractiveMarkerFeedback>(py_feedback);
             auto result = self.process_feedback(feedback);
             if (result.has_value()) {
-              return nb::cast(*result);
+              return nb::cast(*result, nb::rv_policy::copy);
             }
             return nb::cast(nb::none());
           },
