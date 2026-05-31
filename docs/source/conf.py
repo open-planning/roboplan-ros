@@ -76,6 +76,7 @@ autoapi_options = [
     "undoc-members",
     "show-inheritance",
     "show-module-summary",
+    "private-members",
 ]
 autoapi_type = "python"
 autoapi_template_dir = "_templates/autoapi"
