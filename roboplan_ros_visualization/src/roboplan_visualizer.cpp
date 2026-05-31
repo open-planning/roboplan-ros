@@ -1,9 +1,20 @@
 #include <pinocchio/algorithm/geometry.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 
+// hppfcl was renamed to coal. Prefer the coal headers whenever they are available,
+// since modern hpp-fcl releases declare `namespace coal { }` as a real namespace
+// (with `hpp::fcl` as the backward-compatibility alias), which conflicts with
+// declaring `namespace coal = hpp::fcl;` ourselves.
+#if defined(__has_include) && __has_include(<coal/fwd.hh>)
+#include <coal/BVH/BVH_model.h>
+#include <coal/shape/convex.h>
+#include <coal/shape/geometric_shapes.h>
+#else
 #include <hpp/fcl/BVH/BVH_model.h>
 #include <hpp/fcl/shape/convex.h>
 #include <hpp/fcl/shape/geometric_shapes.h>
+namespace coal = hpp::fcl;
+#endif
 
 #include <rclcpp/logging.hpp>
 
