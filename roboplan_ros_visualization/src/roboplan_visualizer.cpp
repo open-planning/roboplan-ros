@@ -1,9 +1,20 @@
 #include <pinocchio/algorithm/geometry.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 
+// hppfcl was renamed to coal. Prefer the coal headers whenever they are available,
+// since modern hpp-fcl releases declare `namespace coal { }` as a real namespace
+// (with `hpp::fcl` as the backward-compatibility alias), which conflicts with
+// declaring `namespace coal = hpp::fcl;` ourselves.
+#if defined(__has_include) && __has_include(<coal/fwd.hh>)
+#include <coal/BVH/BVH_model.h>
+#include <coal/shape/convex.h>
+#include <coal/shape/geometric_shapes.h>
+#else
 #include <hpp/fcl/BVH/BVH_model.h>
 #include <hpp/fcl/shape/convex.h>
 #include <hpp/fcl/shape/geometric_shapes.h>
+namespace coal = hpp::fcl;
+#endif
 
 #include <rclcpp/logging.hpp>
 
@@ -74,35 +85,35 @@ RoboplanVisualizer::create_geometry_marker(int marker_id, const pinocchio::Geome
   // Dispatch on hpp-fcl geometry type.
   const auto* geom = geom_obj.geometry.get();
 
-  if (const auto* cyl = dynamic_cast<const hpp::fcl::Cylinder*>(geom)) {
+  if (const auto* cyl = dynamic_cast<const coal::Cylinder*>(geom)) {
     marker.type = visualization_msgs::msg::Marker::CYLINDER;
     marker.scale.x = marker.scale.y = cyl->radius * 2.0;
     marker.scale.z = cyl->halfLength * 2.0;
 
-  } else if (const auto* cap = dynamic_cast<const hpp::fcl::Capsule*>(geom)) {
+  } else if (const auto* cap = dynamic_cast<const coal::Capsule*>(geom)) {
     // Capsules are just be approximated as cylinders for now...
     marker.type = visualization_msgs::msg::Marker::CYLINDER;
     marker.scale.x = marker.scale.y = cap->radius * 2.0;
     marker.scale.z = cap->halfLength * 2.0;
 
-  } else if (const auto* box = dynamic_cast<const hpp::fcl::Box*>(geom)) {
+  } else if (const auto* box = dynamic_cast<const coal::Box*>(geom)) {
     marker.type = visualization_msgs::msg::Marker::CUBE;
     marker.scale.x = box->halfSide[0] * 2.0;
     marker.scale.y = box->halfSide[1] * 2.0;
     marker.scale.z = box->halfSide[2] * 2.0;
 
-  } else if (const auto* sph = dynamic_cast<const hpp::fcl::Sphere*>(geom)) {
+  } else if (const auto* sph = dynamic_cast<const coal::Sphere*>(geom)) {
     marker.type = visualization_msgs::msg::Marker::SPHERE;
     const double d = sph->radius * 2.0;
     marker.scale.x = marker.scale.y = marker.scale.z = d;
 
-  } else if (dynamic_cast<const hpp::fcl::Cone*>(geom)) {
+  } else if (dynamic_cast<const coal::Cone*>(geom)) {
     // No cone markers are available so...
     // TODO: Make a cone?
     return std::nullopt;
 
-  } else if (dynamic_cast<const hpp::fcl::ConvexBase*>(geom) ||
-             dynamic_cast<const hpp::fcl::BVHModelBase*>(geom)) {
+  } else if (dynamic_cast<const coal::ConvexBase*>(geom) ||
+             dynamic_cast<const coal::BVHModelBase*>(geom)) {
     marker.type = visualization_msgs::msg::Marker::MESH_RESOURCE;
 
     const std::string& mesh_path = geom_obj.meshPath;

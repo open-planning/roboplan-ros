@@ -1,4 +1,5 @@
 ARG ROS_DISTRO=jazzy
+ARG GENERATE_PYTHON_STUBS=ON
 
 # Preserve rosdep installs separate from source. Maintains caches as long as rosdeps do not change.
 FROM alpine:latest AS package-manifests
@@ -23,13 +24,12 @@ RUN apt update -y \
 # non-ROS workflows, so we cannot put these as requirements in the `pyproject.toml`.
 # As/if this package matures, a possible solution is to apply patches for ROS release.
 RUN pip3 install \
-        nanobind \
         matplotlib \
         "numpy<2.0.0" \
         opencv-contrib-python-headless \
         typing_extensions==4.10.0 \
         tyro \
-        "viser>=1.0.1"
+        "viser>=1.0.29"
 
 # Create a ROS 2 workspace and copy in the source code.
 RUN mkdir -p /workspace/roboplan_ws/src/roboplan_ros
@@ -44,7 +44,7 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
 # Copy in remaining source and build
 COPY . src/roboplan_ros
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && colcon build --cmake-args -DBUILD_TESTING=ON
+    && colcon build --cmake-args -DBUILD_TESTING=ON -DGENERATE_PYTHON_STUBS=${GENERATE_PYTHON_STUBS}
 
 # Set up entrypoint and working folder.
 WORKDIR /workspace/roboplan_ws

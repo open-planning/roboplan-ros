@@ -7,17 +7,17 @@
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 
-#include <utils/expected.hpp>
+#include <roboplan_bindings/expected.hpp>
 
-#include "roboplan_ros_cpp/roboplan_ros_cpp_bindings.hpp"
 #include "roboplan_ros_cpp/type_conversions.hpp"
+#include "roboplan_ros_cpp_bindings/roboplan_ros_cpp_bindings.hpp"
 
 namespace nb = nanobind;
 using namespace nb::literals;
 using namespace roboplan_ros_cpp;
 
-NB_MODULE(bindings, m) {
-  m.doc() = "RoboPlan ROS Python bindings for C++ Type Conversions";
+NB_MODULE(_cpp_ext, m) {
+  m.doc() = "RoboPlan ROS nanobind wrappers for core C++ ROS tools.";
 
   m.def(
       "se3ToPose",

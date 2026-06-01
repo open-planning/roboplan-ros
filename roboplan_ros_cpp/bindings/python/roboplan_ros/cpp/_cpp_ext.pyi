@@ -1,4 +1,4 @@
-"""RoboPlan ROS Python bindings for C++ Type Conversions"""
+"""RoboPlan ROS nanobind wrappers for core C++ ROS tools."""
 
 from typing import Annotated
 
