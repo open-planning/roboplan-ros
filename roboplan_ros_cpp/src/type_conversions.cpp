@@ -19,11 +19,11 @@ buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointSt
   JointStateConverterMap conversion_map;
   conversion_map.nq = model.nq;
   conversion_map.nv = model.nv;
-  conversion_map.mappings.reserve(scene.getJointNames().size());
+  conversion_map.mappings.reserve(joint_state.name.size());
 
   // For each actuated joint name, determine type and its location in the Scene's configuration,
   // and put it into the mapping.
-  for (const auto& joint_name : scene.getJointNames()) {
+  for (const auto& joint_name : joint_state.name) {
     const auto joint_info = scene.getJointInfo(joint_name);
     if (!joint_info) {
       return tl::make_unexpected("Failed to get joint info for: " + joint_name);

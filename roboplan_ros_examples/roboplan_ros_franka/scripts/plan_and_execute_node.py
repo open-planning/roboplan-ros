@@ -310,6 +310,7 @@ class PlanAndExecuteNode(Node):
             self._last_joint_state, self._scene, self._conversion_map
         )
         self._latest_joint_positions = joint_config.positions
+        self._scene.setJointPositions(self._latest_joint_positions)
 
         start = JointConfiguration()
         start.positions = self._latest_joint_positions[self._q_indices]
@@ -318,7 +319,11 @@ class PlanAndExecuteNode(Node):
         goal.positions = self._target_q[self._q_indices]
 
         self.get_logger().info("Planning...")
-        path = self._rrt.plan(start, goal)
+        try:
+            path = self._rrt.plan(start, goal)
+        except RuntimeError as e:
+            self.get_logger().error(str(e))
+            path = None
 
         if path is None:
             return False, "Planning failed."
