@@ -310,6 +310,7 @@ class PlanAndExecuteNode(Node):
             self._last_joint_state, self._scene, self._conversion_map
         )
         self._latest_joint_positions = joint_config.positions
+        self._scene.setJointPositions(self._latest_joint_positions)
 
         start = JointConfiguration()
         start.positions = self._latest_joint_positions[self._q_indices]
