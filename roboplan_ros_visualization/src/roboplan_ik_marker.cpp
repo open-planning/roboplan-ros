@@ -26,7 +26,7 @@ RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
   }
 
   last_joint_positions_ = scene_->getCurrentJointPositions();
-  const auto se3_pose = scene_->forwardKinematics(last_joint_positions_, tip_link_);
+  const auto se3_pose = scene_->forwardKinematics(last_joint_positions_, tip_link_, base_link_);
   target_pose_ = roboplan_ros_cpp::se3ToPose(se3_pose);
 }
 
