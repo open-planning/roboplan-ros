@@ -32,7 +32,7 @@ def test_process_feedback():
     q_target = np.array(scene.getCurrentJointPositions())
     q_indices = scene.getJointGroupInfo("arm").q_indices
     q_target[q_indices] = [0.0, -1.57, 1.57, -1.57, -1.57, 0.0]
-    fk_target = scene.forwardKinematics(q_target, "tool0")
+    fk_target = scene.forwardKinematics(q_target, "tool0", "base_link")
     target_pose = se3ToPose(fk_target)
 
     # Solve via process_feedback
@@ -43,7 +43,7 @@ def test_process_feedback():
 
     # Verify FK of solution matches the target
     assert result is not None
-    fk_result = scene.forwardKinematics(result, "tool0")
+    fk_result = scene.forwardKinematics(result, "tool0", "base_link")
     assert abs(fk_result[0, 3] - target_pose.position.x) < 0.01
     assert abs(fk_result[1, 3] - target_pose.position.y) < 0.01
     assert abs(fk_result[2, 3] - target_pose.position.z) < 0.01
