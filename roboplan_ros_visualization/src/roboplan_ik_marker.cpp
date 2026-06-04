@@ -125,8 +125,6 @@ const Eigen::VectorXd& RoboplanIKMarker::last_joint_positions() const {
   return last_joint_positions_;
 }
 
-void RoboplanIKMarker::set_seed_configuration(const Eigen::VectorXd& q) {
-  seed_configuration_ = q;
-}
+void RoboplanIKMarker::set_seed_configuration(const Eigen::VectorXd& q) { seed_configuration_ = q; }
 
 }  // namespace roboplan_ros_visualization
