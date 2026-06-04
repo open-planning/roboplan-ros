@@ -47,8 +47,8 @@ public:
   /// @brief Get the last successful joint positions (or the initial seed).
   const Eigen::VectorXd& last_joint_positions() const;
 
-  /// @brief Sets last joint positions, which are then used as a seed for the next solve.
-  void set_joint_positions(const Eigen::VectorXd& q);
+  /// @brief Sets the seed for the next IK solve (assumes the full configuration).
+  void set_seed_configuration(const Eigen::VectorXd& q);
 
 private:
   /// @brief Shared ptr to avoid ownership issues between C++ and Python
@@ -77,6 +77,9 @@ private:
 
   /// @brief Current target pose for IK
   geometry_msgs::msg::Pose target_pose_;
+
+  /// @brief Set the seed for the IK solver
+  Eigen::VectorXd seed_configuration_;
 };
 
 }  // namespace roboplan_ros_visualization

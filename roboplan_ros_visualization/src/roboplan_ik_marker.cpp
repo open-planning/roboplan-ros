@@ -26,6 +26,7 @@ RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
   }
 
   last_joint_positions_ = scene_->getCurrentJointPositions();
+  seed_configuration_ = last_joint_positions_;
   const auto se3_pose = scene_->forwardKinematics(last_joint_positions_, tip_link_, base_link_);
   target_pose_ = roboplan_ros_cpp::se3ToPose(se3_pose);
 }
@@ -102,7 +103,7 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
   roboplan::JointConfiguration seed;
   Eigen::VectorXd group_positions(q_indices_.size());
   for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
-    group_positions(i) = last_joint_positions_(q_indices_(i));
+    group_positions(i) = seed_configuration_(q_indices_(i));
   }
   seed.positions = group_positions;
 
@@ -124,6 +125,8 @@ const Eigen::VectorXd& RoboplanIKMarker::last_joint_positions() const {
   return last_joint_positions_;
 }
 
-void RoboplanIKMarker::set_joint_positions(const Eigen::VectorXd& q) { last_joint_positions_ = q; }
+void RoboplanIKMarker::set_seed_configuration(const Eigen::VectorXd& q) {
+  seed_configuration_ = q;
+}
 
 }  // namespace roboplan_ros_visualization
