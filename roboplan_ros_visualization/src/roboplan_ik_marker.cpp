@@ -16,17 +16,10 @@ RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
   if (!joint_group_result.has_value()) {
     throw std::runtime_error("Failed to get joint group info: " + joint_group_result.error());
   }
+
   q_indices_ = joint_group_result->q_indices;
-
-  const auto& all_joint_names = scene_->getJointNames();
-  joint_names_.clear();
-  joint_names_.reserve(q_indices_.size());
-  for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
-    joint_names_.push_back(all_joint_names.at(q_indices_(i)));
-  }
-
-  last_joint_positions_ = scene_->getCurrentJointPositions();
-  const auto se3_pose = scene_->forwardKinematics(last_joint_positions_, tip_link_);
+  seed_configuration_ = scene_->getCurrentJointPositions();
+  const auto se3_pose = scene_->forwardKinematics(seed_configuration_, tip_link_, base_link_);
   target_pose_ = roboplan_ros_cpp::se3ToPose(se3_pose);
 }
 
@@ -100,30 +93,18 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
 
   // Extract only the group joints for the seed
   roboplan::JointConfiguration seed;
-  Eigen::VectorXd group_positions(q_indices_.size());
-  for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
-    group_positions(i) = last_joint_positions_(q_indices_(i));
-  }
-  seed.positions = group_positions;
+  seed.positions = seed_configuration_(q_indices_);
 
   roboplan::JointConfiguration solution;
   const bool success = ik_solver_->solveIk(goal, seed, solution);
 
   if (success) {
-    // Then we need to expand back to the full state
-    for (Eigen::Index i = 0; i < q_indices_.size(); ++i) {
-      last_joint_positions_(q_indices_(i)) = solution.positions(i);
-    }
-    return last_joint_positions_;
+    return scene_->toFullJointPositions(joint_group_, solution.positions);
   }
 
   return std::nullopt;
 }
 
-const Eigen::VectorXd& RoboplanIKMarker::last_joint_positions() const {
-  return last_joint_positions_;
-}
-
-void RoboplanIKMarker::set_joint_positions(const Eigen::VectorXd& q) { last_joint_positions_ = q; }
+void RoboplanIKMarker::set_seed_configuration(const Eigen::VectorXd& q) { seed_configuration_ = q; }
 
 }  // namespace roboplan_ros_visualization

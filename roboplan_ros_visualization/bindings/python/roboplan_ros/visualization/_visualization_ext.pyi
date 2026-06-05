@@ -40,9 +40,5 @@ class RoboplanIKMarker:
         Process InteractiveMarkerFeedback. Returns joint positions on success, or else None.
         """
 
-    @property
-    def last_joint_positions(self) -> Annotated[NDArray[numpy.float64], dict(shape=(None,), order='C')]:
-        """The last successful joint positions (or initial seed)."""
-
-    def set_joint_positions(self, q: Annotated[NDArray[numpy.float64], dict(shape=(None,), order='C')]) -> None:
+    def set_seed_configuration(self, q: Annotated[NDArray[numpy.float64], dict(shape=(None,), order='C')]) -> None:
         """Set the seed joint positions for the next solve."""

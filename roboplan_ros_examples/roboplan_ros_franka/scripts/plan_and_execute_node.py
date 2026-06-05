@@ -40,7 +40,12 @@ from std_srvs.srv import Trigger
 from sensor_msgs.msg import JointState
 from interactive_markers import MenuHandler
 
-from roboplan.core import JointConfiguration, PathShortcutter, Scene
+from roboplan.core import (
+    JointConfiguration,
+    PathShortcuttingOptions,
+    PathShortcutter,
+    Scene,
+)
 from roboplan.simple_ik import SimpleIkOptions
 from roboplan.rrt import RRT, RRTOptions
 from roboplan.toppra import PathParameterizerTOPPRA, SplineFittingMode
@@ -197,11 +202,16 @@ class PlanAndExecuteNode(Node):
         self._rrt_options.collision_check_step_size = 0.05
         self._rrt_options.max_planning_time = 5.0
         self._rrt_options.rrt_connect = True
-        self._max_shortcutting_iters = 200
+
+        self._shortcutting_options = PathShortcuttingOptions(
+            group_name=self._joint_group,
+            max_step_size=self._rrt_options.collision_check_step_size,
+            max_iters=200,
+        )
 
         self._rrt = RRT(self._scene, self._rrt_options)
         self._toppra = PathParameterizerTOPPRA(self._scene, self._joint_group)
-        self._shortcutter = PathShortcutter(self._scene, self._joint_group)
+        self._shortcutter = PathShortcutter(self._scene, self._shortcutting_options)
         self._traj_dt = 0.01
 
         # Default QoS for visualization
@@ -329,11 +339,7 @@ class PlanAndExecuteNode(Node):
             return False, "Planning failed."
 
         if self._include_shortcutting:
-            path = self._shortcutter.shortcut(
-                path,
-                max_step_size=self._rrt_options.collision_check_step_size,
-                max_iters=self._max_shortcutting_iters,
-            )
+            path = self._shortcutter.shortcut(path)
 
         self.get_logger().info("Generating trajectory...")
         self._planned_traj = self._toppra.generate(

@@ -117,10 +117,7 @@ NB_MODULE(_visualization_ext, m) {
           },
           "feedback"_a,
           "Process InteractiveMarkerFeedback. Returns joint positions on success, or else None.")
-      .def_prop_ro("last_joint_positions",
-                   &roboplan_ros_visualization::RoboplanIKMarker::last_joint_positions,
-                   "The last successful joint positions (or initial seed).")
-      .def("set_joint_positions",
-           &roboplan_ros_visualization::RoboplanIKMarker::set_joint_positions, "q"_a,
+      .def("set_seed_configuration",
+           &roboplan_ros_visualization::RoboplanIKMarker::set_seed_configuration, "q"_a,
            "Set the seed joint positions for the next solve.");
 }

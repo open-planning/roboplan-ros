@@ -44,11 +44,8 @@ public:
   std::optional<Eigen::VectorXd>
   process_feedback(const visualization_msgs::msg::InteractiveMarkerFeedback& feedback);
 
-  /// @brief Get the last successful joint positions (or the initial seed).
-  const Eigen::VectorXd& last_joint_positions() const;
-
-  /// @brief Sets last joint positions, which are then used as a seed for the next solve.
-  void set_joint_positions(const Eigen::VectorXd& q);
+  /// @brief Sets the seed for the next IK solve (assumes the full configuration).
+  void set_seed_configuration(const Eigen::VectorXd& q);
 
 private:
   /// @brief Shared ptr to avoid ownership issues between C++ and Python
@@ -63,20 +60,17 @@ private:
   ///@ brief The tip link of the IK solver chain.
   std::string tip_link_;
 
-  /// @brief Joint names for the active group
-  std::vector<std::string> joint_names_;
-
   /// @brief Indices into the full configuration vector for this group
   Eigen::VectorXi q_indices_;
 
   /// @brief The underlying IK solver
   std::unique_ptr<roboplan::SimpleIk> ik_solver_;
 
-  /// @brief Last successful joint solution, used as seed for next solve
-  Eigen::VectorXd last_joint_positions_;
-
   /// @brief Current target pose for IK
   geometry_msgs::msg::Pose target_pose_;
+
+  /// @brief Set the seed for the IK solver
+  Eigen::VectorXd seed_configuration_;
 };
 
 }  // namespace roboplan_ros_visualization
