@@ -41,7 +41,12 @@ from std_srvs.srv import Trigger
 from sensor_msgs.msg import JointState
 from interactive_markers import MenuHandler
 
-from roboplan.core import JointConfiguration, PathShortcuttingOptions, PathShortcutter, Scene
+from roboplan.core import (
+    JointConfiguration,
+    PathShortcuttingOptions,
+    PathShortcutter,
+    Scene,
+)
 from roboplan.simple_ik import SimpleIkOptions
 from roboplan.rrt import RRT, RRTOptions
 from roboplan.toppra import PathParameterizerTOPPRA, SplineFittingMode
@@ -336,7 +341,9 @@ class PlanAndExecuteNode(Node):
         try:
             start_time = time.time()
             path = self._rrt.plan(start, goal)
-            self.get_logger().info(f"  Finished planning in {time.time() - start_time} seconds.")
+            self.get_logger().info(
+                f"  Finished planning in {time.time() - start_time} seconds."
+            )
         except RuntimeError as e:
             self.get_logger().error(str(e))
             path = None
@@ -348,16 +355,22 @@ class PlanAndExecuteNode(Node):
             self.get_logger().info("Shortcutting...")
             start_time = time.time()
             path = self._shortcutter.shortcut(path)
-            self.get_logger().info(f"  Finished shortcutting in {time.time() - start_time} seconds.")
+            self.get_logger().info(
+                f"  Finished shortcutting in {time.time() - start_time} seconds."
+            )
 
         self.get_logger().info("Generating trajectory...")
         start_time = time.time()
         self._planned_traj = self._toppra.generate(
             path, self._traj_dt, SplineFittingMode.Adaptive, max_adaptive_iterations=5
         )
-        self.get_logger().info(f"  Finished generating trajectory in {time.time() - start_time} seconds.")
+        self.get_logger().info(
+            f"  Finished generating trajectory in {time.time() - start_time} seconds."
+        )
 
-        self.get_logger().info(f"Total planning time: {time.time() - plan_start_time} seconds.")
+        self.get_logger().info(
+            f"Total planning time: {time.time() - plan_start_time} seconds."
+        )
 
         return (
             True,
@@ -431,7 +444,9 @@ class PlanAndExecuteNode(Node):
         self._ik_marker.set_seed_configuration(self._latest_joint_positions)
 
         # Compute FK for the current state to get the marker pose
-        fk = self._scene.forwardKinematics(self._latest_joint_positions, self._tip_link, self._base_link)
+        fk = self._scene.forwardKinematics(
+            self._latest_joint_positions, self._tip_link, self._base_link
+        )
         pose = se3ToPose(fk)
 
         # Update the IK to the current pose
