@@ -12,6 +12,7 @@ reference, rather than hardened application code.
 """
 
 import os
+import time
 import threading
 import xacro
 import numpy as np
@@ -159,6 +160,7 @@ class PlanAndExecuteNode(Node):
         self._last_joint_state = None
         self._conversion_map = None
         self._q_indices = self._scene.getJointGroupInfo(self._joint_group).q_indices
+        self._latest_joint_positions: np.array | None = None
 
         self._js_executor = SingleThreadedExecutor()
         self._js_executor.add_node(self._js_node)
@@ -167,26 +169,22 @@ class PlanAndExecuteNode(Node):
         )
         self._js_thread.start()
 
-        # Start in a reasonable pose, this could come from hardware.
-        self._latest_joint_positions = np.array(
-            [
-                0.0,
-                -0.785,
-                0.0,
-                -2.356,
-                0.0,
-                1.571,
-                0.785,
-                0,  # fr3_finger_joint1 only (joint2 is mimic joint)
-            ]
-        )
-        self._scene.setJointPositions(self._latest_joint_positions)
+        # Wait for joint states
+        while self._last_joint_state is None:
+            self.get_logger().info("Waiting for joint positions...")
+            time.sleep(1.0)
 
         # Set the IK solver options
         ik_options = SimpleIkOptions()
         ik_options.group_name = self._joint_group
         ik_options.max_iters = 100
         ik_options.step_size = 0.25
+        ik_options.check_collisions = True
+
+        # Increases likelihood of finding an "optimal" solution
+        ik_options.fast_return = False
+        ik_options.max_iters = 100
+        ik_options.max_time = 0.05
         self._ik_marker = RoboplanIKMarker(
             scene=self._scene,
             joint_group=self._joint_group,
@@ -198,21 +196,26 @@ class PlanAndExecuteNode(Node):
         # Set up planning utilities
         self._rrt_options = RRTOptions()
         self._rrt_options.group_name = self._joint_group
-        self._rrt_options.max_connection_distance = 1.0
+        self._rrt_options.max_connection_distance = 3.0
         self._rrt_options.collision_check_step_size = 0.05
         self._rrt_options.max_planning_time = 5.0
         self._rrt_options.rrt_connect = True
+        self._rrt_options.max_nodes = 1000
+        self._rrt_options.goal_biasing_probability = 0.05
+        self._rrt_options.collision_check_use_bisection = True
+        self._include_shortcutting = True
+        self._max_shortcutting_iters = 250
 
         self._shortcutting_options = PathShortcuttingOptions(
             group_name=self._joint_group,
             max_step_size=self._rrt_options.collision_check_step_size,
-            max_iters=200,
+            max_iters=self._max_shortcutting_iters,
         )
 
         self._rrt = RRT(self._scene, self._rrt_options)
         self._toppra = PathParameterizerTOPPRA(self._scene, self._joint_group)
         self._shortcutter = PathShortcutter(self._scene, self._shortcutting_options)
-        self._traj_dt = 0.01
+        self._traj_dt = 0.1
 
         # Default QoS for visualization
         qos = QoSProfile(
@@ -296,6 +299,7 @@ class PlanAndExecuteNode(Node):
         self.create_service(Trigger, "~/reset", self._on_reset)
 
         # Reset and notify
+        self._reset()
         self.get_logger().info("Ready. Move the interactive marker to set a target.")
         self.get_logger().info("Call services: ~/plan, ~/preview, ~/execute, ~/reset")
 
@@ -305,6 +309,7 @@ class PlanAndExecuteNode(Node):
         self._last_joint_state = msg
 
     def _on_ik_feedback(self, feedback):
+        self._ik_marker.set_seed_configuration(self._latest_joint_positions)
         q = self._ik_marker.process_feedback(feedback)
         if q is not None:
             self._target_q = q
@@ -313,6 +318,8 @@ class PlanAndExecuteNode(Node):
             )
 
     def _plan(self):
+        if self._target_q is None:
+            return False, "No target set. Move the interactive marker first."
         if self._target_q is None:
             return False, "No target set. Move the interactive marker first."
 
@@ -329,8 +336,14 @@ class PlanAndExecuteNode(Node):
         goal.positions = self._target_q[self._q_indices]
 
         self.get_logger().info("Planning...")
+        plan_start_time = time.time()
+
         try:
+            start_time = time.time()
             path = self._rrt.plan(start, goal)
+            self.get_logger().info(
+                f"  Finished planning in {time.time() - start_time} seconds."
+            )
         except RuntimeError as e:
             self.get_logger().error(str(e))
             path = None
@@ -339,11 +352,24 @@ class PlanAndExecuteNode(Node):
             return False, "Planning failed."
 
         if self._include_shortcutting:
+            self.get_logger().info("Shortcutting...")
+            start_time = time.time()
             path = self._shortcutter.shortcut(path)
+            self.get_logger().info(
+                f"  Finished shortcutting in {time.time() - start_time} seconds."
+            )
 
         self.get_logger().info("Generating trajectory...")
+        start_time = time.time()
         self._planned_traj = self._toppra.generate(
-            path, self._traj_dt, SplineFittingMode.Hermite
+            path, self._traj_dt, SplineFittingMode.Adaptive, max_adaptive_iterations=5
+        )
+        self.get_logger().info(
+            f"  Finished generating trajectory in {time.time() - start_time} seconds."
+        )
+
+        self.get_logger().info(
+            f"Total planning time: {time.time() - plan_start_time} seconds."
         )
 
         return (
@@ -415,10 +441,12 @@ class PlanAndExecuteNode(Node):
         self._latest_joint_positions = joint_config.positions
 
         # Update the IK marker's seed to the current state
-        self._ik_marker.set_joint_positions(self._latest_joint_positions)
+        self._ik_marker.set_seed_configuration(self._latest_joint_positions)
 
         # Compute FK for the current state to get the marker pose
-        fk = self._scene.forwardKinematics(self._latest_joint_positions, self._tip_link)
+        fk = self._scene.forwardKinematics(
+            self._latest_joint_positions, self._tip_link, self._base_link
+        )
         pose = se3ToPose(fk)
 
         # Update the IK to the current pose
