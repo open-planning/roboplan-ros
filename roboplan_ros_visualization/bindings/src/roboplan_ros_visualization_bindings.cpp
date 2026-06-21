@@ -48,7 +48,8 @@ NB_MODULE(_visualization_ext, m) {
           "__init__",
           [](roboplan_ros_visualization::RoboplanVisualizer* self,
              std::shared_ptr<const roboplan::Scene> scene, const std::string& urdf_xml,
-             const std::string& frame_id, const std::string& ns, nb::handle py_color) {
+             const std::string& frame_id, const std::string& ns, const std::string& group_name,
+             nb::handle py_color) {
             std::optional<std_msgs::msg::ColorRGBA> color = std::nullopt;
             if (!py_color.is_none()) {
               color = pyToCppMsg<std_msgs::msg::ColorRGBA>(py_color);
@@ -56,18 +57,23 @@ NB_MODULE(_visualization_ext, m) {
             // nanobind will pre-allocate memory for the object, so we just construct the object
             // directly there in this lambda. This is messy but ensures no duplication and correct
             // ownership.
-            new (self) roboplan_ros_visualization::RoboplanVisualizer(std::move(scene), urdf_xml,
-                                                                      frame_id, ns, color);
+            new (self) roboplan_ros_visualization::RoboplanVisualizer(
+                std::move(scene), urdf_xml, frame_id, ns, group_name, color);
           },
           "scene"_a, "urdf_xml"_a, "frame_id"_a = "world", "ns"_a = "/roboplan",
-          "color"_a = nb::none())
+          "group_name"_a = "", "color"_a = nb::none())
       .def(
           "markers_from_configuration",
           [MarkerArray](roboplan_ros_visualization::RoboplanVisualizer& self,
                         const Eigen::VectorXd& q) {
             return cppToPyMsg(self.markers_from_configuration(q), MarkerArray);
           },
-          "q"_a, "Compute marker array for the given joint configuration.")
+          "q"_a,
+          "Compute marker array for the given joint configuration, restricted to the currently "
+          "selected joint group (see the constructor and set_group).")
+      .def("set_group", &roboplan_ros_visualization::RoboplanVisualizer::set_group, "group_name"_a,
+           "Select the joint group whose links are rendered. Pass an empty string for the whole "
+           "scene. Raises if the group name is not found in the scene.")
       .def(
           "clear_markers",
           [MarkerArray](roboplan_ros_visualization::RoboplanVisualizer& self) {
