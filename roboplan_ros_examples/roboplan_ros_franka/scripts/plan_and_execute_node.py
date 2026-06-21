@@ -255,6 +255,7 @@ class PlanAndExecuteNode(Node):
         # IK determined target pose in blue
         self._ik_visualizer = RoboplanVisualizer(
             scene=self._scene,
+            group_name=self._joint_group,
             urdf_xml=urdf_xml,
             frame_id="world",
             ns="roboplan_ik",
@@ -268,6 +269,7 @@ class PlanAndExecuteNode(Node):
         # published in green.
         self._traj_visualizer = RoboplanVisualizer(
             scene=self._scene,
+            group_name=self._joint_group,
             urdf_xml=urdf_xml,
             frame_id="world",
             ns="roboplan_traj",

@@ -11,10 +11,17 @@ class RoboplanVisualizer:
     Tool to build RViz MarkerArray messages from a RoboPlan scene and joint configuration.
     """
 
-    def __init__(self, scene: roboplan.core._core_ext.Scene, urdf_xml: str, frame_id: str = 'world', ns: str = '/roboplan', color: object | None = None) -> None: ...
+    def __init__(self, scene: roboplan.core._core_ext.Scene, urdf_xml: str, frame_id: str = 'world', ns: str = '/roboplan', group_name: str = '', color: object | None = None) -> None: ...
 
     def markers_from_configuration(self, q: Annotated[NDArray[numpy.float64], dict(shape=(None,), order='C')]) -> object:
-        """Compute marker array for the given joint configuration."""
+        """
+        Compute marker array for the given joint configuration, restricted to the currently selected joint group (see the constructor and set_group).
+        """
+
+    def set_group(self, group_name: str) -> None:
+        """
+        Select the joint group whose links are rendered. Pass an empty string for the whole scene. Raises if the group name is not found in the scene.
+        """
 
     def clear_markers(self) -> object:
         """Return a MarkerArray that deletes all previously published markers."""
