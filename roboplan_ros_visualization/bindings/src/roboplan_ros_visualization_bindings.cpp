@@ -8,6 +8,7 @@
 #include <roboplan_ros_cpp/type_conversions.hpp>
 #include <roboplan_ros_cpp_bindings/roboplan_ros_cpp_bindings.hpp>
 
+#include <roboplan_ros_visualization/path_visualization.hpp>
 #include <roboplan_ros_visualization/roboplan_ik_marker.hpp>
 #include <roboplan_ros_visualization/roboplan_visualizer.hpp>
 
@@ -29,6 +30,7 @@ NB_MODULE(_visualization_ext, m) {
 
   // Pre-import Python messages to avoid repeated lookups
   nb::object MarkerArray = nb::module_::import_("visualization_msgs.msg").attr("MarkerArray");
+  nb::object Marker = nb::module_::import_("visualization_msgs.msg").attr("Marker");
   nb::object ColorRGBA = nb::module_::import_("std_msgs.msg").attr("ColorRGBA");
   nb::object InteractiveMarker =
       nb::module_::import_("visualization_msgs.msg").attr("InteractiveMarker");
@@ -126,4 +128,22 @@ NB_MODULE(_visualization_ext, m) {
       .def("set_seed_configuration",
            &roboplan_ros_visualization::RoboplanIKMarker::set_seed_configuration, "q"_a,
            "Set the seed joint positions for the next solve.");
+
+  m.def(
+      "markerFromJointTrajectory",
+      [Marker](const roboplan::Scene& scene, const roboplan::JointTrajectory& trajectory,
+               const std::vector<std::string>& frame_names, const std::string& frame_id,
+               const std::string& ns, nb::handle py_color, double line_width) {
+        std::optional<std_msgs::msg::ColorRGBA> color = std::nullopt;
+        if (!py_color.is_none()) {
+          color = pyToCppMsg<std_msgs::msg::ColorRGBA>(py_color);
+        }
+        return cppToPyMsg(roboplan_ros_visualization::markerFromJointTrajectory(
+                              scene, trajectory, frame_names, frame_id, ns, color, line_width),
+                          Marker);
+      },
+      "scene"_a, "trajectory"_a, "frame_names"_a, "frame_id"_a = "world", "ns"_a = "/roboplan_path",
+      "color"_a = nb::none(), "line_width"_a = 0.01,
+      "Build a LINE_LIST Marker tracing the Cartesian path of the given frames along a joint "
+      "trajectory via forward kinematics.");
 }

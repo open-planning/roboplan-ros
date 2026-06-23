@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Annotated
 
 import numpy
@@ -49,3 +50,8 @@ class RoboplanIKMarker:
 
     def set_seed_configuration(self, q: Annotated[NDArray[numpy.float64], dict(shape=(None,), order='C')]) -> None:
         """Set the seed joint positions for the next solve."""
+
+def markerFromJointTrajectory(scene: roboplan.core._core_ext.Scene, trajectory: roboplan.core._core_ext.JointTrajectory, frame_names: Sequence[str], frame_id: str = 'world', ns: str = '/roboplan_path', color: object | None = None, line_width: float = 0.01) -> object:
+    """
+    Build a LINE_LIST Marker tracing the Cartesian path of the given frames along a joint trajectory via forward kinematics.
+    """

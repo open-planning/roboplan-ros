@@ -35,7 +35,7 @@ from rclpy.qos import (
 )
 from control_msgs.action import FollowJointTrajectory
 from std_msgs.msg import ColorRGBA
-from visualization_msgs.msg import MarkerArray
+from visualization_msgs.msg import Marker, MarkerArray
 from interactive_markers import InteractiveMarkerServer
 from std_srvs.srv import Trigger
 from sensor_msgs.msg import JointState
@@ -49,8 +49,12 @@ from roboplan.core import (
 )
 from roboplan.simple_ik import SimpleIkOptions
 from roboplan.rrt import RRT, RRTOptions
-from roboplan.toppra import PathParameterizerTOPPRA, SplineFittingMode
-from roboplan_ros.visualization import RoboplanVisualizer, RoboplanIKMarker
+from roboplan.toppra import PathParameterizerTOPPRA, SplineFittingMode, TOPPRAOptions
+from roboplan_ros.visualization import (
+    RoboplanVisualizer,
+    RoboplanIKMarker,
+    markerFromJointTrajectory,
+)
 from roboplan_ros.cpp import (
     buildConversionMap,
     fromJointState,
@@ -215,7 +219,7 @@ class PlanAndExecuteNode(Node):
         self._rrt = RRT(self._scene, self._rrt_options)
         self._toppra = PathParameterizerTOPPRA(self._scene, self._joint_group)
         self._shortcutter = PathShortcutter(self._scene, self._shortcutting_options)
-        self._traj_dt = 0.1
+        self._traj_dt = 0.01
 
         # Default QoS for visualization
         qos = QoSProfile(
@@ -283,6 +287,20 @@ class PlanAndExecuteNode(Node):
             self._traj_visualizer,
             self._traj_marker_pub,
             self._q_indices,
+        )
+
+        # Publish the planned end-effector path as a light green line upon planning.
+        # Unlike the IK/preview markers (which are republished continuously), the path
+        # is published exactly once per plan, so use a latched QoS.
+        latched_qos = QoSProfile(
+            depth=1,
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
+        )
+        self._planned_path_color = ColorRGBA(r=0.5, g=1.0, b=0.5, a=1.0)
+        self._planned_path_pub = self.create_publisher(
+            Marker, "/roboplan_trajectory/path", latched_qos
         )
 
         # Setup an action client for trajectory execution
@@ -364,7 +382,12 @@ class PlanAndExecuteNode(Node):
         self.get_logger().info("Generating trajectory...")
         start_time = time.time()
         self._planned_traj = self._toppra.generate(
-            path, self._traj_dt, SplineFittingMode.Adaptive, max_adaptive_iterations=5
+            path,
+            TOPPRAOptions(
+                self._traj_dt,
+                mode=SplineFittingMode.Adaptive,
+                max_adaptive_iterations=5,
+            ),
         )
         self.get_logger().info(
             f"  Finished generating trajectory in {time.time() - start_time} seconds."
@@ -372,6 +395,18 @@ class PlanAndExecuteNode(Node):
 
         self.get_logger().info(
             f"Total planning time: {time.time() - plan_start_time} seconds."
+        )
+
+        # Visualize the planned end-effector trajectory.
+        self._planned_path_pub.publish(
+            markerFromJointTrajectory(
+                self._scene,
+                self._planned_traj,
+                [self._tip_link],
+                frame_id="world",
+                ns="planned_trajectory",
+                color=self._planned_path_color,
+            )
         )
 
         return (
@@ -462,6 +497,10 @@ class PlanAndExecuteNode(Node):
         self._target_q = None
         self._planned_traj = None
         self._traj_marker_pub.publish(self._traj_visualizer.clear_markers())
+        delete_marker = Marker()
+        delete_marker.header.frame_id = "world"
+        delete_marker.action = Marker.DELETEALL
+        self._planned_path_pub.publish(delete_marker)
 
     # Menu callbacks
     def _on_plan_menu(self, feedback):
@@ -477,11 +516,8 @@ class PlanAndExecuteNode(Node):
         self.get_logger().info(msg)
 
     def _on_reset_menu(self, feedback):
-        try:
-            self._reset()
-            self.get_logger().info("Reset node to current state.")
-        except Exception as e:
-            self.get_logger().error(f"Failed to reset the node: {e}")
+        self._reset()
+        self.get_logger().info("Reset node to current state.")
 
     # Trigger service callbacks
     def _on_plan(self, request, response):
@@ -497,15 +533,10 @@ class PlanAndExecuteNode(Node):
         return response
 
     def _on_reset(self, request, response):
-        try:
-            self._reset()
-            response.success = True
-            response.message = "Reset node to current state."
-            self.get_logger().info(response.message)
-        except Exception as e:
-            response.success = False
-            response.message = f"Failed to reset the node: {e}"
-            self.get_logger().info(response.message)
+        self._reset()
+        response.success = True
+        response.message = "Reset node to current state."
+        self.get_logger().info(response.message)
         return response
 
     def destroy_node(self):
