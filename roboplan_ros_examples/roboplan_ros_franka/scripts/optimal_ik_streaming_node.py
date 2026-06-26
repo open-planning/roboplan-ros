@@ -251,8 +251,7 @@ class CartesianServoNode(Node):
         # loop_. Still, the marker does some nice things for us so we include it here
         # and just save the target pose away.
         def store_target(target_pose, _):
-            with self._lock:
-                self._raw_target = target_pose.copy()
+            self._raw_target = target_pose.copy()
             return None
 
         self._ik_marker = RoboplanIKMarker(
@@ -369,35 +368,9 @@ class CartesianServoNode(Node):
         msg.points = [point]
         self._cmd_pub.publish(msg)
 
-    def _start(self):
-        """
-        Sync scene to hardware and begin tracking the current marker target.
-
-        Otherwise jerky motions can happen when starting tracking.
-        """
-        if self._last_joint_state is None:
-            raise RuntimeError("No joint states received, cannot start.")
-
-        joint_config = fromJointState(
-            self._last_joint_state, self._scene, self._conversion_map
-        )
-        self._latest_joint_positions = joint_config.positions
-
-        with self._lock:
-            self._scene.setJointPositions(self._latest_joint_positions)
-            self._scene.forwardKinematics(self._latest_joint_positions, self._tip_link)
-            # Reset filter to current pose so that it smoothly moves toward the
-            # marker target.
-            if self._reference_filter_tau > 0:
-                current_pose = self._scene.forwardKinematics(
-                    self._latest_joint_positions, self._tip_link, self._base_link
-                )
-                self._reference_filter.reset(current_pose)
-
-        self._paused = False
-
     def _on_start_menu(self, _):
-        self._start()
+        self._reset()
+        self._paused = False
         self.get_logger().info("Servoing started.")
 
     def _on_pause_menu(self, _):
