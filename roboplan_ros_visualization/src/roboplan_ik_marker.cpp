@@ -5,19 +5,9 @@ namespace roboplan_ros_visualization {
 
 RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
                                    const std::string& joint_group, const std::string& base_link,
-                                   const std::string& tip_link,
-                                   const roboplan::SimpleIkOptions& options)
+                                   const std::string& tip_link, IkSolveFunction ik_solve_fn)
     : scene_(std::move(scene)), joint_group_(joint_group), base_link_(base_link),
-      tip_link_(tip_link) {
-  ik_solver_ = std::make_unique<roboplan::SimpleIk>(
-      std::const_pointer_cast<roboplan::Scene>(scene_), options);
-
-  const auto joint_group_result = scene_->getJointGroupInfo(joint_group_);
-  if (!joint_group_result.has_value()) {
-    throw std::runtime_error("Failed to get joint group info: " + joint_group_result.error());
-  }
-
-  q_indices_ = joint_group_result->q_indices;
+      tip_link_(tip_link), ik_solve_fn_(std::move(ik_solve_fn)) {
   seed_configuration_ = scene_->getCurrentJointPositions();
   const auto se3_pose = scene_->forwardKinematics(seed_configuration_, tip_link_, base_link_);
   target_pose_ = roboplan_ros_cpp::se3ToPose(se3_pose);
@@ -86,23 +76,7 @@ std::optional<Eigen::VectorXd> RoboplanIKMarker::process_feedback(
   target_pose_ = feedback.pose;
   const Eigen::Matrix4d tform = roboplan_ros_cpp::poseToSE3(target_pose_);
 
-  roboplan::CartesianConfiguration goal;
-  goal.base_frame = base_link_;
-  goal.tip_frame = tip_link_;
-  goal.tform = tform;
-
-  // Extract only the group joints for the seed
-  roboplan::JointConfiguration seed;
-  seed.positions = seed_configuration_(q_indices_);
-
-  roboplan::JointConfiguration solution;
-  const bool success = ik_solver_->solveIk(goal, seed, solution);
-
-  if (success) {
-    return scene_->toFullJointPositions(joint_group_, solution.positions);
-  }
-
-  return std::nullopt;
+  return ik_solve_fn_(tform, seed_configuration_);
 }
 
 void RoboplanIKMarker::set_seed_configuration(const Eigen::VectorXd& q) { seed_configuration_ = q; }

@@ -3,8 +3,9 @@
 import numpy as np
 from visualization_msgs.msg import InteractiveMarkerFeedback
 
-from roboplan.core import Scene
+from roboplan.core import Scene, CartesianConfiguration, JointConfiguration
 from roboplan.example_models import get_package_models_dir, get_package_share_dir
+from roboplan.simple_ik import SimpleIk, SimpleIkOptions
 from roboplan_ros.cpp import se3ToPose
 from roboplan_ros.visualization import RoboplanIKMarker
 
@@ -21,16 +22,35 @@ def test_process_feedback():
     q_init[:] = [0.0, -1.57, 1.57, -1.57, -1.57, 0.0]
     scene.setJointPositions(q_init)
 
+    # Build a SimpleIK solve function for use in the marker
+    joint_group = "arm"
+    base_link = "base_link"
+    tip_link = "tool0"
+    ik_solver = SimpleIk(scene, SimpleIkOptions())
+    q_indices = scene.getJointGroupInfo(joint_group).q_indices
+
+    def solve_fn(target_pose, seed):
+        goal = CartesianConfiguration()
+        goal.base_frame = base_link
+        goal.tip_frame = tip_link
+        goal.tform = target_pose
+        seed_jc = JointConfiguration()
+        seed_jc.positions = seed[q_indices]
+        solution = JointConfiguration()
+        if ik_solver.solveIk(goal, seed_jc, solution):
+            return scene.toFullJointPositions(joint_group, solution.positions)
+        return None
+
     ik = RoboplanIKMarker(
         scene=scene,
-        joint_group="arm",
-        base_link="base_link",
-        tip_link="tool0",
+        joint_group=joint_group,
+        base_link=base_link,
+        tip_link=tip_link,
+        solve_fn=solve_fn,
     )
 
     # Compute a reachable target via FK at a known configuration
     q_target = np.array(scene.getCurrentJointPositions())
-    q_indices = scene.getJointGroupInfo("arm").q_indices
     q_target[q_indices] = [0.0, -1.57, 1.57, -1.57, -1.57, 0.0]
     fk_target = scene.forwardKinematics(q_target, "tool0", "base_link")
     target_pose = se3ToPose(fk_target)

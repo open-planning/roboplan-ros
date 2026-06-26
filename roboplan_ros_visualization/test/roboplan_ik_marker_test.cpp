@@ -7,6 +7,7 @@
 #include <roboplan/core/scene.hpp>
 #include <roboplan_ros_cpp/type_conversions.hpp>
 #include <roboplan_ros_visualization/roboplan_ik_marker.hpp>
+#include <roboplan_simple_ik/simple_ik.hpp>
 
 namespace roboplan_ros_visualization {
 
@@ -57,10 +58,42 @@ class RoboplanIkMarkerTest : public ::testing::Test {};
 TEST_F(RoboplanIkMarkerTest, MakeInteractiveMarkerDefaultFrame) {
   auto scene_ = std::make_shared<roboplan::Scene>("test", TWO_LINK_URDF, TWO_LINK_SRDF);
 
+  // Specify links even though it's a silly robot
+  const std::string joint_group = "arm";
+  const std::string base_link = "world";
+  const std::string tip_link = "link2";
+
+  const auto joint_group_info = scene_->getJointGroupInfo(joint_group);
+  ASSERT_TRUE(joint_group_info.has_value());
+  const auto q_indices = joint_group_info->q_indices;
+
   // This 2-DOF arm needs a lot of iterating...
   roboplan::SimpleIkOptions ik_options;
   ik_options.max_iters = 1000;
-  auto ik_ = std::make_unique<RoboplanIKMarker>(scene_, "arm", "world", "link2", ik_options);
+
+  // Setup IK solver and a solve function to pass to the iMarker
+  auto simple_ik = std::make_shared<roboplan::SimpleIk>(
+      std::const_pointer_cast<roboplan::Scene>(scene_), ik_options);
+  auto ik_solve_fn = [scene_, simple_ik, q_indices, joint_group, base_link,
+                      tip_link](const Eigen::Matrix4d& target_pose,
+                                const Eigen::VectorXd& seed) -> std::optional<Eigen::VectorXd> {
+    roboplan::CartesianConfiguration goal;
+    goal.base_frame = base_link;
+    goal.tip_frame = tip_link;
+    goal.tform = target_pose;
+
+    roboplan::JointConfiguration seed_jc;
+    seed_jc.positions = seed(q_indices);
+
+    roboplan::JointConfiguration solution;
+    if (simple_ik->solveIk(goal, seed_jc, solution)) {
+      return scene_->toFullJointPositions(joint_group, solution.positions);
+    }
+    return std::nullopt;
+  };
+
+  auto ik_ =
+      std::make_unique<RoboplanIKMarker>(scene_, joint_group, base_link, tip_link, ik_solve_fn);
 
   // Verify marker construction with default frame
   const auto marker = ik_->construct_imarker();

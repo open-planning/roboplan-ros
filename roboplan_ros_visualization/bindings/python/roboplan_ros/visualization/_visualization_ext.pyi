@@ -1,10 +1,9 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Annotated
 
 import numpy
 from numpy.typing import NDArray
 import roboplan.core._core_ext
-import roboplan.simple_ik._simple_ik_ext
 
 
 class RoboplanVisualizer:
@@ -38,7 +37,7 @@ class RoboplanIKMarker:
     IK solver backend with interactive marker support for 6-DOF pose control.
     """
 
-    def __init__(self, scene: roboplan.core._core_ext.Scene, joint_group: str, base_link: str, tip_link: str, options: roboplan.simple_ik._simple_ik_ext.SimpleIkOptions = ...) -> None: ...
+    def __init__(self, scene: roboplan.core._core_ext.Scene, joint_group: str, base_link: str, tip_link: str, solve_fn: Callable) -> None: ...
 
     def construct_imarker(self) -> object:
         """Build an InteractiveMarker message for the current target pose."""
