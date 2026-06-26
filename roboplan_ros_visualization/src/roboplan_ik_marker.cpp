@@ -4,10 +4,10 @@
 namespace roboplan_ros_visualization {
 
 RoboplanIKMarker::RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene,
-                                   const std::string& joint_group, const std::string& base_link,
-                                   const std::string& tip_link, IkSolveFunction ik_solve_fn)
-    : scene_(std::move(scene)), joint_group_(joint_group), base_link_(base_link),
-      tip_link_(tip_link), ik_solve_fn_(std::move(ik_solve_fn)) {
+                                   const std::string& base_link, const std::string& tip_link,
+                                   IkSolveFunction ik_solve_fn)
+    : scene_(std::move(scene)), base_link_(base_link), tip_link_(tip_link),
+      ik_solve_fn_(std::move(ik_solve_fn)) {
   seed_configuration_ = scene_->getCurrentJointPositions();
   const auto se3_pose = scene_->forwardKinematics(seed_configuration_, tip_link_, base_link_);
   target_pose_ = roboplan_ros_cpp::se3ToPose(se3_pose);
@@ -17,7 +17,7 @@ visualization_msgs::msg::InteractiveMarker RoboplanIKMarker::construct_imarker()
   visualization_msgs::msg::InteractiveMarker int_marker;
   int_marker.header.frame_id = base_link_;
   int_marker.name = "ik_target";
-  int_marker.description = "IK Target Pose for " + joint_group_;
+  int_marker.description = "IK Target Pose Marker";
   int_marker.pose = target_pose_;
   int_marker.scale = 0.2f;
 

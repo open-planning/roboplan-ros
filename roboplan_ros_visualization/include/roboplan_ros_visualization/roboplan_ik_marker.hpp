@@ -33,13 +33,11 @@ class RoboplanIKMarker {
 public:
   /// @brief Constructs the IK solver and marker.
   /// @param scene A fully configured RoboPlan Scene.
-  /// @param joint_group The joint group name for the IK solver.
   /// @param base_link Base link of the IK chain.
   /// @param tip_link Tip link of the IK chain.
   /// @param solve_fn Callback invoked on each marker pose update to solve IK.
-  RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene, const std::string& joint_group,
-                   const std::string& base_link, const std::string& tip_link,
-                   IkSolveFunction ik_solve_fn);
+  RoboplanIKMarker(std::shared_ptr<const roboplan::Scene> scene, const std::string& base_link,
+                   const std::string& tip_link, IkSolveFunction ik_solve_fn);
 
   /// @brief Build an InteractiveMarker message for the current target pose.
   /// @return A configured InteractiveMarker with 6-DOF controls.
@@ -57,9 +55,6 @@ public:
 private:
   /// @brief Shared ptr to avoid ownership issues between C++ and Python.
   std::shared_ptr<const roboplan::Scene> scene_;
-
-  /// @brief The name of the joint group in the scene
-  std::string joint_group_;
 
   /// @brief The base link used for the IK solver, and frame for the marker header.
   std::string base_link_;

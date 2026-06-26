@@ -97,10 +97,10 @@ NB_MODULE(_visualization_ext, m) {
       .def(
           "__init__",
           [](roboplan_ros_visualization::RoboplanIKMarker* self,
-             std::shared_ptr<const roboplan::Scene> scene, const std::string& joint_group,
-             const std::string& base_link, const std::string& tip_link, nb::callable ik_solve_fn) {
-            // Wrap the python callable in C++ to be able to pass function pointers
-            // across the boundary.
+             std::shared_ptr<const roboplan::Scene> scene, const std::string& base_link,
+             const std::string& tip_link, nb::callable ik_solve_fn) {
+            // Wrap the python callable in C++ to be able to pass function pointers between python
+            // and cpp.
             auto cpp_solve_fn =
                 [ik_solve_fn](const Eigen::Matrix4d& target_pose,
                               const Eigen::VectorXd& seed) -> std::optional<Eigen::VectorXd> {
@@ -112,9 +112,9 @@ NB_MODULE(_visualization_ext, m) {
               return nb::cast<Eigen::VectorXd>(result);
             };
             new (self) roboplan_ros_visualization::RoboplanIKMarker(
-                std::move(scene), joint_group, base_link, tip_link, std::move(cpp_solve_fn));
+                std::move(scene), base_link, tip_link, std::move(cpp_solve_fn));
           },
-          "scene"_a, "joint_group"_a, "base_link"_a, "tip_link"_a, "ik_solve_fn"_a)
+          "scene"_a, "base_link"_a, "tip_link"_a, "ik_solve_fn"_a)
       .def(
           "construct_imarker",
           [InteractiveMarker](const roboplan_ros_visualization::RoboplanIKMarker& self) {

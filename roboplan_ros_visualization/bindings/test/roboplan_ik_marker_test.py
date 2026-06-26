@@ -49,7 +49,6 @@ def test_process_feedback():
 
     ik = RoboplanIKMarker(
         scene=scene,
-        joint_group=joint_group,
         base_link=base_link,
         tip_link=tip_link,
         ik_solve_fn=ik_solve_fn,
@@ -138,7 +137,6 @@ def test_process_feedback_oink():
 
     ik = RoboplanIKMarker(
         scene=scene,
-        joint_group=joint_group,
         base_link=base_link,
         tip_link=tip_link,
         ik_solve_fn=ik_solve_fn,

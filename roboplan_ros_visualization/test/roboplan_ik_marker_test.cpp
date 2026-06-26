@@ -92,8 +92,7 @@ TEST_F(RoboplanIkMarkerTest, MakeInteractiveMarkerDefaultFrame) {
     return std::nullopt;
   };
 
-  auto ik_ =
-      std::make_unique<RoboplanIKMarker>(scene_, joint_group, base_link, tip_link, ik_solve_fn);
+  auto ik_ = std::make_unique<RoboplanIKMarker>(scene_, base_link, tip_link, ik_solve_fn);
 
   // Verify marker construction with default frame
   const auto marker = ik_->construct_imarker();
