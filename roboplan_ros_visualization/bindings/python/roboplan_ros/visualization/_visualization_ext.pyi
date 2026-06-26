@@ -37,7 +37,7 @@ class RoboplanIKMarker:
     IK solver backend with interactive marker support for 6-DOF pose control.
     """
 
-    def __init__(self, scene: roboplan.core._core_ext.Scene, joint_group: str, base_link: str, tip_link: str, solve_fn: Callable) -> None: ...
+    def __init__(self, scene: roboplan.core._core_ext.Scene, joint_group: str, base_link: str, tip_link: str, ik_solve_fn: Callable) -> None: ...
 
     def construct_imarker(self) -> object:
         """Build an InteractiveMarker message for the current target pose."""

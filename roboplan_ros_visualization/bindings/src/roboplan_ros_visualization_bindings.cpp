@@ -114,7 +114,7 @@ NB_MODULE(_visualization_ext, m) {
             new (self) roboplan_ros_visualization::RoboplanIKMarker(
                 std::move(scene), joint_group, base_link, tip_link, std::move(cpp_solve_fn));
           },
-          "scene"_a, "joint_group"_a, "base_link"_a, "tip_link"_a, "solve_fn"_a)
+          "scene"_a, "joint_group"_a, "base_link"_a, "tip_link"_a, "ik_solve_fn"_a)
       .def(
           "construct_imarker",
           [InteractiveMarker](const roboplan_ros_visualization::RoboplanIKMarker& self) {
