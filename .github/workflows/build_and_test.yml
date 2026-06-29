@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros_distro: [kilted, jazzy, humble]
+        ros_distro: [rolling, lyrical, kilted, jazzy, humble]
 
     runs-on: ubuntu-latest
     steps:

@@ -15,7 +15,6 @@ find_package(roboplan_simple_ik REQUIRED)
 find_package(roboplan_ros_cpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
-find_package(tl_expected REQUIRED)
 
 add_library(roboplan_ros_visualization SHARED
     src/roboplan_visualizer.cpp

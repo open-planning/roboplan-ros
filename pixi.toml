@@ -31,7 +31,7 @@ mold = ">=2.40.2,<3"
 sccache = ">=0.10.0,<0.11"
 
 # Common roboplan base deps
-python = ">=3.11,<3.13"
+python = ">=3.11,<3.15"
 gtest = ">=1.17.0,<2"
 tyro = ">=0.9.32,<0.10"
 matplotlib = ">=3.10.6,<4"
@@ -60,6 +60,85 @@ LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
 CXXFLAGS = "-fuse-ld=mold"
 
+# Define one environment per ROS 2 distro.
+[environments]
+rolling = { features = ["rolling"] }
+lyrical = { features = ["lyrical"] }
+kilted = { features = ["kilted"] }
+jazzy = { features = ["jazzy"] }
+humble = { features = ["humble"] }
+
+###################
+## ROS 2 Rolling ##
+###################
+[feature.rolling]
+channels = ["https://prefix.dev/robostack-rolling"]
+
+[feature.rolling.dependencies]
+ros-rolling-ros-base = "*"
+
+# RoboPlan and RoboPlan ROS dependencies
+ros-rolling-builtin-interfaces = "*"
+ros-rolling-coal = "*"
+ros-rolling-console-bridge-vendor = "*"
+ros-rolling-controller-manager = "*"
+ros-rolling-eigenpy = "*"
+ros-rolling-geometry-msgs = "*"
+ros-rolling-interactive-markers = "*"
+ros-rolling-joint-state-broadcaster = "*"
+ros-rolling-joint-trajectory-controller = "*"
+ros-rolling-pinocchio = "*"
+ros-rolling-robot-state-publisher = "*"
+ros-rolling-rviz2 = "*"
+ros-rolling-sensor-msgs = "*"
+ros-rolling-tf2-eigen = "*"
+ros-rolling-tinyxml2-vendor = "*"
+ros-rolling-topic-tools = "*"
+ros-rolling-trajectory-msgs = "*"
+ros-rolling-urdfdom = "*"
+ros-rolling-visualization-msgs = "*"
+ros-rolling-xacro = "*"
+
+[feature.rolling.activation.env]
+ROS_DISTRO = "rolling"
+
+###################
+## ROS 2 Lyrical ##
+###################
+[feature.lyrical]
+channels = ["https://prefix.dev/robostack-lyrical"]
+
+[feature.lyrical.dependencies]
+ros-lyrical-ros-base = "*"
+
+# RoboPlan and RoboPlan ROS dependencies
+ros-lyrical-builtin-interfaces = "*"
+ros-lyrical-coal = "*"
+ros-lyrical-console-bridge-vendor = "*"
+ros-lyrical-controller-manager = "*"
+ros-lyrical-eigenpy = "*"
+ros-lyrical-geometry-msgs = "*"
+ros-lyrical-interactive-markers = "*"
+ros-lyrical-joint-state-broadcaster = "*"
+ros-lyrical-joint-trajectory-controller = "*"
+ros-lyrical-pinocchio = "*"
+ros-lyrical-robot-state-publisher = "*"
+ros-lyrical-rviz2 = "*"
+ros-lyrical-sensor-msgs = "*"
+ros-lyrical-tf2-eigen = "*"
+ros-lyrical-tinyxml2-vendor = "*"
+ros-lyrical-topic-tools = "*"
+ros-lyrical-trajectory-msgs = "*"
+ros-lyrical-urdfdom = "*"
+ros-lyrical-visualization-msgs = "*"
+ros-lyrical-xacro = "*"
+
+[feature.lyrical.activation.env]
+ROS_DISTRO = "lyrical"
+
+##################
+## ROS 2 Kilted ##
+##################
 [feature.kilted]
 channels = ["https://prefix.dev/robostack-kilted"]
 
@@ -93,6 +172,9 @@ ros-kilted-yaml-cpp-vendor = "*"
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
 
+#################
+## ROS 2 Jazzy ##
+#################
 [feature.jazzy]
 channels = ["https://prefix.dev/robostack-jazzy"]
 
@@ -126,6 +208,9 @@ ros-jazzy-yaml-cpp-vendor = "*"
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
 
+##################
+## ROS 2 Humble ##
+##################
 [feature.humble]
 channels = ["https://prefix.dev/robostack-humble"]
 
@@ -158,8 +243,3 @@ ros-humble-yaml-cpp-vendor = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
-
-[environments]
-kilted = { features = ["kilted"] }
-jazzy = { features = ["jazzy"] }
-humble = { features = ["humble"] }
