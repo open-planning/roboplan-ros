@@ -48,6 +48,10 @@ nodeenv = ">=1.10.0, <2"
 # For ROS, should be available across distros
 lttng-ust = ">=2.13.9,<3"
 
+# This fails with colcon test on newer pytest versions
+# due to failures loading ROS launch testing plugins.
+pytest = "<9.1.0"
+
 [activation]
 scripts = ["install/setup.sh"]
 
