@@ -63,16 +63,7 @@ from roboplan_ros.cpp import (
     se3ToPose,
 )
 from roboplan_ros_py.trajectory_publisher import TrajectoryPublisher
-
-
-def spin_executor(executor):
-    """Helper function to spin an executor."""
-    try:
-        executor.spin()
-    except ExternalShutdownException:
-        pass
-    except KeyboardInterrupt:
-        pass
+from roboplan_ros_examples import spin_executor
 
 
 class PlanAndExecuteNode(Node):

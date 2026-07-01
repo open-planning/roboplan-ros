@@ -26,7 +26,6 @@ from rclpy.node import Node
 from rclpy.executors import (
     MultiThreadedExecutor,
     SingleThreadedExecutor,
-    ExternalShutdownException,
 )
 from rclpy.qos import (
     QoSProfile,
@@ -34,10 +33,7 @@ from rclpy.qos import (
     QoSHistoryPolicy,
     QoSDurabilityPolicy,
 )
-from builtin_interfaces.msg import Duration
-from std_msgs.msg import ColorRGBA
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
-from visualization_msgs.msg import MarkerArray
 from interactive_markers import InteractiveMarkerServer, MenuHandler
 from std_srvs.srv import Trigger
 from sensor_msgs.msg import JointState
@@ -53,18 +49,9 @@ from roboplan.optimal_ik import (
     PositionLimit,
     VelocityLimit,
 )
-from roboplan_ros.visualization import RoboplanVisualizer, RoboplanIKMarker
+from roboplan_ros.visualization import RoboplanIKMarker
 from roboplan_ros.cpp import buildConversionMap, fromJointState, se3ToPose
-
-
-def spin_executor(executor):
-    """Helper function to spin an executor."""
-    try:
-        executor.spin()
-    except ExternalShutdownException:
-        pass
-    except KeyboardInterrupt:
-        pass
+from roboplan_ros_examples import spin_executor
 
 
 class CartesianServoNode(Node):
