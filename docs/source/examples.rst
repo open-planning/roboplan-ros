@@ -32,3 +32,29 @@ To launch the demo,
    :width: 600px
 
    Sample RRT planning and execution with the Franka FR3 arm.
+
+
+Sample Cartesian Servoing with OInK
+-----------------------------------
+
+This example demonstrates real-time Cartesian servoing using OInK (Optimal Inverse Kinematics) with the Franka FR3 arm.
+
+Unlike the plan-and-execute workflow, there is no trajectory planning or preview step.
+A background control loop continuously solves a single-step IK optimization, then publishes joint commands directly to track the interactive marker's pose.
+The solver uses a prioritized task hierarchy:
+
+- **Priority 1**: A frame task tracks the end-effector pose set by the interactive marker.
+- **Priority 2**: A configuration task that regularizes toward the starting joint configuration.
+
+Joint position and velocity limits are enforced as QP constraints.
+
+To launch the demo,
+
+::
+
+    ros2 launch roboplan_ros_franka franka_oink.launch.yaml
+
+.. figure:: media/sample_oink.gif
+   :width: 600px
+
+   Sample OInK pose tracking with the Franka FR3 arm.
