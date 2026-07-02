@@ -21,22 +21,13 @@ import numpy as np
 
 from ament_index_python.packages import get_package_share_directory
 
-import rclpy
 from rclpy.node import Node
 from rclpy.executors import (
-    MultiThreadedExecutor,
     SingleThreadedExecutor,
-)
-from rclpy.qos import (
-    QoSProfile,
-    QoSReliabilityPolicy,
-    QoSHistoryPolicy,
-    QoSDurabilityPolicy,
 )
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from interactive_markers import InteractiveMarkerServer, MenuHandler
 from std_srvs.srv import Trigger
-from sensor_msgs.msg import JointState
 
 from roboplan.core import CartesianConfiguration, Scene
 from roboplan.filters import SE3LowPassFilter
@@ -51,7 +42,7 @@ from roboplan.optimal_ik import (
 )
 from roboplan_ros.visualization import RoboplanIKMarker
 from roboplan_ros.cpp import buildConversionMap, fromJointState, se3ToPose
-from roboplan_ros_examples import spin_executor
+from roboplan_ros_examples import spin_executor, JointStateSubscriber
 
 
 class CartesianServoNode(Node):
@@ -120,6 +111,9 @@ class CartesianServoNode(Node):
         self._reference_filter_tau = self.get_parameter("reference_filter_tau").value
         self._command_duration_ms = self.get_parameter("command_duration_ms").value
 
+        # Control loop time step for Cartesian tracking
+        self._dt = 1.0 / control_freq
+
         # Get robot description files and setup the scene
         pkg_share_dir = get_package_share_directory(robot_description_package)
         models_dir = os.path.join(pkg_share_dir, robot_descriptions_model_path)
@@ -135,44 +129,26 @@ class CartesianServoNode(Node):
             yaml_config_path=yaml_config_path,
         )
 
-        # Subscribe to joint states to keep the scene in sync with hardware.
-        self._js_node = Node("joint_state_listener")
-        self._js_sub = self._js_node.create_subscription(
-            JointState,
-            joint_state_topic,
-            self._on_joint_state,
-            QoSProfile(
-                depth=1,
-                reliability=QoSReliabilityPolicy.BEST_EFFORT,
-                history=QoSHistoryPolicy.KEEP_LAST,
-                durability=QoSDurabilityPolicy.VOLATILE,
-            ),
-        )
-        self._last_joint_state = None
-        self._conversion_map = None
-        joint_group_info = self._scene.getJointGroupInfo(self._joint_group)
-        self._q_indices = joint_group_info.q_indices
-        self._joint_names = joint_group_info.joint_names
-        self._latest_joint_positions: np.array | None = None
-
-        self._js_executor = SingleThreadedExecutor()
-        self._js_executor.add_node(self._js_node)
-        self._js_thread = threading.Thread(
-            target=spin_executor, daemon=True, args=(self._js_executor,)
-        )
-        self._js_thread.start()
-
         # Start paused so the robot doesn't move until the user is ready and the
         # iMarker has been initialized. Otherwise danger.
         self._paused = True
 
+        # Subscribe to joint states to keep the scene in sync with hardware.
+        self._js_subscriber = JointStateSubscriber(topic=joint_state_topic)
+
         # Wait for joint states
-        while self._last_joint_state is None:
+        while self._js_subscriber.last_joint_state is None:
             self.get_logger().info("Waiting for joint positions...")
             time.sleep(1.0)
 
-        # Control loop time step
-        self._dt = 1.0 / control_freq
+        # Once we have joint states, build the required joint state to roboplan scene
+        # conversion map
+        joint_group_info = self._scene.getJointGroupInfo(self._joint_group)
+        self._q_indices = joint_group_info.q_indices
+        self._joint_names = joint_group_info.joint_names
+        self._conversion_map = buildConversionMap(
+            self._scene, self._js_subscriber.last_joint_state
+        )
 
         # Set up the solver
         self._oink = Oink(self._scene, self._joint_group)
@@ -289,11 +265,6 @@ class CartesianServoNode(Node):
             "Ready. Drag the interactive marker, then right-click > Start to begin servoing."
         )
 
-    def _on_joint_state(self, msg):
-        if self._conversion_map is None:
-            self._conversion_map = buildConversionMap(self._scene, msg)
-        self._last_joint_state = msg
-
     def _on_ik_feedback(self, feedback):
         """Pass feedback through the marker. solve_fn stores the target;
         the control loop tracks it."""
@@ -377,14 +348,14 @@ class CartesianServoNode(Node):
 
     def _reset(self):
         """Reset the marker and control state to the current hardware state."""
-        if self._last_joint_state is None:
+        if self._js_subscriber.last_joint_state is None:
             raise RuntimeError("No joint states received, cannot reset to hw state.")
 
         # Pause it
         self._on_pause_menu(None)
 
         joint_config = fromJointState(
-            self._last_joint_state, self._scene, self._conversion_map
+            self._js_subscriber.last_joint_state, self._scene, self._conversion_map
         )
         self._latest_joint_positions = joint_config.positions
 
@@ -409,41 +380,21 @@ class CartesianServoNode(Node):
         self._control_thread.join(timeout=1.0)
 
         # Shut down executors and join their threads
-        self._js_executor.shutdown()
+        self._js_subscriber.shutdown()
         self._marker_executor.shutdown()
-        self._js_thread.join(timeout=0.25)
         self._marker_thread.join(timeout=0.25)
         self._marker_node.destroy_node()
 
-        # Delete nanobind objects before shutdown
+        # Manually remove self referenced nanobind objects before destruction.
+        # https://nanobind.readthedocs.io/en/latest/refleaks.html
         self._ik_marker = None
-        self._ik_visualizer = None
-        self._frame_task = None
-        self._tasks = None
-        self._constraints = None
-        self._barriers = None
-        self._oink = None
-        self._reference_filter = None
-        self._scene = None
 
         super().destroy_node()
 
 
-def main(args=None):
-    rclpy.init(args=args)
-    node = CartesianServoNode()
-    executor = MultiThreadedExecutor()
-    executor.add_node(node)
-
-    try:
-        executor.spin()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        executor.shutdown()
-        node.destroy_node()
-        rclpy.try_shutdown()
-
-
 if __name__ == "__main__":
-    main()
+    import rclpy
+    from roboplan_ros_examples import run_node
+
+    rclpy.init()
+    run_node(CartesianServoNode())
