@@ -21,6 +21,7 @@ import numpy as np
 
 from ament_index_python.packages import get_package_share_directory
 
+import rclpy
 from rclpy.node import Node
 from rclpy.executors import SingleThreadedExecutor
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
@@ -392,8 +393,5 @@ class CartesianServoNode(Node):
 
 
 if __name__ == "__main__":
-    import rclpy
-    from roboplan_ros_examples import run_node
-
     rclpy.init()
     run_node(CartesianServoNode())
