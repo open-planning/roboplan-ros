@@ -13,6 +13,7 @@ install(DIRECTORY config launch
         DESTINATION share/${PROJECT_NAME})
 
 install(PROGRAMS
+        scripts/optimal_ik_streaming_node.py
         scripts/plan_and_execute_node.py
         DESTINATION lib/${PROJECT_NAME}
 )
