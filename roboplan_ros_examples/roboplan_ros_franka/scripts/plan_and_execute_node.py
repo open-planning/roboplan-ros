@@ -15,18 +15,13 @@ import os
 import time
 import threading
 import xacro
-import numpy as np
 
 from ament_index_python.packages import get_package_share_directory
 
 import rclpy
 from rclpy.action import ActionClient
 from rclpy.node import Node
-from rclpy.executors import (
-    MultiThreadedExecutor,
-    SingleThreadedExecutor,
-    ExternalShutdownException,
-)
+from rclpy.executors import SingleThreadedExecutor
 from rclpy.qos import (
     QoSProfile,
     QoSReliabilityPolicy,
@@ -38,16 +33,16 @@ from std_msgs.msg import ColorRGBA
 from visualization_msgs.msg import Marker, MarkerArray
 from interactive_markers import InteractiveMarkerServer
 from std_srvs.srv import Trigger
-from sensor_msgs.msg import JointState
 from interactive_markers import MenuHandler
 
 from roboplan.core import (
+    CartesianConfiguration,
     JointConfiguration,
     PathShortcuttingOptions,
     PathShortcutter,
     Scene,
 )
-from roboplan.simple_ik import SimpleIkOptions
+from roboplan.simple_ik import SimpleIk, SimpleIkOptions
 from roboplan.rrt import RRT, RRTOptions
 from roboplan.toppra import PathParameterizerTOPPRA, SplineFittingMode, TOPPRAOptions
 from roboplan_ros.visualization import (
@@ -62,16 +57,8 @@ from roboplan_ros.cpp import (
     se3ToPose,
 )
 from roboplan_ros_py.trajectory_publisher import TrajectoryPublisher
-
-
-def spin_executor(executor):
-    """Helper function to spin an executor."""
-    try:
-        executor.spin()
-    except ExternalShutdownException:
-        pass
-    except KeyboardInterrupt:
-        pass
+from roboplan_ros_examples import run_node, spin_executor
+from roboplan_ros_examples.utils import JointStateSubscriber
 
 
 class PlanAndExecuteNode(Node):
@@ -145,40 +132,24 @@ class PlanAndExecuteNode(Node):
             package_paths=package_paths,
             yaml_config_path=yaml_config_path,
         )
+        self._q_indices = self._scene.getJointGroupInfo(self._joint_group).q_indices
 
         # Subscribe to joint states to keep the scene in sync with hardware. These
         # can bog down other CBs, so putting it out here keeps the rest of the node
         # responsive.
-        self._js_node = Node("joint_state_listener")
-        self._js_sub = self._js_node.create_subscription(
-            JointState,
-            joint_state_topic,
-            self._on_joint_state,
-            QoSProfile(
-                depth=1,
-                reliability=QoSReliabilityPolicy.BEST_EFFORT,
-                history=QoSHistoryPolicy.KEEP_LAST,
-                durability=QoSDurabilityPolicy.VOLATILE,
-            ),
-        )
-        self._last_joint_state = None
-        self._conversion_map = None
-        self._q_indices = self._scene.getJointGroupInfo(self._joint_group).q_indices
-        self._latest_joint_positions: np.array | None = None
-
-        self._js_executor = SingleThreadedExecutor()
-        self._js_executor.add_node(self._js_node)
-        self._js_thread = threading.Thread(
-            target=spin_executor, daemon=True, args=(self._js_executor,)
-        )
-        self._js_thread.start()
+        self._js_subscriber = JointStateSubscriber(topic=joint_state_topic)
 
         # Wait for joint states
-        while self._last_joint_state is None:
+        while self._js_subscriber.last_joint_state is None:
             self.get_logger().info("Waiting for joint positions...")
             time.sleep(1.0)
 
-        # Set the IK solver options
+        # Once we have joint states we can build the conversion map
+        self._conversion_map = buildConversionMap(
+            self._scene, self._js_subscriber.last_joint_state
+        )
+
+        # Set up the IK solver and wrap it in a callback for the marker
         ik_options = SimpleIkOptions()
         ik_options.group_name = self._joint_group
         ik_options.max_iters = 100
@@ -189,12 +160,32 @@ class PlanAndExecuteNode(Node):
         ik_options.fast_return = False
         ik_options.max_iters = 100
         ik_options.max_time = 0.05
+
+        # Setup an IK solver and function to pass to the interactive marker
+        ik_solver = SimpleIk(self._scene, ik_options)
+        q_indices = self._q_indices
+        joint_group = self._joint_group
+        base_link = self._base_link
+        tip_link = self._tip_link
+        scene = self._scene
+
+        def ik_solve_fn(target_pose, seed):
+            goal = CartesianConfiguration()
+            goal.base_frame = base_link
+            goal.tip_frame = tip_link
+            goal.tform = target_pose
+            seed_jc = JointConfiguration()
+            seed_jc.positions = seed[q_indices]
+            solution = JointConfiguration()
+            if ik_solver.solveIk(goal, seed_jc, solution):
+                return scene.toFullJointPositions(joint_group, solution.positions)
+            return None
+
         self._ik_marker = RoboplanIKMarker(
             scene=self._scene,
-            joint_group=self._joint_group,
             base_link=self._base_link,
             tip_link=self._tip_link,
-            options=ik_options,
+            ik_solve_fn=ik_solve_fn,
         )
 
         # Set up planning utilities
@@ -323,11 +314,6 @@ class PlanAndExecuteNode(Node):
         self.get_logger().info("Ready. Move the interactive marker to set a target.")
         self.get_logger().info("Call services: ~/plan, ~/preview, ~/execute, ~/reset")
 
-    def _on_joint_state(self, msg):
-        if self._conversion_map is None:
-            self._conversion_map = buildConversionMap(self._scene, msg)
-        self._last_joint_state = msg
-
     def _on_ik_feedback(self, feedback):
         self._ik_marker.set_seed_configuration(self._latest_joint_positions)
         q = self._ik_marker.process_feedback(feedback)
@@ -344,7 +330,7 @@ class PlanAndExecuteNode(Node):
             return False, "No target set. Move the interactive marker first."
 
         joint_config = fromJointState(
-            self._last_joint_state, self._scene, self._conversion_map
+            self._js_subscriber.last_joint_state, self._scene, self._conversion_map
         )
         self._latest_joint_positions = joint_config.positions
         self._scene.setJointPositions(self._latest_joint_positions)
@@ -468,12 +454,12 @@ class PlanAndExecuteNode(Node):
 
     def _reset(self):
         """Clears all plans and resets to a hardware state."""
-        if self._last_joint_state is None:
+        if self._js_subscriber.last_joint_state is None:
             raise RuntimeError("No joint states received, cannot reset to hw state.")
 
         # Reset joint positions to the latest joint state
         joint_config = fromJointState(
-            self._last_joint_state, self._scene, self._conversion_map
+            self._js_subscriber.last_joint_state, self._scene, self._conversion_map
         )
         self._latest_joint_positions = joint_config.positions
 
@@ -541,29 +527,18 @@ class PlanAndExecuteNode(Node):
 
     def destroy_node(self):
         self._player.stop()
-        self._js_executor.shutdown()
+        self._js_subscriber.shutdown()
         self._marker_executor.shutdown()
-        self._js_thread.join(timeout=0.25)
         self._marker_thread.join(timeout=0.25)
         self._marker_node.destroy_node()
+
+        # Manually remove self referenced nanobind objects before destruction.
+        # https://nanobind.readthedocs.io/en/latest/refleaks.html
+        self._ik_marker = None
+
         super().destroy_node()
 
 
-def main(args=None):
-    rclpy.init(args=args)
-    node = PlanAndExecuteNode()
-    executor = MultiThreadedExecutor()
-    executor.add_node(node)
-
-    try:
-        executor.spin()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        executor.shutdown()
-        node.destroy_node()
-        rclpy.try_shutdown()
-
-
 if __name__ == "__main__":
-    main()
+    rclpy.init()
+    run_node(PlanAndExecuteNode())
