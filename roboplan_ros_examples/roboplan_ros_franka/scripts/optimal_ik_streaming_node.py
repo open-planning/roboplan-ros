@@ -22,9 +22,7 @@ import numpy as np
 from ament_index_python.packages import get_package_share_directory
 
 from rclpy.node import Node
-from rclpy.executors import (
-    SingleThreadedExecutor,
-)
+from rclpy.executors import SingleThreadedExecutor
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from interactive_markers import InteractiveMarkerServer, MenuHandler
 from std_srvs.srv import Trigger
@@ -42,7 +40,8 @@ from roboplan.optimal_ik import (
 )
 from roboplan_ros.visualization import RoboplanIKMarker
 from roboplan_ros.cpp import buildConversionMap, fromJointState, se3ToPose
-from roboplan_ros_examples import spin_executor, JointStateSubscriber
+from roboplan_ros_examples import run_node, spin_executor
+from roboplan_ros_examples.utils import JointStateSubscriber
 
 
 class CartesianServoNode(Node):

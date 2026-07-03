@@ -39,7 +39,6 @@ Sample Cartesian Servoing with OInK
 
 This example demonstrates real-time Cartesian servoing using OInK (Optimal Inverse Kinematics) with the Franka FR3 arm.
 
-Unlike the plan-and-execute workflow, there is no trajectory planning or preview step.
 A background control loop continuously solves a single-step IK optimization, then publishes joint commands directly to track the interactive marker's pose.
 The solver uses a prioritized task hierarchy:
 

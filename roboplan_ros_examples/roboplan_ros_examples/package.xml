@@ -3,7 +3,7 @@
 <package format="3">
   <name>roboplan_ros_examples</name>
   <version>0.0.0</version>
-  <description>Example of using RoboPlan in the ROS ecosystem.</description>
+  <description>Examples of using RoboPlan in the ROS ecosystem.</description>
   <maintainer email="sebas.a.castro@gmail.com">Sebastian Castro</maintainer>
   <maintainer email="eholum@gmail.com">Erik Holum</maintainer>
   <license>MIT</license>

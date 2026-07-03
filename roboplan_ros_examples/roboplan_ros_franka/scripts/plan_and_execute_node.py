@@ -18,6 +18,7 @@ import xacro
 
 from ament_index_python.packages import get_package_share_directory
 
+import rclpy
 from rclpy.action import ActionClient
 from rclpy.node import Node
 from rclpy.executors import SingleThreadedExecutor
@@ -56,7 +57,8 @@ from roboplan_ros.cpp import (
     se3ToPose,
 )
 from roboplan_ros_py.trajectory_publisher import TrajectoryPublisher
-from roboplan_ros_examples import spin_executor, JointStateSubscriber
+from roboplan_ros_examples import run_node, spin_executor
+from roboplan_ros_examples.utils import JointStateSubscriber
 
 
 class PlanAndExecuteNode(Node):
@@ -538,8 +540,5 @@ class PlanAndExecuteNode(Node):
 
 
 if __name__ == "__main__":
-    import rclpy
-    from roboplan_ros_examples import run_node
-
     rclpy.init()
     run_node(PlanAndExecuteNode())
