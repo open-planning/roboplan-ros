@@ -21,7 +21,6 @@
   <depend>roboplan_ros_cpp</depend>
   <depend>roboplan_simple_ik</depend>
   <depend>sensor_msgs</depend>
-  <depend>tl_expected</depend>
   <depend>visualization_msgs</depend>
 
   <exec_depend>rviz2</exec_depend>

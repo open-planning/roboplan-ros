@@ -19,7 +19,6 @@
   <depend>roboplan</depend>
   <depend>rosidl_generator_cpp</depend>
   <depend>sensor_msgs</depend>
-  <depend>tl_expected</depend>
   <depend>trajectory_msgs</depend>
   <depend>tf2_eigen</depend>
 

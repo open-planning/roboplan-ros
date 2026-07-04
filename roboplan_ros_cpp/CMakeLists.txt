@@ -11,7 +11,6 @@ find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(tl_expected REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(tf2_eigen REQUIRED)
 
