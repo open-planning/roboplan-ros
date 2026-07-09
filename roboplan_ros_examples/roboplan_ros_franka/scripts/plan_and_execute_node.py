@@ -324,8 +324,6 @@ class PlanAndExecuteNode(Node):
     def _plan(self):
         if self._target_q is None:
             return False, "No target set. Move the interactive marker first."
-        if self._target_q is None:
-            return False, "No target set. Move the interactive marker first."
 
         joint_config = fromJointState(
             self._js_subscriber.last_joint_state, self._scene, self._conversion_map
