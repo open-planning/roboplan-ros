@@ -2,8 +2,8 @@
 Changelog for package roboplan_ros_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.0 (2026-07-08)
+------------------
 * Bumping RoboPlan, dependencies, and no more pixi-build-ros (`#42 <https://github.com/open-planning/roboplan-ros/issues/42>`_)
 * Add a very basic RRT planning example (`#41 <https://github.com/open-planning/roboplan-ros/issues/41>`_)
 * Update RTD Docs, add a design philosophy (`#34 <https://github.com/open-planning/roboplan-ros/issues/34>`_)

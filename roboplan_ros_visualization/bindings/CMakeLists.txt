@@ -9,7 +9,7 @@ find_package(rosidl_generator_cpp REQUIRED)
 # Rely on tl_expected if found, else look at the roboplan alias.
 find_package(tl_expected QUIET)
 if (NOT tl_expected_FOUND)
-    add_library(tl_expected::tl_expected ALIAS roboplan::tl_expected)
+  add_library(tl_expected::tl_expected ALIAS roboplan::tl_expected)
 endif()
 
 # Detect the installed nanobind package and import it into CMake

@@ -2,8 +2,8 @@
 Changelog for package roboplan_ros_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.0 (2026-07-08)
+------------------
 * Add Lyrical and Rolling pixi environments and CI jobs (`#54 <https://github.com/open-planning/roboplan-ros/issues/54>`_)
 * Update RoboPlan to 0.4.0 with additional fixes (`#46 <https://github.com/open-planning/roboplan-ros/issues/46>`_)
 * Bumping RoboPlan, dependencies, and no more pixi-build-ros (`#42 <https://github.com/open-planning/roboplan-ros/issues/42>`_)
