@@ -11,10 +11,11 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <build_depend>builtin_interfaces</build_depend>
+  <build_depend>nanobind-dev</build_depend>
+  <build_depend>python3-dev</build_depend>
 
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
-  <depend>nanobind-dev</depend>
   <depend>pinocchio</depend>
   <depend>roboplan</depend>
   <depend>rosidl_generator_cpp</depend>

@@ -11,10 +11,12 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
 
+  <build_depend>nanobind-dev</build_depend>
+  <build_depend>python3-dev</build_depend>
+
   <depend>ament_index_cpp</depend>
   <depend>geometry_msgs</depend>
   <depend>interactive_markers</depend>
-  <depend>nanobind-dev</depend>
   <depend>rclcpp</depend>
   <depend>rclpy</depend>
   <depend>roboplan</depend>
