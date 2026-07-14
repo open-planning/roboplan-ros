@@ -2,7 +2,7 @@
 Changelog for package roboplan_ros_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.5.0 (2026-07-08)
+0.5.1 (2026-07-13)
 ------------------
 * Add Lyrical and Rolling pixi environments and CI jobs (`#54 <https://github.com/open-planning/roboplan-ros/issues/54>`_)
 * Generic solve function in interactive IK and OInK example (`#52 <https://github.com/open-planning/roboplan-ros/issues/52>`_)

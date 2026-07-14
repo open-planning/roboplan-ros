@@ -3,7 +3,7 @@ authors = ["Erik Holum <eholum@gmail.com>"]
 channels = ["conda-forge"]
 name = "roboplan-ros"
 platforms = ["linux-64", "linux-aarch64"]
-version = "0.5.0"
+version = "0.5.1"
 
 [tasks]
 setup-colcon = { cmd = """
