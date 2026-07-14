@@ -12,6 +12,7 @@ colcon mixin update default
 """ }
 build = { cmd = ["colcon", "build"] }
 build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
+# TODO: Stop skipping the test_import_pinocchio when RoboStack is caught up on Pinocchio >= 4.0.0
 test = { cmd = ["colcon", "test"], env = { PYTEST_ADDOPTS = "-k 'not test_import_pinocchio'" } }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
 

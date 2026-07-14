@@ -130,6 +130,6 @@ jobs:
           docker run --rm \
             ${{ steps.meta.outputs.tags }} \
             bash -c "
-              colcon test --pytest-args -k='not test_import_pinocchio' && \
+              colcon test && \
               colcon test-result --verbose
             "
