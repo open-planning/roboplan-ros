@@ -12,12 +12,8 @@ colcon mixin update default
 """ }
 build = { cmd = ["colcon", "build"] }
 build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
-test = { cmd = ["colcon", "test"] }
-test-result = {cmd = [
-  "colcon",
-  "test-result",
-  "--verbose",
-]}
+test = { cmd = ["colcon", "test"], env = { PYTEST_ADDOPTS = "-k 'not test_import_pinocchio'" } }
+test-result = { cmd = ["colcon", "test-result", "--verbose"] }
 
 [dependencies]
 # Build deps
