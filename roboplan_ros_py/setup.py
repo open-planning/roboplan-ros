@@ -4,7 +4,7 @@ package_name = "roboplan_ros_py"
 
 setup(
     name=package_name,
-    version="0.0.0",
+    version="0.5.1",
     packages=[package_name],
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
@@ -17,7 +17,7 @@ setup(
     zip_safe=True,
     maintainer="Sebastian Castro, Erik Holum",
     maintainer_email="sebas.a.castro@gmail.com, eholum@gmail.com",
-    description="Python bindings for the roboplan motion planning library.",
+    description="Python bindings for the RoboPlan motion planning library.",
     license="MIT",
     extras_require={
         "test": [

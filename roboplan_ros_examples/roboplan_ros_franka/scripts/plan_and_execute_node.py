@@ -154,12 +154,10 @@ class PlanAndExecuteNode(Node):
         ik_options.group_name = self._joint_group
         ik_options.max_iters = 100
         ik_options.step_size = 0.25
+        ik_options.max_time = 0.05
         ik_options.check_collisions = True
-
         # Increases likelihood of finding an "optimal" solution
         ik_options.fast_return = False
-        ik_options.max_iters = 100
-        ik_options.max_time = 0.05
 
         # Setup an IK solver and function to pass to the interactive marker
         ik_solver = SimpleIk(self._scene, ik_options)
@@ -324,8 +322,6 @@ class PlanAndExecuteNode(Node):
             )
 
     def _plan(self):
-        if self._target_q is None:
-            return False, "No target set. Move the interactive marker first."
         if self._target_q is None:
             return False, "No target set. Move the interactive marker first."
 
