@@ -36,7 +36,7 @@ filelock = ">=3.20.0,<4"
 numpy = ">=1.26.4,<3"
 nanobind = ">=2.12.0,<3"
 libtoppra  = ">=0.6.4,<0.7"
-osqp-eigen = ">=0.11.0,<0.12"
+proxsuite = ">=0.7.3,<0.8"
 
 viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
 pycollada = ">=0.9.2, <0.10"

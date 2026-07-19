@@ -1,5 +1,6 @@
 matplotlib
 numpy
+obj2mjcf
 opencv-contrib-python-headless
 plyfile
 tyro
