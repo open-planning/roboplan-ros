@@ -67,19 +67,19 @@ launch:
       pkg: controller_manager
       exec: spawner
       output: screen
-      args: "joint_state_broadcaster"
+      args: "joint_state_broadcaster --controller-manager-timeout 300"
 
   - node:
       pkg: controller_manager
       exec: spawner
       output: screen
-      args: "fr3_arm_controller"
+      args: "fr3_arm_controller --controller-manager-timeout 300"
 
   - node:
       pkg: controller_manager
       exec: spawner
       output: screen
-      args: "fr3_gripper_controller"
+      args: "fr3_gripper_controller --controller-manager-timeout 300"
 
   - node:
       pkg: rviz2

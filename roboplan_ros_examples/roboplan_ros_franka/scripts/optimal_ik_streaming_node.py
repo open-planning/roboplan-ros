@@ -211,14 +211,14 @@ class CartesianServoNode(Node):
         # end-effector tracking — only uses redundant degrees of freedom.
         q_home = np.array(self._scene.getCurrentJointPositions())
         joint_weights = np.full(self._num_variables, 0.05)
-        config_task = ConfigurationTask(
+        self._config_task = ConfigurationTask(
             self._oink,
             q_home[self._oink.q_indices],
             joint_weights,
             ConfigurationTaskOptions(task_gain=1.0, lm_damping=0.0, priority=2),
         )
 
-        self._tasks = [self._frame_task, config_task]
+        self._tasks = [self._frame_task, self._config_task]
 
         # Constraints: joint position and velocity limits
         position_limit = PositionLimit(self._oink, gain=1.0)
@@ -448,6 +448,9 @@ class CartesianServoNode(Node):
 
         with self._lock:
             self._scene.setJointPositions(self._latest_joint_positions)
+            self._config_task.setTargetConfiguration(
+                self._latest_joint_positions[self._oink.q_indices]
+            )
             self._scene.forwardKinematics(self._latest_joint_positions, self._tip_link)
             initial_pose = self._scene.forwardKinematics(
                 self._latest_joint_positions, self._tip_link, self._base_link

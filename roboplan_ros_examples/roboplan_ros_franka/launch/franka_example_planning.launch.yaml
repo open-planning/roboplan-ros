@@ -19,7 +19,7 @@ launch:
           value: $(var hardware_type)
 
   # IK planning and execution node.
-  # In simulation, the tabletop is also added to the planning scene.
+  # In MuJoCo, the tabletop is also added to the planning scene.
   - node:
       pkg: roboplan_ros_franka
       exec: plan_and_execute_node.py
