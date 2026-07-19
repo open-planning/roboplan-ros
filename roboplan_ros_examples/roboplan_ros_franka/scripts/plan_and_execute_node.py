@@ -58,7 +58,12 @@ from roboplan_ros.cpp import (
 )
 from roboplan_ros_py.trajectory_publisher import TrajectoryPublisher
 from roboplan_ros_examples import run_node, spin_executor
-from roboplan_ros_examples.utils import JointStateSubscriber
+from roboplan_ros_examples.utils import (
+    JointStateSubscriber,
+    ParallelGripperClient,
+    add_box_obstacles,
+    obstacle_marker_array,
+)
 
 
 class PlanAndExecuteNode(Node):
@@ -90,11 +95,22 @@ class PlanAndExecuteNode(Node):
             "action_server_name", "/fr3_arm_controller/follow_joint_trajectory"
         )
 
+        # Gripper params, for commanding a parallel gripper controller
+        self.declare_parameter(
+            "gripper_action_name", "/fr3_gripper_controller/gripper_cmd"
+        )
+        self.declare_parameter("gripper_joint", "fr3_finger_joint1")
+        self.declare_parameter("gripper_open_position", 0.04)
+        self.declare_parameter("gripper_closed_position", 0.0)
+
         # IK and Planner params
         self.declare_parameter("include_shortcutting", True)
         self.declare_parameter("joint_group", "fr3_arm")
         self.declare_parameter("base_link", "fr3_link0")
         self.declare_parameter("tip_link", "fr3_hand")
+
+        # Optional YAML file with box obstacles to add to the planning scene
+        self.declare_parameter("obstacles_config_file", "")
 
         # Get parameter values
         robot_description_package = self.get_parameter(
@@ -109,6 +125,13 @@ class PlanAndExecuteNode(Node):
 
         joint_state_topic = self.get_parameter("joint_state_topic").value
         action_server_name = self.get_parameter("action_server_name").value
+
+        gripper_action_name = self.get_parameter("gripper_action_name").value
+        self._gripper_joint = self.get_parameter("gripper_joint").value
+        self._gripper_open_position = self.get_parameter("gripper_open_position").value
+        self._gripper_closed_position = self.get_parameter(
+            "gripper_closed_position"
+        ).value
 
         self._include_shortcutting = self.get_parameter("include_shortcutting").value
         self._joint_group = self.get_parameter("joint_group").value
@@ -133,6 +156,16 @@ class PlanAndExecuteNode(Node):
             yaml_config_path=yaml_config_path,
         )
         self._q_indices = self._scene.getJointGroupInfo(self._joint_group).q_indices
+
+        # Optionally add obstacles (e.g., a tabletop) to the planning scene so
+        # that IK and planning avoid them.
+        self._obstacles = []
+        obstacles_config_file = self.get_parameter("obstacles_config_file").value
+        if obstacles_config_file:
+            self._obstacles = add_box_obstacles(self._scene, obstacles_config_file)
+            self.get_logger().info(
+                f"Added {len(self._obstacles)} obstacle(s) to the planning scene."
+            )
 
         # Subscribe to joint states to keep the scene in sync with hardware. These
         # can bog down other CBs, so putting it out here keeps the rest of the node
@@ -242,6 +275,8 @@ class PlanAndExecuteNode(Node):
         menu.insert("Preview", callback=self._on_preview_menu)
         menu.insert("Execute", callback=self._on_execute_menu)
         menu.insert("Reset", callback=self._on_reset_menu)
+        menu.insert("Open Gripper", callback=self._on_open_gripper_menu)
+        menu.insert("Close Gripper", callback=self._on_close_gripper_menu)
         menu.apply(self._ik_server, "ik_target")
         self._ik_server.applyChanges()
 
@@ -292,9 +327,25 @@ class PlanAndExecuteNode(Node):
             Marker, "/roboplan_trajectory/path", latched_qos
         )
 
+        # Publish any planning scene obstacles as markers, exactly once.
+        self._obstacle_marker_pub = self.create_publisher(
+            MarkerArray, "roboplan_scene/obstacles", latched_qos
+        )
+        if self._obstacles:
+            self._obstacle_marker_pub.publish(obstacle_marker_array(self._obstacles))
+
         # Setup an action client for trajectory execution
         self._execute_client = ActionClient(
             self, FollowJointTrajectory, action_server_name
+        )
+
+        # Setup an action client for commanding a parallel gripper controller
+        self._gripper_client = ParallelGripperClient(
+            self,
+            gripper_action_name,
+            self._gripper_joint,
+            self._gripper_open_position,
+            self._gripper_closed_position,
         )
 
         # Target pose and planned trajectories
@@ -306,13 +357,35 @@ class PlanAndExecuteNode(Node):
         self.create_service(Trigger, "~/preview", self._on_preview)
         self.create_service(Trigger, "~/execute", self._on_execute)
         self.create_service(Trigger, "~/reset", self._on_reset)
+        self.create_service(Trigger, "~/open_gripper", self._on_open_gripper)
+        self.create_service(Trigger, "~/close_gripper", self._on_close_gripper)
 
         # Reset and notify
         self._reset()
         self.get_logger().info("Ready. Move the interactive marker to set a target.")
-        self.get_logger().info("Call services: ~/plan, ~/preview, ~/execute, ~/reset")
+        self.get_logger().info(
+            "Call services: ~/plan, ~/preview, ~/execute, ~/reset, "
+            "~/open_gripper, ~/close_gripper"
+        )
+
+    def _get_hardware_positions(self):
+        """
+        Returns the latest joint positions, clamped to the joint limits.
+
+        Simulated (or real) hardware can report positions slightly outside the
+        limits, which would otherwise make planning reject the configuration.
+        """
+        joint_config = fromJointState(
+            self._js_subscriber.last_joint_state, self._scene, self._conversion_map
+        )
+        return self._scene.clampToValidConfiguration(joint_config.positions)
 
     def _on_ik_feedback(self, feedback):
+        # Sync with the latest hardware state so that joints outside the
+        # planning group (e.g., the gripper fingers) are up to date in the
+        # scene, since the IK solution is visualized at the full configuration.
+        self._latest_joint_positions = self._get_hardware_positions()
+        self._scene.setJointPositions(self._latest_joint_positions)
         self._ik_marker.set_seed_configuration(self._latest_joint_positions)
         q = self._ik_marker.process_feedback(feedback)
         if q is not None:
@@ -325,10 +398,7 @@ class PlanAndExecuteNode(Node):
         if self._target_q is None:
             return False, "No target set. Move the interactive marker first."
 
-        joint_config = fromJointState(
-            self._js_subscriber.last_joint_state, self._scene, self._conversion_map
-        )
-        self._latest_joint_positions = joint_config.positions
+        self._latest_joint_positions = self._get_hardware_positions()
         self._scene.setJointPositions(self._latest_joint_positions)
 
         start = JointConfiguration()
@@ -454,10 +524,7 @@ class PlanAndExecuteNode(Node):
             raise RuntimeError("No joint states received, cannot reset to hw state.")
 
         # Reset joint positions to the latest joint state
-        joint_config = fromJointState(
-            self._js_subscriber.last_joint_state, self._scene, self._conversion_map
-        )
-        self._latest_joint_positions = joint_config.positions
+        self._latest_joint_positions = self._get_hardware_positions()
 
         # Update the IK marker's seed to the current state
         self._ik_marker.set_seed_configuration(self._latest_joint_positions)
@@ -501,6 +568,14 @@ class PlanAndExecuteNode(Node):
         self._reset()
         self.get_logger().info("Reset node to current state.")
 
+    def _on_open_gripper_menu(self, feedback):
+        _, msg = self._gripper_client.open()
+        self.get_logger().info(msg)
+
+    def _on_close_gripper_menu(self, feedback):
+        _, msg = self._gripper_client.close()
+        self.get_logger().info(msg)
+
     # Trigger service callbacks
     def _on_plan(self, request, response):
         response.success, response.message = self._plan()
@@ -519,6 +594,14 @@ class PlanAndExecuteNode(Node):
         response.success = True
         response.message = "Reset node to current state."
         self.get_logger().info(response.message)
+        return response
+
+    def _on_open_gripper(self, request, response):
+        response.success, response.message = self._gripper_client.open()
+        return response
+
+    def _on_close_gripper(self, request, response):
+        response.success, response.message = self._gripper_client.close()
         return response
 
     def destroy_node(self):

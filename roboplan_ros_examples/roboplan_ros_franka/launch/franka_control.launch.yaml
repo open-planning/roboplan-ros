@@ -5,22 +5,63 @@ launch:
       default: $(find-pkg-share roboplan_ros_franka)/config/franka_config.rviz
       description: "Specify an rviz configuration file."
 
+  - arg:
+      name: hardware_type
+      default: mock
+      description: "The ros2_control hardware to use ('mock' or 'mujoco')."
+
+  - let:
+      name: use_mujoco
+      value: $(eval "'$(var hardware_type)' == 'mujoco'")
+
   - node:
       pkg: robot_state_publisher
       exec: robot_state_publisher
       output: screen
       param:
+        - name: use_sim_time
+          value: $(var use_mujoco)
+          type: bool
         - name: robot_description
-          value: $(command "xacro $(find-pkg-share roboplan_example_models)/models/franka_robot_model/fr3.urdf")
+          value: $(command "xacro $(find-pkg-share roboplan_example_models)/models/franka_robot_model/fr3.urdf ros2_control_hardware:=$(var hardware_type)")
 
+  # Controller manager with mock hardware
   - node:
       pkg: controller_manager
       exec: ros2_control_node
       output: screen
+      unless: $(var use_mujoco)
       param:
         - from: $(find-pkg-share roboplan_ros_franka)/config/ros2_controllers.yaml
         - name: robot_description
           value: $(command "xacro $(find-pkg-share roboplan_example_models)/models/franka_robot_model/fr3.urdf")
+
+  # Auto-generate the MuJoCo model (MJCF) from the published robot description,
+  # merge in the tabletop scene, and publish it for the simulator to load.
+  # Note this can take a while when first launching.
+  - node:
+      pkg: mujoco_ros2_control
+      exec: robot_description_to_mjcf.sh
+      output: screen
+      if: $(var use_mujoco)
+      args: >-
+        -m $(find-pkg-share roboplan_ros_franka)/description/fr3_mujoco_inputs.xml
+        --scene $(find-pkg-share roboplan_ros_franka)/description/fr3_mujoco_scene.xml
+        --publish_topic /mujoco_robot_description
+
+  # The MuJoCo simulation, which also runs the controller manager
+  - node:
+      pkg: mujoco_ros2_control
+      exec: ros2_control_node
+      output: screen
+      if: $(var use_mujoco)
+      param:
+        - name: use_sim_time
+          value: true
+        - from: $(find-pkg-share roboplan_ros_franka)/config/ros2_controllers.yaml
+      remap:
+        - from: ~/robot_description
+          to: /robot_description
 
   - node:
       pkg: controller_manager
@@ -35,8 +76,18 @@ launch:
       args: "fr3_arm_controller"
 
   - node:
+      pkg: controller_manager
+      exec: spawner
+      output: screen
+      args: "fr3_gripper_controller"
+
+  - node:
       pkg: rviz2
       exec: rviz2
       name: rviz2
       output: log
       args: "-d $(var rviz_config)"
+      param:
+        - name: use_sim_time
+          value: $(var use_mujoco)
+          type: bool

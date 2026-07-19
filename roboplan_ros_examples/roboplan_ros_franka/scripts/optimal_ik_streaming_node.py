@@ -25,6 +25,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.executors import SingleThreadedExecutor
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from visualization_msgs.msg import MarkerArray
 from interactive_markers import InteractiveMarkerServer, MenuHandler
 from std_srvs.srv import Trigger
 
@@ -37,12 +38,20 @@ from roboplan.optimal_ik import (
     FrameTaskOptions,
     Oink,
     PositionLimit,
+    SelfCollisionBarrier,
+    SelfCollisionBarrierOptions,
     VelocityLimit,
 )
 from roboplan_ros.visualization import RoboplanIKMarker
 from roboplan_ros.cpp import buildConversionMap, fromJointState, se3ToPose
 from roboplan_ros_examples import run_node, spin_executor
-from roboplan_ros_examples.utils import JointStateSubscriber
+from roboplan_ros_examples.utils import (
+    LATCHED_QOS,
+    JointStateSubscriber,
+    ParallelGripperClient,
+    add_box_obstacles,
+    obstacle_marker_array,
+)
 
 
 class CartesianServoNode(Node):
@@ -72,6 +81,20 @@ class CartesianServoNode(Node):
             "joint_command_topic", "/fr3_arm_controller/joint_trajectory"
         )
 
+        # Gripper params, for commanding a parallel gripper controller
+        self.declare_parameter(
+            "gripper_action_name", "/fr3_gripper_controller/gripper_cmd"
+        )
+        self.declare_parameter("gripper_joint", "fr3_finger_joint1")
+        self.declare_parameter("gripper_open_position", 0.04)
+        self.declare_parameter("gripper_closed_position", 0.0)
+
+        # Optional YAML file with box obstacles to add to the scene
+        self.declare_parameter("obstacles_config_file", "")
+
+        # Whether to add a collision avoidance barrier to the solver.
+        self.declare_parameter("use_collision_barrier", False)
+
         # IK params
         self.declare_parameter("joint_group", "fr3_arm")
         self.declare_parameter("base_link", "fr3_link0")
@@ -98,6 +121,13 @@ class CartesianServoNode(Node):
 
         joint_state_topic = self.get_parameter("joint_state_topic").value
         joint_command_topic = self.get_parameter("joint_command_topic").value
+
+        gripper_action_name = self.get_parameter("gripper_action_name").value
+        gripper_joint = self.get_parameter("gripper_joint").value
+        gripper_open_position = self.get_parameter("gripper_open_position").value
+        gripper_closed_position = self.get_parameter("gripper_closed_position").value
+
+        use_collision_barrier = self.get_parameter("use_collision_barrier").value
 
         self._joint_group = self.get_parameter("joint_group").value
         self._base_link = self.get_parameter("base_link").value
@@ -128,6 +158,15 @@ class CartesianServoNode(Node):
             package_paths=package_paths,
             yaml_config_path=yaml_config_path,
         )
+
+        # Optionally add obstacles (e.g., a tabletop) to the scene.
+        self._obstacles = []
+        obstacles_config_file = self.get_parameter("obstacles_config_file").value
+        if obstacles_config_file:
+            self._obstacles = add_box_obstacles(self._scene, obstacles_config_file)
+            self.get_logger().info(
+                f"Added {len(self._obstacles)} obstacle(s) to the scene."
+            )
 
         # Start paused so the robot doesn't move until the user is ready and the
         # iMarker has been initialized. Otherwise danger.
@@ -191,7 +230,15 @@ class CartesianServoNode(Node):
         )
         velocity_limit = VelocityLimit(self._oink, self._dt, v_max)
         self._constraints = [position_limit, velocity_limit]
+
         self._barriers = []
+        if use_collision_barrier:
+            barrier_options = SelfCollisionBarrierOptions(
+                n_collision_pairs=5, d_min=0.02
+            )
+            self._barriers.append(
+                SelfCollisionBarrier(self._oink, self._scene, self._dt, barrier_options)
+            )
 
         # Thread-safe access to scene and target
         self._lock = threading.Lock()
@@ -238,6 +285,8 @@ class CartesianServoNode(Node):
         menu.insert("Start", callback=self._on_start_menu)
         menu.insert("Pause", callback=self._on_pause_menu)
         menu.insert("Reset", callback=self._on_reset_menu)
+        menu.insert("Open Gripper", callback=self._on_open_gripper_menu)
+        menu.insert("Close Gripper", callback=self._on_close_gripper_menu)
         menu.apply(self._ik_server, "ik_target")
         self._ik_server.applyChanges()
 
@@ -251,8 +300,26 @@ class CartesianServoNode(Node):
         # Joint command publisher
         self._cmd_pub = self.create_publisher(JointTrajectory, joint_command_topic, 10)
 
-        # Reset service
+        # Publish any scene obstacles as markers, exactly once
+        self._obstacle_marker_pub = self.create_publisher(
+            MarkerArray, "roboplan_scene/obstacles", LATCHED_QOS
+        )
+        if self._obstacles:
+            self._obstacle_marker_pub.publish(obstacle_marker_array(self._obstacles))
+
+        # Setup an action client for commanding a parallel gripper controller
+        self._gripper_client = ParallelGripperClient(
+            self,
+            gripper_action_name,
+            gripper_joint,
+            gripper_open_position,
+            gripper_closed_position,
+        )
+
+        # Trigger services
         self.create_service(Trigger, "~/reset", self._on_reset)
+        self.create_service(Trigger, "~/open_gripper", self._on_open_gripper)
+        self.create_service(Trigger, "~/close_gripper", self._on_close_gripper)
 
         # Start control loop
         self._running = True
@@ -339,6 +406,22 @@ class CartesianServoNode(Node):
         self._reset()
         self.get_logger().info("Reset marker to current hardware state.")
 
+    def _on_open_gripper_menu(self, _):
+        _, msg = self._gripper_client.open()
+        self.get_logger().info(msg)
+
+    def _on_close_gripper_menu(self, _):
+        _, msg = self._gripper_client.close()
+        self.get_logger().info(msg)
+
+    def _on_open_gripper(self, _, response):
+        response.success, response.message = self._gripper_client.open()
+        return response
+
+    def _on_close_gripper(self, _, response):
+        response.success, response.message = self._gripper_client.close()
+        return response
+
     def _on_reset(self, _, response):
         self._reset()
         response.success = True
@@ -354,10 +437,14 @@ class CartesianServoNode(Node):
         # Pause it
         self._on_pause_menu(None)
 
+        # Clamp to the joint limits, since (simulated) hardware can report
+        # positions slightly outside them.
         joint_config = fromJointState(
             self._js_subscriber.last_joint_state, self._scene, self._conversion_map
         )
-        self._latest_joint_positions = joint_config.positions
+        self._latest_joint_positions = self._scene.clampToValidConfiguration(
+            joint_config.positions
+        )
 
         with self._lock:
             self._scene.setJointPositions(self._latest_joint_positions)

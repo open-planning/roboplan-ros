@@ -1,14 +1,32 @@
 launch:
 
+  - arg:
+      name: hardware_type
+      default: mock
+      description: "The ros2_control hardware to use ('mock' or 'mujoco')."
+
+  - let:
+      name: use_mujoco
+      value: $(eval "'$(var hardware_type)' == 'mujoco'")
+
   # Include the control launch file with custom rviz config
   - include:
       file: $(find-pkg-share roboplan_ros_franka)/launch/franka_control.launch.yaml
       arg:
         - name: rviz_config
           value: $(find-pkg-share roboplan_ros_franka)/config/franka_ik_config.rviz
+        - name: hardware_type
+          value: $(var hardware_type)
 
-  # IK planning and execution node
+  # IK planning and execution node.
+  # In simulation, the tabletop is also added to the planning scene.
   - node:
       pkg: roboplan_ros_franka
       exec: plan_and_execute_node.py
       output: screen
+      param:
+        - name: use_sim_time
+          value: $(var use_mujoco)
+          type: bool
+        - name: obstacles_config_file
+          value: $(eval "'$(find-pkg-share roboplan_ros_franka)/config/fr3_mujoco_obstacles.yaml' if $(var use_mujoco) else ''")
