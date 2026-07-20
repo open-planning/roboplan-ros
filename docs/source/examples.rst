@@ -48,7 +48,7 @@ The solver uses a prioritized task hierarchy:
 - **Priority 2**: A configuration task that regularizes toward the starting joint configuration.
 
 Joint position and velocity limits are enforced as QP constraints.
-A collision avoidance barrier can also be enabled with the ``use_collision_barrier`` launch argument, which keeps the arm clear of self-collisions and any scene obstacles.
+A collision avoidance barrier can also be enabled with the ``avoid_collisions`` launch argument, which keeps the arm clear of self-collisions and any scene obstacles.
 
 To launch the demo,
 

@@ -90,11 +90,9 @@ class CartesianServoNode(Node):
         self.declare_parameter("gripper_open_position", 0.04)
         self.declare_parameter("gripper_closed_position", 0.0)
 
-        # Optional YAML file with box obstacles to add to the scene
+        # Collision related parameters
         self.declare_parameter("obstacles_config_file", "")
-
-        # Whether to add a collision avoidance barrier to the solver.
-        self.declare_parameter("use_collision_barrier", False)
+        self.declare_parameter("avoid_collisions", False)
 
         # IK params
         self.declare_parameter("joint_group", "fr3_arm")
@@ -128,7 +126,7 @@ class CartesianServoNode(Node):
         gripper_open_position = self.get_parameter("gripper_open_position").value
         gripper_closed_position = self.get_parameter("gripper_closed_position").value
 
-        use_collision_barrier = self.get_parameter("use_collision_barrier").value
+        avoid_collisions = self.get_parameter("avoid_collisions").value
 
         self._joint_group = self.get_parameter("joint_group").value
         self._base_link = self.get_parameter("base_link").value
@@ -237,9 +235,11 @@ class CartesianServoNode(Node):
         self._constraints = [position_limit, velocity_limit]
 
         self._barriers = []
-        if use_collision_barrier:
+        if avoid_collisions:
             barrier_options = SelfCollisionBarrierOptions(
-                n_collision_pairs=5, d_min=0.02
+                n_collision_pairs=5,
+                d_min=0.02,
+                safe_displacement_gain=0.01,
             )
             self._barriers.append(
                 SelfCollisionBarrier(self._oink, self._scene, self._dt, barrier_options)

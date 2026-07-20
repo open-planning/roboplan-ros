@@ -10,10 +10,9 @@ launch:
       value: $(eval "'$(var hardware_type)' == 'mujoco'")
 
   - arg:
-      name: use_collision_barrier
-      default: $(eval "'$(var hardware_type)' == 'mujoco'")
-      description: "Add a collision avoidance barrier to the solver. Defaults
-        to true when simulating, so that the tabletop scene is avoided."
+      name: avoid_collisions
+      default: "false"
+      description: "Add a collision avoidance barrier to the solver."
 
   # Include the control launch file with custom rviz config
   - include:
@@ -34,8 +33,8 @@ launch:
         - name: use_sim_time
           value: $(var use_mujoco)
           type: bool
-        - name: use_collision_barrier
-          value: $(var use_collision_barrier)
+        - name: avoid_collisions
+          value: $(var avoid_collisions)
           type: bool
         - name: obstacles_config_file
           value: $(eval "'$(find-pkg-share roboplan_ros_franka)/config/fr3_mujoco_obstacles.yaml' if $(var use_mujoco) else ''")
