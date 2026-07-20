@@ -22,6 +22,7 @@ import numpy as np
 from ament_index_python.packages import get_package_share_directory
 
 import rclpy
+from rclpy.duration import Duration
 from rclpy.node import Node
 from rclpy.executors import SingleThreadedExecutor
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
@@ -139,10 +140,14 @@ class CartesianServoNode(Node):
         orientation_cost = self.get_parameter("orientation_cost").value
         control_freq = self.get_parameter("control_freq").value
         self._reference_filter_tau = self.get_parameter("reference_filter_tau").value
-        self._command_duration_ms = self.get_parameter("command_duration_ms").value
+        command_duration_ms = self.get_parameter("command_duration_ms").value
+        self._command_duration_msg = Duration(
+            seconds=command_duration_ms / 1000.0
+        ).to_msg()
 
         # Control loop time step for Cartesian tracking
         self._dt = 1.0 / control_freq
+        self._period = Duration(seconds=self._dt)
 
         # Get robot description files and setup the scene
         pkg_share_dir = get_package_share_directory(robot_description_package)
@@ -341,7 +346,7 @@ class CartesianServoNode(Node):
     def _control_loop(self):
         """Continuously run one OInK step per tick while not paused"""
         while self._running:
-            loop_start = time.time()
+            loop_start = self.get_clock().now()
 
             if not self._paused:
                 with self._lock:
@@ -381,8 +386,7 @@ class CartesianServoNode(Node):
 
                 self._publish_joint_command(q_current)
 
-            elapsed = time.time() - loop_start
-            time.sleep(max(0, self._dt - elapsed))
+            self.get_clock().sleep_until(loop_start + self._period)
 
     def _publish_joint_command(self, q):
         """Publish a single-point JointTrajectory to command the robot."""
@@ -390,6 +394,7 @@ class CartesianServoNode(Node):
         msg.joint_names = list(self._joint_names)
         point = JointTrajectoryPoint()
         point.positions = q[self._q_indices].tolist()
+        point.time_from_start = self._command_duration_msg
         msg.points = [point]
         self._cmd_pub.publish(msg)
 
