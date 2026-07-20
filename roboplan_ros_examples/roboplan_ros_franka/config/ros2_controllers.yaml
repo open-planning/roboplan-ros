@@ -26,6 +26,7 @@
       state_interfaces:
         - position
         - velocity
+      interpolate_from_desired_state: true
       joints:
         - fr3_joint1
         - fr3_joint2
@@ -50,6 +51,7 @@
       state_interfaces:
         - position
         - velocity
+      interpolate_from_desired_state: true
       joints:
         - left_fr3_joint1
         - left_fr3_joint2
@@ -74,6 +76,7 @@
       state_interfaces:
         - position
         - velocity
+      interpolate_from_desired_state: true
       joints:
         - right_fr3_joint1
         - right_fr3_joint2
