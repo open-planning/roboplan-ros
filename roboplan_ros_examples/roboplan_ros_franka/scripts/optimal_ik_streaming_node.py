@@ -90,16 +90,6 @@ class CartesianServoNode(Node):
         self.declare_parameter("gripper_open_position", 0.04)
         self.declare_parameter("gripper_closed_position", 0.0)
 
-        # Collision related parameters. A high safe_displacement_gain damps all
-        # motion within the barrier's tracking distance (its weight fluctuates
-        # with the selected collision pairs, which reads as chatter), so keep
-        # it small and let the inequality constraints do the work.
-        self.declare_parameter("obstacles_config_file", "")
-        self.declare_parameter("avoid_collisions", False)
-        self.declare_parameter("n_collision_pairs", 5)
-        self.declare_parameter("min_collision_distance", 0.02)
-        self.declare_parameter("safe_displacement_gain", 0.01)
-
         # IK params
         self.declare_parameter("joint_group", "fr3_arm")
         self.declare_parameter("base_link", "fr3_link0")
@@ -112,6 +102,13 @@ class CartesianServoNode(Node):
         self.declare_parameter("control_freq", 100.0)
         self.declare_parameter("reference_filter_tau", 0.1)
         self.declare_parameter("command_duration_ms", 100)
+
+        # Collision related parameters.
+        self.declare_parameter("obstacles_config_file", "")
+        self.declare_parameter("avoid_collisions", False)
+        self.declare_parameter("n_collision_pairs", 5)
+        self.declare_parameter("min_collision_distance", 0.02)
+        self.declare_parameter("safe_displacement_gain", 0.01)
 
         # Get parameter values
         robot_description_package = self.get_parameter(
@@ -151,7 +148,6 @@ class CartesianServoNode(Node):
 
         # Control loop time step for Cartesian tracking
         self._dt = 1.0 / control_freq
-        self._period = Duration(seconds=self._dt)
 
         # Get robot description files and setup the scene
         pkg_share_dir = get_package_share_path(robot_description_package).as_posix()
@@ -336,6 +332,8 @@ class CartesianServoNode(Node):
 
         # Start control loop
         self._running = True
+        self._tick = threading.Event()
+        self._tick_timer = self.create_timer(self._dt, self._tick.set)
         self._control_thread = threading.Thread(target=self._control_loop, daemon=True)
         self._control_thread.start()
 
@@ -354,7 +352,11 @@ class CartesianServoNode(Node):
     def _control_loop(self):
         """Continuously run one OInK step per tick while not paused"""
         while self._running:
-            loop_start = self.get_clock().now()
+            # The wall-clock timeout only bounds how long shutdown (or a
+            # paused sim, which stops the tick timer) can stall this thread.
+            if not self._tick.wait(timeout=0.25):
+                continue
+            self._tick.clear()
 
             if not self._paused:
                 with self._lock:
@@ -384,8 +386,15 @@ class CartesianServoNode(Node):
                             f"IK solver failed: {e}", throttle_duration_sec=1.0
                         )
 
-                    self._delta_q_full[:] = 0.0
                     self._delta_q_full[self._oink.v_indices] = self._delta_q
+                    if self._barriers:
+                        self._oink.enforceBarriers(
+                            self._scene,
+                            self._barriers,
+                            self._delta_q_full,
+                            tolerance=0.0,
+                        )
+
                     q_current = self._scene.integrate(q_current, self._delta_q_full)
 
                     self._scene.setJointPositions(q_current)
@@ -393,8 +402,6 @@ class CartesianServoNode(Node):
                     self._latest_joint_positions = q_current
 
                 self._publish_joint_command(q_current)
-
-            self.get_clock().sleep_until(loop_start + self._period)
 
     def _publish_joint_command(self, q):
         """Publish a single-point JointTrajectory to command the robot."""
@@ -480,6 +487,7 @@ class CartesianServoNode(Node):
     def destroy_node(self):
         # Stop the control loop first so it releases the lock
         self._running = False
+        self._tick.set()
         self._control_thread.join(timeout=1.0)
 
         # Shut down executors and join their threads

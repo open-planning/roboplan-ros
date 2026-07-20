@@ -24,7 +24,7 @@ launch:
           value: $(var hardware_type)
 
   # Cartesian servoing node.
-  # In simulation, the tabletop is also added to the scene.
+  # In simulation or if avoiding collisions, the tabletop is also added to the scene.
   - node:
       pkg: roboplan_ros_franka
       exec: optimal_ik_streaming_node.py
@@ -37,4 +37,4 @@ launch:
           value: $(var avoid_collisions)
           type: bool
         - name: obstacles_config_file
-          value: $(eval "'$(find-pkg-share roboplan_ros_franka)/config/fr3_mujoco_obstacles.yaml' if $(var use_mujoco) else ''")
+          value: $(eval "'$(find-pkg-share roboplan_ros_franka)/config/fr3_mujoco_obstacles.yaml' if $(var use_mujoco) or '$(var avoid_collisions)'.lower() == 'true' else ''")

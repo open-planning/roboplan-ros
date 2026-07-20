@@ -30,9 +30,8 @@
                 ctrlrange="0.5445 4.5169" forcerange="-12 12"/>
       <position name="fr3_joint7" joint="fr3_joint7" kp="2000" dampratio="1.0"
                 ctrlrange="-3.0159 3.0159" forcerange="-12 12"/>
-      <!-- The fingers are coupled through a tendon and driven by a single
-           actuator, which mujoco_ros2_control requires to be named after the
-           commanded ros2_control joint. -->
+      <!-- The fingers are coupled through a tendon and driven by a single actuator,
+           which mujoco_ros2_control requires to be named after the commanded ros2_control joint. -->
       <position name="fr3_finger_joint1" tendon="split" kp="1000" dampratio="3.0"
                 ctrlrange="0 0.04" forcerange="-100 100"/>
     </actuator>
