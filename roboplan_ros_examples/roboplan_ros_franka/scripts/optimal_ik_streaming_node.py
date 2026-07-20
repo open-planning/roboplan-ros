@@ -19,7 +19,7 @@ import threading
 import xacro
 import numpy as np
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_path
 
 import rclpy
 from rclpy.duration import Duration
@@ -90,9 +90,15 @@ class CartesianServoNode(Node):
         self.declare_parameter("gripper_open_position", 0.04)
         self.declare_parameter("gripper_closed_position", 0.0)
 
-        # Collision related parameters
+        # Collision related parameters. A high safe_displacement_gain damps all
+        # motion within the barrier's tracking distance (its weight fluctuates
+        # with the selected collision pairs, which reads as chatter), so keep
+        # it small and let the inequality constraints do the work.
         self.declare_parameter("obstacles_config_file", "")
         self.declare_parameter("avoid_collisions", False)
+        self.declare_parameter("n_collision_pairs", 5)
+        self.declare_parameter("min_collision_distance", 0.02)
+        self.declare_parameter("safe_displacement_gain", 0.01)
 
         # IK params
         self.declare_parameter("joint_group", "fr3_arm")
@@ -148,7 +154,7 @@ class CartesianServoNode(Node):
         self._period = Duration(seconds=self._dt)
 
         # Get robot description files and setup the scene
-        pkg_share_dir = get_package_share_directory(robot_description_package)
+        pkg_share_dir = get_package_share_path(robot_description_package).as_posix()
         models_dir = os.path.join(pkg_share_dir, robot_descriptions_model_path)
         urdf_xml = xacro.process_file(os.path.join(models_dir, urdf_filename)).toxml()
         srdf_xml = xacro.process_file(os.path.join(models_dir, srdf_filename)).toxml()
@@ -237,9 +243,11 @@ class CartesianServoNode(Node):
         self._barriers = []
         if avoid_collisions:
             barrier_options = SelfCollisionBarrierOptions(
-                n_collision_pairs=5,
-                d_min=0.02,
-                safe_displacement_gain=0.01,
+                n_collision_pairs=self.get_parameter("n_collision_pairs").value,
+                d_min=self.get_parameter("min_collision_distance").value,
+                safe_displacement_gain=self.get_parameter(
+                    "safe_displacement_gain"
+                ).value,
             )
             self._barriers.append(
                 SelfCollisionBarrier(self._oink, self._scene, self._dt, barrier_options)

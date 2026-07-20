@@ -16,7 +16,7 @@ import time
 import threading
 import xacro
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_path
 
 import rclpy
 from rclpy.action import ActionClient
@@ -139,7 +139,7 @@ class PlanAndExecuteNode(Node):
         self._tip_link = self.get_parameter("tip_link").value
 
         # Get robot description files and setup the scene
-        pkg_share_dir = get_package_share_directory(robot_description_package)
+        pkg_share_dir = get_package_share_path(robot_description_package).as_posix()
         models_dir = os.path.join(
             pkg_share_dir,
             robot_descriptions_model_path,
