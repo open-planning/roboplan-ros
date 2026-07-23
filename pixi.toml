@@ -33,6 +33,7 @@ build = { cmd = [
   "-DCMAKE_C_COMPILER=clang-cl",
   "-DCMAKE_CXX_COMPILER=clang-cl",
   "-DCMAKE_LINKER=lld-link",
+  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
 ] }
 
 [dependencies]
