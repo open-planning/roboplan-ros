@@ -1,0 +1,59 @@
+<mujoco_inputs>
+
+  <!-- Inputs for auto-generating a MuJoCo model (MJCF) from the FR3 URDF with
+       the mujoco_ros2_control conversion script. The contents of `raw_inputs`
+       are copied directly into the generated MJCF. -->
+  <raw_inputs>
+    <option integrator="implicitfast" cone="elliptic" impratio="10"/>
+
+    <default>
+      <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+      </default>
+      <default class="collision">
+        <geom group="3" type="mesh"/>
+      </default>
+    </default>
+
+    <actuator>
+      <position name="fr3_joint1" joint="fr3_joint1" kp="4500" dampratio="1.0"
+                ctrlrange="-2.7437 2.7437" forcerange="-87 87"/>
+      <position name="fr3_joint2" joint="fr3_joint2" kp="4500" dampratio="1.0"
+                ctrlrange="-1.7837 1.7837" forcerange="-87 87"/>
+      <position name="fr3_joint3" joint="fr3_joint3" kp="3500" dampratio="1.0"
+                ctrlrange="-2.9007 2.9007" forcerange="-87 87"/>
+      <position name="fr3_joint4" joint="fr3_joint4" kp="3500" dampratio="1.0"
+                ctrlrange="-3.0421 -0.1518" forcerange="-87 87"/>
+      <position name="fr3_joint5" joint="fr3_joint5" kp="2000" dampratio="1.0"
+                ctrlrange="-2.8065 2.8065" forcerange="-12 12"/>
+      <position name="fr3_joint6" joint="fr3_joint6" kp="2000" dampratio="1.0"
+                ctrlrange="0.5445 4.5169" forcerange="-12 12"/>
+      <position name="fr3_joint7" joint="fr3_joint7" kp="2000" dampratio="1.0"
+                ctrlrange="-3.0159 3.0159" forcerange="-12 12"/>
+      <!-- The fingers are coupled through a tendon and driven by a single actuator,
+           which mujoco_ros2_control requires to be named after the commanded ros2_control joint. -->
+      <position name="fr3_finger_joint1" tendon="split" kp="1000" dampratio="3.0"
+                ctrlrange="0 0.04" forcerange="-100 100"/>
+    </actuator>
+
+    <tendon>
+      <fixed name="split">
+        <joint joint="fr3_finger_joint1" coef="0.5"/>
+        <joint joint="fr3_finger_joint2" coef="0.5"/>
+      </fixed>
+    </tendon>
+
+    <equality>
+      <joint joint1="fr3_finger_joint1" joint2="fr3_finger_joint2"
+             polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    </equality>
+  </raw_inputs>
+
+  <processed_inputs>
+    <!-- The conversion script uses convex hulls of the visual meshes for
+         collision. Decompose the finger mesh so the fingers get accurate
+         (non-convex) collision geometry for grasping. -->
+    <decompose_mesh mesh_name="finger" threshold="0.05"/>
+  </processed_inputs>
+
+</mujoco_inputs>

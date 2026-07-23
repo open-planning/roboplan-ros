@@ -1,0 +1,9 @@
+# Planning scene obstacles matching the MuJoCo tabletop scene in
+# fr3_mujoco_scene.xml. The cube is intentionally not included, so that grasp
+# targets at the cube remain collision free.
+obstacles:
+  - name: table
+    parent_frame: world
+    size: [0.5, 0.8, 0.4]
+    xyz: [0.6, 0.0, 0.2]
+    color: [0.5, 0.35, 0.2, 1.0]

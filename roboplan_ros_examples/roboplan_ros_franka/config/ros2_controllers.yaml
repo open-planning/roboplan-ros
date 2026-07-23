@@ -6,6 +6,9 @@
       fr3_arm_controller:
         type: joint_trajectory_controller/JointTrajectoryController
 
+      fr3_gripper_controller:
+        type: parallel_gripper_action_controller/GripperActionController
+
       left_fr3_arm_controller:
         type: joint_trajectory_controller/JointTrajectoryController
 
@@ -23,6 +26,7 @@
       state_interfaces:
         - position
         - velocity
+      interpolate_from_desired_state: true
       joints:
         - fr3_joint1
         - fr3_joint2
@@ -32,6 +36,14 @@
         - fr3_joint6
         - fr3_joint7
 
+  fr3_gripper_controller:
+    ros__parameters:
+      joint: fr3_finger_joint1
+      goal_tolerance: 0.002
+      allow_stalling: true
+      stall_velocity_threshold: 0.001
+      stall_timeout: 1.0
+
   left_fr3_arm_controller:
     ros__parameters:
       command_interfaces:
@@ -39,6 +51,7 @@
       state_interfaces:
         - position
         - velocity
+      interpolate_from_desired_state: true
       joints:
         - left_fr3_joint1
         - left_fr3_joint2
@@ -48,6 +61,14 @@
         - left_fr3_joint6
         - left_fr3_joint7
 
+  left_fr3_gripper_controller:
+    ros__parameters:
+      joint: left_fr3_finger_joint1
+      goal_tolerance: 0.002
+      allow_stalling: true
+      stall_velocity_threshold: 0.001
+      stall_timeout: 1.0
+
   right_fr3_arm_controller:
     ros__parameters:
       command_interfaces:
@@ -55,6 +76,7 @@
       state_interfaces:
         - position
         - velocity
+      interpolate_from_desired_state: true
       joints:
         - right_fr3_joint1
         - right_fr3_joint2
@@ -63,3 +85,11 @@
         - right_fr3_joint5
         - right_fr3_joint6
         - right_fr3_joint7
+
+  right_fr3_gripper_controller:
+    ros__parameters:
+      joint: right_fr3_finger_joint1
+      goal_tolerance: 0.002
+      allow_stalling: true
+      stall_velocity_threshold: 0.001
+      stall_timeout: 1.0

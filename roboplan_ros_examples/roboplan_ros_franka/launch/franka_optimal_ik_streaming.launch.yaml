@@ -1,14 +1,40 @@
 launch:
 
+  - arg:
+      name: hardware_type
+      default: mock
+      description: "The ros2_control hardware to use ('mock' or 'mujoco')."
+
+  - let:
+      name: use_mujoco
+      value: $(eval "'$(var hardware_type)' == 'mujoco'")
+
+  - arg:
+      name: avoid_collisions
+      default: "false"
+      description: "Add a collision avoidance barrier to the solver."
+
   # Include the control launch file with custom rviz config
   - include:
       file: $(find-pkg-share roboplan_ros_franka)/launch/franka_control.launch.yaml
       arg:
         - name: rviz_config
           value: $(find-pkg-share roboplan_ros_franka)/config/franka_oink_config.rviz
+        - name: hardware_type
+          value: $(var hardware_type)
 
-  # IK planning and execution node
+  # Cartesian servoing node.
+  # In simulation or if avoiding collisions, the tabletop is also added to the scene.
   - node:
       pkg: roboplan_ros_franka
       exec: optimal_ik_streaming_node.py
       output: screen
+      param:
+        - name: use_sim_time
+          value: $(var use_mujoco)
+          type: bool
+        - name: avoid_collisions
+          value: $(var avoid_collisions)
+          type: bool
+        - name: obstacles_config_file
+          value: $(eval "'$(find-pkg-share roboplan_ros_franka)/config/fr3_mujoco_obstacles.yaml' if $(var use_mujoco) or '$(var avoid_collisions)'.lower() == 'true' else ''")

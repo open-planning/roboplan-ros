@@ -1,7 +1,13 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 
+#include <ament_index_cpp/version.h>
+#if AMENT_INDEX_CPP_VERSION_GTE(1, 13, 2)
+#include <ament_index_cpp/get_package_share_path.hpp>
+#else
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#endif
+
 #include <roboplan_ros_cpp/type_conversions.hpp>
 
 namespace roboplan_ros_cpp {
@@ -9,9 +15,14 @@ namespace roboplan_ros_cpp {
 class TypeConversionsTest : public ::testing::Test {
 protected:
   void SetUp() override {
+#if AMENT_INDEX_CPP_VERSION_GTE(1, 13, 2)
+    const auto resources_dir =
+        ament_index_cpp::get_package_share_path("roboplan_ros_cpp") / "test" / "resources";
+#else
     const auto resources_dir =
         std::filesystem::path(ament_index_cpp::get_package_share_directory("roboplan_ros_cpp")) /
         "test" / "resources";
+#endif
 
     urdf_path = resources_dir / "test_robot.urdf";
     srdf_path = resources_dir / "test_robot.srdf";

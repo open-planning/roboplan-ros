@@ -149,6 +149,18 @@ Visualization Manager:
       Show Descriptions: false
       Show Visual Aids: false
       Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Scene_Obstacles
+      Namespaces:
+        roboplan_obstacles: true
+      Topic:
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /roboplan_scene/obstacles
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

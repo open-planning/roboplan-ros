@@ -1,10 +1,7 @@
 import pytest
 import numpy as np
-import os
 
-from pathlib import Path
-
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_path
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose, TransformStamped
 
@@ -22,9 +19,7 @@ from roboplan_ros.cpp import (
 )
 
 
-resource_path = (
-    Path(get_package_share_directory("roboplan_ros_cpp")) / "test" / "resources"
-)
+resource_path = get_package_share_path("roboplan_ros_cpp") / "test" / "resources"
 urdf_path = resource_path / "test_robot.urdf"
 srdf_path = resource_path / "test_robot.srdf"
 

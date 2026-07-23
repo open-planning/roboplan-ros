@@ -1,5 +1,6 @@
 matplotlib
 numpy<2.0.0
+obj2mjcf
 opencv-contrib-python-headless
 plyfile
 typing_extensions==4.10.0

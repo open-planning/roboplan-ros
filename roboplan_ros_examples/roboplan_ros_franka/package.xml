@@ -19,7 +19,11 @@
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
   <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend condition="$ROS_DISTRO != humble">parallel_gripper_controller</exec_depend>
   <exec_depend>topic_tools</exec_depend>
+
+  <!-- TODO: Not yet released into ROS 2 Lyrical/Rolling, update when it is. -->
+  <exec_depend condition="$ROS_DISTRO != lyrical and $ROS_DISTRO != rolling">mujoco_ros2_control</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

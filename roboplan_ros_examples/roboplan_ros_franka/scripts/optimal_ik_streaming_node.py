@@ -19,12 +19,14 @@ import threading
 import xacro
 import numpy as np
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_path
 
 import rclpy
+from rclpy.duration import Duration
 from rclpy.node import Node
 from rclpy.executors import SingleThreadedExecutor
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from visualization_msgs.msg import MarkerArray
 from interactive_markers import InteractiveMarkerServer, MenuHandler
 from std_srvs.srv import Trigger
 
@@ -37,12 +39,20 @@ from roboplan.optimal_ik import (
     FrameTaskOptions,
     Oink,
     PositionLimit,
+    SelfCollisionBarrier,
+    SelfCollisionBarrierOptions,
     VelocityLimit,
 )
 from roboplan_ros.visualization import RoboplanIKMarker
 from roboplan_ros.cpp import buildConversionMap, fromJointState, se3ToPose
 from roboplan_ros_examples import run_node, spin_executor
-from roboplan_ros_examples.utils import JointStateSubscriber
+from roboplan_ros_examples.utils import (
+    LATCHED_QOS,
+    JointStateSubscriber,
+    ParallelGripperClient,
+    add_box_obstacles,
+    obstacle_marker_array,
+)
 
 
 class CartesianServoNode(Node):
@@ -72,6 +82,14 @@ class CartesianServoNode(Node):
             "joint_command_topic", "/fr3_arm_controller/joint_trajectory"
         )
 
+        # Gripper params, for commanding a parallel gripper controller
+        self.declare_parameter(
+            "gripper_action_name", "/fr3_gripper_controller/gripper_cmd"
+        )
+        self.declare_parameter("gripper_joint", "fr3_finger_joint1")
+        self.declare_parameter("gripper_open_position", 0.04)
+        self.declare_parameter("gripper_closed_position", 0.0)
+
         # IK params
         self.declare_parameter("joint_group", "fr3_arm")
         self.declare_parameter("base_link", "fr3_link0")
@@ -84,6 +102,13 @@ class CartesianServoNode(Node):
         self.declare_parameter("control_freq", 100.0)
         self.declare_parameter("reference_filter_tau", 0.1)
         self.declare_parameter("command_duration_ms", 100)
+
+        # Collision related parameters.
+        self.declare_parameter("obstacles_config_file", "")
+        self.declare_parameter("avoid_collisions", False)
+        self.declare_parameter("n_collision_pairs", 5)
+        self.declare_parameter("min_collision_distance", 0.02)
+        self.declare_parameter("safe_displacement_gain", 0.01)
 
         # Get parameter values
         robot_description_package = self.get_parameter(
@@ -99,6 +124,13 @@ class CartesianServoNode(Node):
         joint_state_topic = self.get_parameter("joint_state_topic").value
         joint_command_topic = self.get_parameter("joint_command_topic").value
 
+        gripper_action_name = self.get_parameter("gripper_action_name").value
+        gripper_joint = self.get_parameter("gripper_joint").value
+        gripper_open_position = self.get_parameter("gripper_open_position").value
+        gripper_closed_position = self.get_parameter("gripper_closed_position").value
+
+        avoid_collisions = self.get_parameter("avoid_collisions").value
+
         self._joint_group = self.get_parameter("joint_group").value
         self._base_link = self.get_parameter("base_link").value
         self._tip_link = self.get_parameter("tip_link").value
@@ -109,13 +141,16 @@ class CartesianServoNode(Node):
         orientation_cost = self.get_parameter("orientation_cost").value
         control_freq = self.get_parameter("control_freq").value
         self._reference_filter_tau = self.get_parameter("reference_filter_tau").value
-        self._command_duration_ms = self.get_parameter("command_duration_ms").value
+        command_duration_ms = self.get_parameter("command_duration_ms").value
+        self._command_duration_msg = Duration(
+            seconds=command_duration_ms / 1000.0
+        ).to_msg()
 
         # Control loop time step for Cartesian tracking
         self._dt = 1.0 / control_freq
 
         # Get robot description files and setup the scene
-        pkg_share_dir = get_package_share_directory(robot_description_package)
+        pkg_share_dir = get_package_share_path(robot_description_package).as_posix()
         models_dir = os.path.join(pkg_share_dir, robot_descriptions_model_path)
         urdf_xml = xacro.process_file(os.path.join(models_dir, urdf_filename)).toxml()
         srdf_xml = xacro.process_file(os.path.join(models_dir, srdf_filename)).toxml()
@@ -128,6 +163,15 @@ class CartesianServoNode(Node):
             package_paths=package_paths,
             yaml_config_path=yaml_config_path,
         )
+
+        # Optionally add obstacles (e.g., a tabletop) to the scene.
+        self._obstacles = []
+        obstacles_config_file = self.get_parameter("obstacles_config_file").value
+        if obstacles_config_file:
+            self._obstacles = add_box_obstacles(self._scene, obstacles_config_file)
+            self.get_logger().info(
+                f"Added {len(self._obstacles)} obstacle(s) to the scene."
+            )
 
         # Start paused so the robot doesn't move until the user is ready and the
         # iMarker has been initialized. Otherwise danger.
@@ -172,14 +216,14 @@ class CartesianServoNode(Node):
         # end-effector tracking — only uses redundant degrees of freedom.
         q_home = np.array(self._scene.getCurrentJointPositions())
         joint_weights = np.full(self._num_variables, 0.05)
-        config_task = ConfigurationTask(
+        self._config_task = ConfigurationTask(
             self._oink,
             q_home[self._oink.q_indices],
             joint_weights,
             ConfigurationTaskOptions(task_gain=1.0, lm_damping=0.0, priority=2),
         )
 
-        self._tasks = [self._frame_task, config_task]
+        self._tasks = [self._frame_task, self._config_task]
 
         # Constraints: joint position and velocity limits
         position_limit = PositionLimit(self._oink, gain=1.0)
@@ -191,7 +235,19 @@ class CartesianServoNode(Node):
         )
         velocity_limit = VelocityLimit(self._oink, self._dt, v_max)
         self._constraints = [position_limit, velocity_limit]
+
         self._barriers = []
+        if avoid_collisions:
+            barrier_options = SelfCollisionBarrierOptions(
+                n_collision_pairs=self.get_parameter("n_collision_pairs").value,
+                d_min=self.get_parameter("min_collision_distance").value,
+                safe_displacement_gain=self.get_parameter(
+                    "safe_displacement_gain"
+                ).value,
+            )
+            self._barriers.append(
+                SelfCollisionBarrier(self._oink, self._scene, self._dt, barrier_options)
+            )
 
         # Thread-safe access to scene and target
         self._lock = threading.Lock()
@@ -238,6 +294,8 @@ class CartesianServoNode(Node):
         menu.insert("Start", callback=self._on_start_menu)
         menu.insert("Pause", callback=self._on_pause_menu)
         menu.insert("Reset", callback=self._on_reset_menu)
+        menu.insert("Open Gripper", callback=self._on_open_gripper_menu)
+        menu.insert("Close Gripper", callback=self._on_close_gripper_menu)
         menu.apply(self._ik_server, "ik_target")
         self._ik_server.applyChanges()
 
@@ -251,11 +309,31 @@ class CartesianServoNode(Node):
         # Joint command publisher
         self._cmd_pub = self.create_publisher(JointTrajectory, joint_command_topic, 10)
 
-        # Reset service
+        # Publish any scene obstacles as markers, exactly once
+        self._obstacle_marker_pub = self.create_publisher(
+            MarkerArray, "roboplan_scene/obstacles", LATCHED_QOS
+        )
+        if self._obstacles:
+            self._obstacle_marker_pub.publish(obstacle_marker_array(self._obstacles))
+
+        # Setup an action client for commanding a parallel gripper controller
+        self._gripper_client = ParallelGripperClient(
+            self,
+            gripper_action_name,
+            gripper_joint,
+            gripper_open_position,
+            gripper_closed_position,
+        )
+
+        # Trigger services
         self.create_service(Trigger, "~/reset", self._on_reset)
+        self.create_service(Trigger, "~/open_gripper", self._on_open_gripper)
+        self.create_service(Trigger, "~/close_gripper", self._on_close_gripper)
 
         # Start control loop
         self._running = True
+        self._tick = threading.Event()
+        self._tick_timer = self.create_timer(self._dt, self._tick.set)
         self._control_thread = threading.Thread(target=self._control_loop, daemon=True)
         self._control_thread.start()
 
@@ -274,7 +352,11 @@ class CartesianServoNode(Node):
     def _control_loop(self):
         """Continuously run one OInK step per tick while not paused"""
         while self._running:
-            loop_start = time.time()
+            # The wall-clock timeout only bounds how long shutdown (or a
+            # paused sim, which stops the tick timer) can stall this thread.
+            if not self._tick.wait(timeout=0.25):
+                continue
+            self._tick.clear()
 
             if not self._paused:
                 with self._lock:
@@ -304,8 +386,15 @@ class CartesianServoNode(Node):
                             f"IK solver failed: {e}", throttle_duration_sec=1.0
                         )
 
-                    self._delta_q_full[:] = 0.0
                     self._delta_q_full[self._oink.v_indices] = self._delta_q
+                    if self._barriers:
+                        self._oink.enforceBarriers(
+                            self._scene,
+                            self._barriers,
+                            self._delta_q_full,
+                            tolerance=0.0,
+                        )
+
                     q_current = self._scene.integrate(q_current, self._delta_q_full)
 
                     self._scene.setJointPositions(q_current)
@@ -314,15 +403,13 @@ class CartesianServoNode(Node):
 
                 self._publish_joint_command(q_current)
 
-            elapsed = time.time() - loop_start
-            time.sleep(max(0, self._dt - elapsed))
-
     def _publish_joint_command(self, q):
         """Publish a single-point JointTrajectory to command the robot."""
         msg = JointTrajectory()
         msg.joint_names = list(self._joint_names)
         point = JointTrajectoryPoint()
         point.positions = q[self._q_indices].tolist()
+        point.time_from_start = self._command_duration_msg
         msg.points = [point]
         self._cmd_pub.publish(msg)
 
@@ -339,6 +426,22 @@ class CartesianServoNode(Node):
         self._reset()
         self.get_logger().info("Reset marker to current hardware state.")
 
+    def _on_open_gripper_menu(self, _):
+        _, msg = self._gripper_client.open()
+        self.get_logger().info(msg)
+
+    def _on_close_gripper_menu(self, _):
+        _, msg = self._gripper_client.close()
+        self.get_logger().info(msg)
+
+    def _on_open_gripper(self, _, response):
+        response.success, response.message = self._gripper_client.open()
+        return response
+
+    def _on_close_gripper(self, _, response):
+        response.success, response.message = self._gripper_client.close()
+        return response
+
     def _on_reset(self, _, response):
         self._reset()
         response.success = True
@@ -354,13 +457,20 @@ class CartesianServoNode(Node):
         # Pause it
         self._on_pause_menu(None)
 
+        # Clamp to the joint limits, since (simulated) hardware can report
+        # positions slightly outside them.
         joint_config = fromJointState(
             self._js_subscriber.last_joint_state, self._scene, self._conversion_map
         )
-        self._latest_joint_positions = joint_config.positions
+        self._latest_joint_positions = self._scene.clampToValidConfiguration(
+            joint_config.positions
+        )
 
         with self._lock:
             self._scene.setJointPositions(self._latest_joint_positions)
+            self._config_task.setTargetConfiguration(
+                self._latest_joint_positions[self._oink.q_indices]
+            )
             self._scene.forwardKinematics(self._latest_joint_positions, self._tip_link)
             initial_pose = self._scene.forwardKinematics(
                 self._latest_joint_positions, self._tip_link, self._base_link
@@ -377,6 +487,7 @@ class CartesianServoNode(Node):
     def destroy_node(self):
         # Stop the control loop first so it releases the lock
         self._running = False
+        self._tick.set()
         self._control_thread.join(timeout=1.0)
 
         # Shut down executors and join their threads
