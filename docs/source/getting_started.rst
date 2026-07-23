@@ -28,7 +28,7 @@ For isolated development work we recommend the `Pixi <https://pixi.sh>`_ package
 ROS and all required dependencies are installable through `conda` and `Robostack <https://robostack.github.io>`_.
 
 Different versions of ROS (humble, jazzy, kilted, lyrical, and rolling) are supported with pixi environments.
-The build relies on the `pixi-build-ros <https://prefix-dev.github.io/pixi-build-backends/backends/pixi-build-ros/#env>`_ backend to manage ROS dependencies from the workspace.
+The environments are available for Linux, macOS, and Windows.
 
 First, install Pixi using `these instructions <https://pixi.sh/latest/#installation>`_.
 
