@@ -52,7 +52,15 @@ install(TARGETS _cpp_ext LIBRARY DESTINATION "${PYTHON_DESTINATION}/roboplan_ros
 # Older nanobind versions (which can come from rosdep on certain distros) do not provide
 # nanobind_add_stub, so skip generation rather than failing the configure step.
 # See https://github.com/ros/rosdistro/pull/49894 for more details.
-option(GENERATE_PYTHON_STUBS "Generate the Python stubs associated with the bindings" ON)
+# Default OFF on Windows: stub generation imports the extension from the build
+# tree, where the DLLs it depends on are not yet on the loader search path.
+# The committed stubs are generated on Unix.
+if(WIN32)
+  set(generate_stubs_default OFF)
+else()
+  set(generate_stubs_default ON)
+endif()
+option(GENERATE_PYTHON_STUBS "Generate the Python stubs associated with the bindings" ${generate_stubs_default})
 if(GENERATE_PYTHON_STUBS AND NOT COMMAND nanobind_add_stub)
   message(WARNING
     "Skipping Python stub generation: the installed nanobind version does not "

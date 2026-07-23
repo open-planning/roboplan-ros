@@ -14,6 +14,13 @@ if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
+# macOS: strip unused dylibs (like GNU --as-needed on Linux) so the Python
+# generator libraries exported by the ROS interface targets stay out of the
+# dylib closure; they reference Python symbols plain C++ binaries cannot load.
+if(APPLE)
+  add_link_options(LINKER:-dead_strip_dylibs)
+endif()
+
 find_package(ament_cmake REQUIRED)
 find_package(roboplan REQUIRED)
 find_package(Eigen3 REQUIRED)
