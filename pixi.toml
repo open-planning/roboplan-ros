@@ -103,9 +103,6 @@ scripts = ['install\setup.bat']
 [target.win.activation.env]
 # Prioritize pixi installed packages, which live under Library on Windows
 CMAKE_PREFIX_PATH = '%CONDA_PREFIX%\Library;%CMAKE_PREFIX_PATH%'
-# Restore PATH-based DLL resolution so Python extensions can find the
-# workspace and ROS DLLs (standard RoboStack guidance for Windows).
-CONDA_DLL_SEARCH_MODIFICATION_ENABLE = "1"
 
 # Define one environment per ROS 2 distro.
 [environments]
