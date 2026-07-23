@@ -7,3 +7,6 @@ build:
     - sccache
   event-handlers:
     - console_direct+
+test:
+  event-handlers:
+    - console_direct+

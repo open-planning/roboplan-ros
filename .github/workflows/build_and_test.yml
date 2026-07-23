@@ -55,26 +55,14 @@ jobs:
           cache: true
           cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
           environments: ${{ matrix.ros_distro }}
-      - name: Build
+      - name: Build and test
         env:
           SCCACHE_DIR: ${{ github.workspace }}/.sccache
         run: |
           pixi run -e ${{ matrix.ros_distro }} setup-colcon
           pixi run -e ${{ matrix.ros_distro }} build
-      - name: Test
-        run: pixi run -e ${{ matrix.ros_distro }} test
-      # Show verbose results even when the test step itself errors out.
-      - name: Test results
-        if: always()
-        run: pixi run -e ${{ matrix.ros_distro }} test-result
-      - name: Upload test logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-logs-${{ matrix.os }}-${{ matrix.ros_distro }}
-          path: |
-            log/latest_test/
-            build/*/Testing/Temporary/LastTest.log
+          pixi run -e ${{ matrix.ros_distro }} test
+          pixi run -e ${{ matrix.ros_distro }} test-result
       - name: Check bindings stub files
         if: runner.os == 'Linux'
         run: |
