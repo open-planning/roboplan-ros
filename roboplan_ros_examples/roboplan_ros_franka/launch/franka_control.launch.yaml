@@ -67,19 +67,19 @@ launch:
       pkg: controller_manager
       exec: spawner
       output: screen
-      args: "joint_state_broadcaster --controller-manager-timeout 300"
+      args: "joint_state_broadcaster --controller-manager-timeout 300 --param-file $(find-pkg-share roboplan_ros_franka)/config/ros2_controllers.yaml"
 
   - node:
       pkg: controller_manager
       exec: spawner
       output: screen
-      args: "fr3_arm_controller --controller-manager-timeout 300"
+      args: "fr3_arm_controller --controller-manager-timeout 300 --param-file $(find-pkg-share roboplan_ros_franka)/config/ros2_controllers.yaml"
 
   - node:
       pkg: controller_manager
       exec: spawner
       output: screen
-      args: "fr3_gripper_controller --controller-manager-timeout 300"
+      args: "fr3_gripper_controller --controller-manager-timeout 300 --param-file $(find-pkg-share roboplan_ros_franka)/config/ros2_controllers.yaml"
 
   - node:
       pkg: rviz2

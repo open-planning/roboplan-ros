@@ -1,8 +1,24 @@
 cmake_minimum_required(VERSION 3.22)
 project(roboplan_ros_visualization)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+  # clang-cl remaps plain -Wall to MSVC /Wall (clang's -Weverything); use the
+  # /clang: prefix to pass the GNU-style flags through unchanged.
+  add_compile_options(/clang:-Wall /clang:-Wextra /clang:-Wpedantic)
+elseif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# Windows: auto-export all symbols so DLLs get import libraries.
+if(WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
+# macOS: strip unused dylibs (like GNU --as-needed on Linux) so the Python
+# generator libraries exported by the ROS interface targets stay out of the
+# dylib closure; they reference Python symbols plain C++ binaries cannot load.
+if(APPLE)
+  add_link_options(LINKER:-dead_strip_dylibs)
 endif()
 
 find_package(ament_cmake REQUIRED)

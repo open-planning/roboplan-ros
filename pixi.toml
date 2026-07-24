@@ -1,8 +1,11 @@
 [workspace]
-authors = ["Erik Holum <eholum@gmail.com>"]
+authors = [
+    "Erik Holum <eholum@gmail.com>",
+    "Sebastian Castro <sebas.a.castro@gmail.com>"
+]
 channels = ["conda-forge"]
 name = "roboplan-ros"
-platforms = ["linux-64", "linux-aarch64"]
+platforms = ["linux-64", "linux-aarch64", "osx-arm64", "win-64"]
 version = "0.5.1"
 
 [tasks]
@@ -12,9 +15,26 @@ colcon mixin update default
 """ }
 build = { cmd = ["colcon", "build"] }
 build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
-# TODO: Stop skipping the test_import_pinocchio when RoboStack is caught up on Pinocchio >= 4.0.0
-test = { cmd = ["colcon", "test"], env = { PYTEST_ADDOPTS = "-k 'not test_import_pinocchio'" } }
+test = { cmd = ["colcon", "test"] }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
+
+# Use the mold linker on Linux. Added here rather than in colcon_defaults.yaml,
+# since the defaults file applies to all platforms.
+[target.linux.tasks]
+build = { cmd = ["colcon", "build", "--mixin", "mold"] }
+build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--mixin", "mold"] }
+
+# Use the MSVC-compatible clang driver: conda-forge packages are built with
+# MSVC and export MSVC-style flags that the GNU-style clang++ driver rejects.
+[target.win.tasks]
+build = { cmd = [
+  "colcon", "build", "--cmake-args",
+  "-GNinja",
+  "-DCMAKE_C_COMPILER=clang-cl",
+  "-DCMAKE_CXX_COMPILER=clang-cl",
+  "-DCMAKE_LINKER=lld-link",
+  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+] }
 
 [dependencies]
 # Build deps
@@ -24,8 +44,7 @@ cmake = ">=3.30.5,<4"
 clangxx = ">=19.1.7,<20"
 lld = ">=19.1.2,<20"
 ninja = ">=1.13.1,<2"
-mold = ">=2.40.2,<3"
-sccache = ">=0.10.0,<0.11"
+sccache = ">=0.16.0,<0.17"
 
 # Common roboplan base deps
 python = ">=3.11,<3.15"
@@ -42,12 +61,24 @@ viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
 pycollada = ">=0.9.2, <0.10"
 nodeenv = ">=1.10.0, <2"
 
-# For ROS, should be available across distros
-lttng-ust = ">=2.13.9,<3"
-
 # This fails with colcon test on newer pytest versions
 # due to failures loading ROS launch testing plugins.
 pytest = "<9.1.0"
+
+[target.linux.dependencies]
+mold = ">=2.40.2,<3"
+# For ROS tracing, Linux-only
+lttng-ust = ">=2.13.9,<3"
+
+[target.win.dependencies]
+# Needed to lookup example model resources on non-POSIX platforms.
+dlfcn-win32 = ">=1.4.2,<2"
+# The MSVC STL on current GitHub Windows runners (Visual Studio 2026) requires
+# clang >= 20, so use a newer LLVM toolchain than on Linux.
+clangxx = ">=22.1.8,<23"
+compiler-rt = ">=22.1.8,<23"
+lld = ">=22.1.8,<23"
+llvm-tools = ">=22.1.8,<23"
 
 [pypi-dependencies]
 obj2mjcf = ">=0.0.25, <0.0.26"
@@ -55,14 +86,24 @@ obj2mjcf = ">=0.0.25, <0.0.26"
 [activation]
 scripts = ["install/setup.sh"]
 
-[activation.env]
+[target.unix.activation.env]
 # Prioritize pixi installed packages
 CMAKE_PREFIX_PATH = "${CONDA_PREFIX}:${CMAKE_PREFIX_PATH}"
 # Ensures the linker knows where to look for conda managed packages
 LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LIBRARY_PATH}"
 LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
+
+[target.linux.activation.env]
 CXXFLAGS = "-fuse-ld=mold"
+
+# Windows activation scripts expand %VAR% instead of $VAR.
+[target.win.activation]
+scripts = ['install\setup.bat']
+
+[target.win.activation.env]
+# Prioritize pixi installed packages, which live under Library on Windows
+CMAKE_PREFIX_PATH = '%CONDA_PREFIX%\Library;%CMAKE_PREFIX_PATH%'
 
 # Define one environment per ROS 2 distro.
 [environments]
@@ -83,16 +124,13 @@ ros-rolling-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
 ros-rolling-builtin-interfaces = "*"
-ros-rolling-coal = "*"
 ros-rolling-console-bridge-vendor = "*"
 ros-rolling-controller-manager = "*"
-ros-rolling-eigenpy = "*"
 ros-rolling-geometry-msgs = "*"
 ros-rolling-interactive-markers = "*"
 ros-rolling-joint-state-broadcaster = "*"
 ros-rolling-joint-trajectory-controller = "*"
 ros-rolling-parallel-gripper-controller = "*"
-ros-rolling-pinocchio = "*"
 ros-rolling-robot-state-publisher = "*"
 ros-rolling-ros2controlcli = "*"
 ros-rolling-rviz2 = "*"
@@ -104,6 +142,9 @@ ros-rolling-trajectory-msgs = "*"
 ros-rolling-urdfdom = "*"
 ros-rolling-visualization-msgs = "*"
 ros-rolling-xacro = "*"
+
+# Pinocchio from conda-forge, since RoboStack does not build it for win-64
+pinocchio = ">=4.1.0,<5"
 
 [feature.rolling.activation.env]
 ROS_DISTRO = "rolling"
@@ -119,16 +160,13 @@ ros-lyrical-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
 ros-lyrical-builtin-interfaces = "*"
-ros-lyrical-coal = "*"
 ros-lyrical-console-bridge-vendor = "*"
 ros-lyrical-controller-manager = "*"
-ros-lyrical-eigenpy = "*"
 ros-lyrical-geometry-msgs = "*"
 ros-lyrical-interactive-markers = "*"
 ros-lyrical-joint-state-broadcaster = "*"
 ros-lyrical-joint-trajectory-controller = "*"
 ros-lyrical-parallel-gripper-controller = "*"
-ros-lyrical-pinocchio = "*"
 ros-lyrical-robot-state-publisher = "*"
 ros-lyrical-ros2controlcli = "*"
 ros-lyrical-rviz2 = "*"
@@ -140,6 +178,9 @@ ros-lyrical-trajectory-msgs = "*"
 ros-lyrical-urdfdom = "*"
 ros-lyrical-visualization-msgs = "*"
 ros-lyrical-xacro = "*"
+
+# Pinocchio from conda-forge, since RoboStack does not build it for win-64
+pinocchio = ">=4.1.0,<5"
 
 [feature.lyrical.activation.env]
 ROS_DISTRO = "lyrical"
@@ -155,15 +196,12 @@ ros-kilted-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
 ros-kilted-builtin-interfaces = "*"
-ros-kilted-coal = "*"
 ros-kilted-console-bridge-vendor = "*"
 ros-kilted-controller-manager = "*"
-ros-kilted-eigenpy = "*"
 ros-kilted-geometry-msgs = "*"
 ros-kilted-interactive-markers = "*"
 ros-kilted-joint-state-broadcaster = "*"
 ros-kilted-joint-trajectory-controller = "*"
-ros-kilted-pinocchio = "*"
 ros-kilted-robot-state-publisher = "*"
 ros-kilted-ros2controlcli = "*"
 ros-kilted-rviz2 = "*"
@@ -179,6 +217,9 @@ ros-kilted-visualization-msgs = "*"
 ros-kilted-xacro = "*"
 ros-kilted-yaml-cpp-vendor = "*"
 
+# Pinocchio from conda-forge, since RoboStack does not build it for win-64
+pinocchio = ">=4.1.0,<5"
+
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
 
@@ -193,17 +234,13 @@ ros-jazzy-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
 ros-jazzy-builtin-interfaces = "*"
-ros-jazzy-coal = "*"
 ros-jazzy-console-bridge-vendor = "*"
 ros-jazzy-controller-manager = "*"
-ros-jazzy-eigenpy = "*"
 ros-jazzy-geometry-msgs = "*"
 ros-jazzy-interactive-markers = "*"
 ros-jazzy-joint-state-broadcaster = "*"
 ros-jazzy-joint-trajectory-controller = "*"
-ros-jazzy-mujoco-ros2-control = "*"
 ros-jazzy-parallel-gripper-controller = "*"
-ros-jazzy-pinocchio = "*"
 ros-jazzy-robot-state-publisher = "*"
 ros-jazzy-ros2controlcli = "*"
 ros-jazzy-rviz2 = "*"
@@ -217,6 +254,13 @@ ros-jazzy-urdfdom = "*"
 ros-jazzy-visualization-msgs = "*"
 ros-jazzy-xacro = "*"
 ros-jazzy-yaml-cpp-vendor = "*"
+
+# Pinocchio from conda-forge, since RoboStack does not build it for win-64
+pinocchio = ">=4.1.0,<5"
+
+# RoboStack only builds mujoco_ros2_control for Linux
+[feature.jazzy.target.linux.dependencies]
+ros-jazzy-mujoco-ros2-control = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
@@ -232,15 +276,12 @@ ros-humble-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
 ros-humble-builtin-interfaces = "*"
-ros-humble-coal = "*"
 ros-humble-console-bridge-vendor = "*"
 ros-humble-controller-manager = "*"
-ros-humble-eigenpy = "*"
 ros-humble-geometry-msgs = "*"
 ros-humble-interactive-markers = "*"
 ros-humble-joint-state-broadcaster = "*"
 ros-humble-joint-trajectory-controller = "*"
-ros-humble-pinocchio = "*"
 ros-humble-robot-state-publisher = "*"
 ros-humble-ros2controlcli = "*"
 ros-humble-rviz2 = "*"
@@ -254,6 +295,10 @@ ros-humble-urdfdom = "*"
 ros-humble-visualization-msgs = "*"
 ros-humble-xacro = "*"
 ros-humble-yaml-cpp-vendor = "*"
+
+# Pinocchio from conda-forge, since RoboStack does not build it for win-64.
+# Humble's boost pin limits Pinocchio to 4.0.0, unlike the newer distros.
+pinocchio = ">=4.0.0,<5"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"

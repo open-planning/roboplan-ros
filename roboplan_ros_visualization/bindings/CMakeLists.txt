@@ -38,6 +38,7 @@ target_link_libraries(_visualization_ext PRIVATE
   ${rosidl_generator_cpp_LIBRARIES}
   tl_expected::tl_expected
 )
+
 # Manually install rather than rely on ament python packaging to match core roboplan's
 # standard for ROS bindings. This will put bindings into `roboplan_ros.<package>`.
 ament_get_python_install_dir(_ament_py_dir)
@@ -51,11 +52,32 @@ install(TARGETS _visualization_ext
   LIBRARY DESTINATION "${PYTHON_DESTINATION}/roboplan_ros/visualization"
 )
 
+# Ensure the extension can find workspace dylibs via @rpath on macOS, as it seems that
+# SIP will strip DYLD_LIBRARY_PATH from subprocesses, which will break stub generation.
+if(APPLE)
+  file(RELATIVE_PATH _ext_to_lib
+    "${CMAKE_INSTALL_PREFIX}/${PYTHON_DESTINATION}/roboplan_ros/visualization"
+    "${CMAKE_INSTALL_PREFIX}/lib"
+  )
+  set_target_properties(_visualization_ext PROPERTIES
+    INSTALL_RPATH "@loader_path/${_ext_to_lib}"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+  )
+endif()
+
 # Generate Python stub files from the bindings.
 # Older nanobind versions (which can come from rosdep on certain distros) do not provide
 # nanobind_add_stub, so skip generation rather than failing the configure step.
 # See https://github.com/ros/rosdistro/pull/49894 for more details.
-option(GENERATE_PYTHON_STUBS "Generate the Python stubs associated with the bindings" ON)
+# Default OFF on Windows: stub generation imports the extension from the build
+# tree, where the DLLs it depends on are not yet on the loader search path.
+# The committed stubs are generated on Unix.
+if(WIN32)
+  set(generate_stubs_default OFF)
+else()
+  set(generate_stubs_default ON)
+endif()
+option(GENERATE_PYTHON_STUBS "Generate the Python stubs associated with the bindings" ${generate_stubs_default})
 if(GENERATE_PYTHON_STUBS AND NOT COMMAND nanobind_add_stub)
   message(WARNING
     "Skipping Python stub generation: the installed nanobind version does not "
