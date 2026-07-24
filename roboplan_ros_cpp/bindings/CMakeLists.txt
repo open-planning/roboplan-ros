@@ -48,6 +48,19 @@ else()
 endif()
 install(TARGETS _cpp_ext LIBRARY DESTINATION "${PYTHON_DESTINATION}/roboplan_ros/cpp")
 
+# Ensure the extension can find workspace dylibs via @rpath on macOS, as it seems that
+# SIP will strip DYLD_LIBRARY_PATH from subprocesses, which will break stub generation.
+if(APPLE)
+  file(RELATIVE_PATH _ext_to_lib
+    "${CMAKE_INSTALL_PREFIX}/${PYTHON_DESTINATION}/roboplan_ros/cpp"
+    "${CMAKE_INSTALL_PREFIX}/lib"
+  )
+  set_target_properties(_cpp_ext PROPERTIES
+    INSTALL_RPATH "@loader_path/${_ext_to_lib}"
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+  )
+endif()
+
 # Generate Python stub files from the bindings.
 # Older nanobind versions (which can come from rosdep on certain distros) do not provide
 # nanobind_add_stub, so skip generation rather than failing the configure step.
