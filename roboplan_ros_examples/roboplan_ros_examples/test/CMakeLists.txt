@@ -1,0 +1,2 @@
+find_package(ament_cmake_pytest REQUIRED)
+ament_add_pytest_test(import_ros_bindings_test import_ros_bindings_test.py TIMEOUT 300)
