@@ -10,7 +10,6 @@ Refer to the [full documentation](https://roboplan-ros.readthedocs.io) for more 
 
 The main folders found in this repo are as follows.
 
-- `roboplan` : Upstream library as a submodule for development and testing.
 - `roboplan_ros_cpp` : C++ based ROS 2 functions for RoboPlan.
 - `roboplan_ros_py` : Python based ROS 2 functions for RoboPlan.
 - `roboplan_ros_visualization` : Tools for visualizing and interacting with RoboPlan with ROS 2 infrastructure.

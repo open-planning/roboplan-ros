@@ -40,8 +40,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - name: Cache sccache
         uses: actions/cache@v4
         with:
@@ -59,7 +57,7 @@ jobs:
         env:
           SCCACHE_DIR: ${{ github.workspace }}/.sccache
         run: |
-          pixi run -e ${{ matrix.ros_distro }} setup-colcon
+          pixi run -e ${{ matrix.ros_distro }} setup
           pixi run -e ${{ matrix.ros_distro }} build
           pixi run -e ${{ matrix.ros_distro }} test
           pixi run -e ${{ matrix.ros_distro }} test-result
@@ -90,8 +88,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
       - name: Docker metadata
         id: meta
         uses: docker/metadata-action@v5
