@@ -2,8 +2,8 @@
 Changelog for package roboplan_ros_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.0 (2026-07-31)
+------------------
 * Support macOS and Windows through Pixi (`#58 <https://github.com/open-planning/roboplan-ros/issues/58>`_)
 * Add mujoco_ros2_control option and gripper open/close to examples (`#57 <https://github.com/open-planning/roboplan-ros/issues/57>`_)
 * Contributors: Sebastian Castro, Erik Holum
