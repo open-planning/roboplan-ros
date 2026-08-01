@@ -30,11 +30,18 @@ RUN pip3 install -r /tmp/ros_python_requirements.txt
 RUN mkdir -p /workspace/roboplan_ws/src/roboplan_ros
 WORKDIR /workspace/roboplan_ws
 
+# Clone the RoboPlan repo to build it from source.
+# This can later be replaced with binaries, or at least have two separate Docker images.
+COPY ROBOPLAN_VERSION src
+RUN cd src \
+    && git clone https://github.com/open-planning/roboplan.git \
+    && git -C roboplan checkout "$(cat ROBOPLAN_VERSION)"
+
 # Copy package manifests for installing rosdeps
 COPY --from=package-manifests /roboplan_ros ./src/roboplan_ros
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
     && apt update -y \
-    && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
+    && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y --skip-keys proxsuite
 
 # Copy in remaining source and build
 COPY . src/roboplan_ros

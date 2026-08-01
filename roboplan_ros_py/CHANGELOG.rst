@@ -2,6 +2,9 @@
 Changelog for package roboplan_ros_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.0 (2026-07-31)
+------------------
+
 0.5.1 (2026-07-13)
 ------------------
 * Bumping RoboPlan, dependencies, and no more pixi-build-ros (`#42 <https://github.com/open-planning/roboplan-ros/issues/42>`_)

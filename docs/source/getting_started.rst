@@ -1,11 +1,11 @@
 Getting Started
 ===============
 
-First, clone this repo *including submodules*.
+First, clone this repo.
 
 ::
 
-    git clone --recursive https://github.com/open-planning/roboplan-ros.git
+    git clone https://github.com/open-planning/roboplan-ros.git
     cd roboplan-ros
 
 ---
@@ -39,8 +39,8 @@ Once set up, you can run the ``pixi`` tasks as follows.
     # Install the frozen environment
     pixi install -e jazzy --frozen
 
-    # Setup the environment
-    pixi run -e jazzy setup-colcon
+    # Setup the environment (this clones the roboplan repo to the root folder)
+    pixi run -e jazzy setup
 
     # Build (optionally with symlink installs)
     pixi run -e jazzy build
@@ -82,9 +82,6 @@ The examples from the upstream repository should also be available, as well:
 **NOTE:** All ROS distros will share build/install directories by default.
 Be sure to ``rm -rf build/* install/*`` when switching between ROS versions or things will break.
 
-**NOTE:** The ``pixi-build-ros`` backend requires that all ``package.xml`` files be referenced in the ``[dev]`` block of the ``pixi.toml`` file.
-For now, this includes the packages in the ``roboplan`` submodule.
-This could be resolved with `pixi add roboplan-python`, but for now we stick with the source build for development purposes.
 
 ---
 
@@ -121,7 +118,8 @@ Lastly, as a ``colcon`` package, the wrappers can be compiled in any valid ROS 2
 
     mkdir -p ~/roboplan_ws/src
     cd ~/roboplan_ws/src
-    git clone --recursive https://github.com/open-planning/roboplan-ros.git
+    git clone https://github.com/open-planning/roboplan-ros.git
+    git clone --branch 0.6.0 https://github.com/open-planning/roboplan.git
 
 **NOTE:** To compile the bindings you should install nanobind from pip:
 
