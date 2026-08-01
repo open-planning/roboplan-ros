@@ -32,7 +32,10 @@ WORKDIR /workspace/roboplan_ws
 
 # Clone the RoboPlan repo to build it from source.
 # This can later be replaced with binaries, or at least have two separate Docker images.
-RUN git clone --branch 0.6.0 https://github.com/open-planning/roboplan.git src/roboplan
+COPY ROBOPLAN_VERSION src
+RUN cd src \
+    && git clone https://github.com/open-planning/roboplan.git \
+    && git -C roboplan checkout "$(cat ROBOPLAN_VERSION)"
 
 # Copy package manifests for installing rosdeps
 COPY --from=package-manifests /roboplan_ros ./src/roboplan_ros

@@ -11,7 +11,8 @@ version = "0.6.0"
 [tasks]
 # Clones the matching RoboPlan release (if the folder does not exist) and sets up colcon mixins.
 setup = { cmd = """
-git clone --branch 0.6.0 https://github.com/open-planning/roboplan.git || true && \
+git clone https://github.com/open-planning/roboplan.git || true && \
+git -C roboplan checkout "$(cat ROBOPLAN_VERSION)" && \
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
