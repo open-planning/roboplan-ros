@@ -34,7 +34,7 @@ WORKDIR /workspace/roboplan_ws
 COPY --from=package-manifests /roboplan_ros ./src/roboplan_ros
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
     && apt update -y \
-    && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y
+    && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y --skip-keys proxsuite
 
 # Copy in remaining source and build
 COPY . src/roboplan_ros
