@@ -18,4 +18,6 @@ The main folders found in this repo are as follows.
 
 ---
 
-![Interactive inverse kinematics (IK) in RViz with the Franka FR3 arm.](docs/source/media/franka_interactive_ik.gif)
+<img src="docs/source/media/sample_oink.gif" alt="Interactive inverse kinematics (IK) in RViz with the Franka FR3 arm." width="600">
+
+<img src="docs/source/media/sample_rrt_execution.gif" alt="Interactive motion planning in RViz with the Franka FR3 arm." width="600">
