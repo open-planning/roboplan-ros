@@ -2,6 +2,11 @@
 Changelog for package roboplan_ros_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Support macOS and Windows through Pixi (`#58 <https://github.com/open-planning/roboplan-ros/issues/58>`_)
+* Contributors: Sebastian Castro, Erik Holum
+
 0.5.1 (2026-07-13)
 ------------------
 * Add Lyrical and Rolling pixi environments and CI jobs (`#54 <https://github.com/open-planning/roboplan-ros/issues/54>`_)
