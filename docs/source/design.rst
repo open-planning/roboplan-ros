@@ -3,7 +3,7 @@
 Design Philosophy
 =================
 
-We follow the `Design Philosophy <https://roboplan.readthedocs.io/en/latest/design.html>`_ of the core RoboPlan repo
+We follow the `Design Philosophy <https://roboplan.readthedocs.io/en/latest/design/philosophy.html>`_ of the core RoboPlan repo
 (excepting that we have a hard dependency on ROS 2 as a middleware, of course).
 
 Every robot system deployed in the real world has a unique set of requirements and needs.
