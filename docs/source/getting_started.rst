@@ -119,7 +119,7 @@ Lastly, as a ``colcon`` package, the wrappers can be compiled in any valid ROS 2
     mkdir -p ~/roboplan_ws/src
     cd ~/roboplan_ws/src
     git clone https://github.com/open-planning/roboplan-ros.git
-    git clone --branch 0.6.0 https://github.com/open-planning/roboplan.git
+    git clone --branch 0.6.1 https://github.com/open-planning/roboplan.git
 
 **NOTE:** To compile the bindings you should install nanobind from pip:
 
