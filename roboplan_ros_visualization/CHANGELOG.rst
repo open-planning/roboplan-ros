@@ -2,8 +2,8 @@
 Changelog for package roboplan_ros_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.1 (2026-08-20)
+------------------
 * Depend on typing_extensions via rosdep (`#62 <https://github.com/open-planning/roboplan-ros/issues/62>`_)
 * Contributors: Sebastian Castro
 
