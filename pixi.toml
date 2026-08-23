@@ -6,7 +6,7 @@ authors = [
 channels = ["conda-forge"]
 name = "roboplan-ros"
 platforms = ["linux-64", "linux-aarch64", "osx-arm64", "win-64"]
-version = "0.6.0"
+version = "0.6.1"
 
 [tasks]
 # Clones the matching RoboPlan release (if the folder does not exist) and sets up colcon mixins.
