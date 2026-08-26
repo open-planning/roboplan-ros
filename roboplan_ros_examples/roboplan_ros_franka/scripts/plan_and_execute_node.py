@@ -21,6 +21,7 @@ from ament_index_python.packages import get_package_share_path
 import rclpy
 from rclpy.action import ActionClient
 from rclpy.node import Node
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.executors import SingleThreadedExecutor
 from rclpy.qos import (
     QoSProfile,
@@ -352,10 +353,20 @@ class PlanAndExecuteNode(Node):
         self._target_q = None
         self._planned_traj = None
 
-        # Setup Trigger Services
-        self.create_service(Trigger, "~/plan", self._on_plan)
-        self.create_service(Trigger, "~/preview", self._on_preview)
-        self.create_service(Trigger, "~/execute", self._on_execute)
+        # Locks the scene, planners, or planned trajectory.
+        self._lock = threading.Lock()
+
+        # Setup Trigger Services.
+        planning_cbg = MutuallyExclusiveCallbackGroup()
+        self.create_service(
+            Trigger, "~/plan", self._on_plan, callback_group=planning_cbg
+        )
+        self.create_service(
+            Trigger, "~/preview", self._on_preview, callback_group=planning_cbg
+        )
+        self.create_service(
+            Trigger, "~/execute", self._on_execute, callback_group=planning_cbg
+        )
         self.create_service(Trigger, "~/reset", self._on_reset)
         self.create_service(Trigger, "~/open_gripper", self._on_open_gripper)
         self.create_service(Trigger, "~/close_gripper", self._on_close_gripper)
@@ -384,12 +395,14 @@ class PlanAndExecuteNode(Node):
         # Sync with the latest hardware state so that joints outside the
         # planning group (e.g., the gripper fingers) are up to date in the
         # scene, since the IK solution is visualized at the full configuration.
-        self._latest_joint_positions = self._get_hardware_positions()
-        self._scene.setJointPositions(self._latest_joint_positions)
-        self._ik_marker.set_seed_configuration(self._latest_joint_positions)
-        q = self._ik_marker.process_feedback(feedback)
+        with self._lock:
+            self._latest_joint_positions = self._get_hardware_positions()
+            self._scene.setJointPositions(self._latest_joint_positions)
+            self._ik_marker.set_seed_configuration(self._latest_joint_positions)
+            q = self._ik_marker.process_feedback(feedback)
+            if q is not None:
+                self._target_q = q
         if q is not None:
-            self._target_q = q
             self._ik_marker_pub.publish(
                 self._ik_visualizer.markers_from_configuration(q)
             )
@@ -398,95 +411,101 @@ class PlanAndExecuteNode(Node):
         if self._target_q is None:
             return False, "No target set. Move the interactive marker first."
 
-        self._latest_joint_positions = self._get_hardware_positions()
-        self._scene.setJointPositions(self._latest_joint_positions)
+        with self._lock:
+            self._latest_joint_positions = self._get_hardware_positions()
+            self._scene.setJointPositions(self._latest_joint_positions)
 
-        start = JointConfiguration()
-        start.positions = self._latest_joint_positions[self._q_indices]
+            start = JointConfiguration()
+            start.positions = self._latest_joint_positions[self._q_indices]
 
-        goal = JointConfiguration()
-        goal.positions = self._target_q[self._q_indices]
+            goal = JointConfiguration()
+            goal.positions = self._target_q[self._q_indices]
 
-        self.get_logger().info("Planning...")
-        plan_start_time = time.time()
+            self.get_logger().info("Planning...")
+            plan_start_time = time.time()
 
-        try:
+            try:
+                start_time = time.time()
+                path = self._rrt.plan(start, goal)
+                self.get_logger().info(
+                    f"  Finished planning in {time.time() - start_time} seconds."
+                )
+            except RuntimeError as e:
+                self.get_logger().error(str(e))
+                path = None
+
+            if path is None:
+                return False, "Planning failed."
+
+            if self._include_shortcutting:
+                self.get_logger().info("Shortcutting...")
+                start_time = time.time()
+                path = self._shortcutter.shortcut(path)
+                self.get_logger().info(
+                    f"  Finished shortcutting in {time.time() - start_time} seconds."
+                )
+
+            self.get_logger().info("Generating trajectory...")
             start_time = time.time()
-            path = self._rrt.plan(start, goal)
+            self._planned_traj = self._toppra.generate(
+                path,
+                TOPPRAOptions(
+                    self._traj_dt,
+                    mode=SplineFittingMode.Adaptive,
+                    max_adaptive_iterations=5,
+                ),
+            )
+            elapsed = time.time() - start_time
             self.get_logger().info(
-                f"  Finished planning in {time.time() - start_time} seconds."
+                f"  Finished generating trajectory in {elapsed} seconds."
             )
-        except RuntimeError as e:
-            self.get_logger().error(str(e))
-            path = None
 
-        if path is None:
-            return False, "Planning failed."
-
-        if self._include_shortcutting:
-            self.get_logger().info("Shortcutting...")
-            start_time = time.time()
-            path = self._shortcutter.shortcut(path)
             self.get_logger().info(
-                f"  Finished shortcutting in {time.time() - start_time} seconds."
+                f"Total planning time: {time.time() - plan_start_time} seconds."
             )
 
-        self.get_logger().info("Generating trajectory...")
-        start_time = time.time()
-        self._planned_traj = self._toppra.generate(
-            path,
-            TOPPRAOptions(
-                self._traj_dt,
-                mode=SplineFittingMode.Adaptive,
-                max_adaptive_iterations=5,
-            ),
-        )
-        self.get_logger().info(
-            f"  Finished generating trajectory in {time.time() - start_time} seconds."
-        )
-
-        self.get_logger().info(
-            f"Total planning time: {time.time() - plan_start_time} seconds."
-        )
-
-        # Visualize the planned end-effector trajectory.
-        self._planned_path_pub.publish(
-            markerFromJointTrajectory(
-                self._scene,
-                self._planned_traj,
-                [self._tip_link],
-                frame_id="world",
-                ns="planned_trajectory",
-                color=self._planned_path_color,
+            # Visualize the planned end-effector trajectory.
+            self._planned_path_pub.publish(
+                markerFromJointTrajectory(
+                    self._scene,
+                    self._planned_traj,
+                    [self._tip_link],
+                    frame_id="world",
+                    ns="planned_trajectory",
+                    color=self._planned_path_color,
+                )
             )
-        )
 
-        return (
-            True,
-            f"Planned trajectory with {len(self._planned_traj.positions)} points",
-        )
+            return (
+                True,
+                f"Planned trajectory with {len(self._planned_traj.positions)} points",
+            )
 
     def _preview(self):
-        if self._planned_traj is None:
+        with self._lock:
+            traj = self._planned_traj
+        if traj is None:
             return False, "No trajectory to preview. Plan first."
 
         self.get_logger().info("Previewing trajectory...")
         self._player.play(
-            self._planned_traj,
+            traj,
             self._traj_dt,
             on_complete=lambda: self.get_logger().info("Preview complete."),
         )
         return True, "Playback started."
 
     def _execute(self):
-        if self._planned_traj is None:
+        with self._lock:
+            traj = self._planned_traj
+        if traj is None:
             return False, "No trajectory to execute. Plan first."
 
         if not self._execute_client.wait_for_server(timeout_sec=2.0):
             return False, "Action server not available."
 
         goal = FollowJointTrajectory.Goal()
-        goal.trajectory = toJointTrajectory(self._planned_traj)
+        goal.trajectory = toJointTrajectory(traj)
 
         self.get_logger().info("Sending trajectory for execution...")
         future = self._execute_client.send_goal_async(
@@ -523,33 +542,36 @@ class PlanAndExecuteNode(Node):
         if self._js_subscriber.last_joint_state is None:
             raise RuntimeError("No joint states received, cannot reset to hw state.")
 
-        # Reset joint positions to the latest joint state
-        self._latest_joint_positions = self._get_hardware_positions()
+        with self._lock:
+            # Reset joint positions to the latest joint state
+            self._latest_joint_positions = self._get_hardware_positions()
 
-        # Update the IK marker's seed to the current state
-        self._ik_marker.set_seed_configuration(self._latest_joint_positions)
+            # Update the IK marker's seed to the current state
+            self._ik_marker.set_seed_configuration(self._latest_joint_positions)
 
-        # Compute FK for the current state to get the marker pose
-        fk = self._scene.forwardKinematics(
-            self._latest_joint_positions, self._tip_link, self._base_link
-        )
-        pose = se3ToPose(fk)
+            # Compute FK for the current state to get the marker pose
+            fk = self._scene.forwardKinematics(
+                self._latest_joint_positions, self._tip_link, self._base_link
+            )
+            pose = se3ToPose(fk)
 
-        # Update the IK to the current pose
-        self._ik_server.setPose("ik_target", pose)
-        self._ik_server.applyChanges()
-        self._ik_marker_pub.publish(
-            self._ik_visualizer.markers_from_configuration(self._latest_joint_positions)
-        )
+            # Update the IK to the current pose
+            self._ik_server.setPose("ik_target", pose)
+            self._ik_server.applyChanges()
+            self._ik_marker_pub.publish(
+                self._ik_visualizer.markers_from_configuration(
+                    self._latest_joint_positions
+                )
+            )
 
-        # Clear the planned trajectory and target
-        self._target_q = None
-        self._planned_traj = None
-        self._traj_marker_pub.publish(self._traj_visualizer.clear_markers())
-        delete_marker = Marker()
-        delete_marker.header.frame_id = "world"
-        delete_marker.action = Marker.DELETEALL
-        self._planned_path_pub.publish(delete_marker)
+            # Clear the planned trajectory and target
+            self._target_q = None
+            self._planned_traj = None
+            self._traj_marker_pub.publish(self._traj_visualizer.clear_markers())
+            delete_marker = Marker()
+            delete_marker.header.frame_id = "world"
+            delete_marker.action = Marker.DELETEALL
+            self._planned_path_pub.publish(delete_marker)
 
     # Menu callbacks
     def _on_plan_menu(self, feedback):

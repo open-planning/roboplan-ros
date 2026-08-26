@@ -91,7 +91,7 @@ NB_MODULE(_cpp_ext, m) {
   m.def(
       "buildConversionMap",
       [](nb::handle py_scene, nb::handle py_joint_state) {
-        auto scene = nb::cast<roboplan::Scene>(py_scene);
+        const auto& scene = nb::cast<roboplan::Scene&>(py_scene);
         auto joint_state = pyToCppMsg<sensor_msgs::msg::JointState>(py_joint_state);
         return handle_expected(buildConversionMap(scene, joint_state));
       },
@@ -102,7 +102,7 @@ NB_MODULE(_cpp_ext, m) {
       "toJointState",
       [](nb::handle py_config, nb::handle py_scene) {
         auto config = nb::cast<roboplan::JointConfiguration>(py_config);
-        auto scene = nb::cast<roboplan::Scene>(py_scene);
+        const auto& scene = nb::cast<roboplan::Scene&>(py_scene);
         auto result = handle_expected(toJointState(config, scene));
         return cppToPyMsg(result, nb::module_::import_("sensor_msgs.msg").attr("JointState"));
       },
@@ -114,7 +114,7 @@ NB_MODULE(_cpp_ext, m) {
       [](nb::handle py_joint_state, nb::handle py_scene,
          const JointStateConverterMap& conversion_map) {
         auto joint_state = pyToCppMsg<sensor_msgs::msg::JointState>(py_joint_state);
-        auto scene = nb::cast<roboplan::Scene>(py_scene);
+        const auto& scene = nb::cast<roboplan::Scene&>(py_scene);
         return handle_expected(fromJointState(joint_state, scene, conversion_map));
       },
       "py_joint_state"_a, "py_scene"_a, "conversion_map"_a,
