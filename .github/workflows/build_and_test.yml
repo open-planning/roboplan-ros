@@ -1,4 +1,4 @@
-name: build_and_test
+name: CI
 
 on:
   # Run action on certain pull request events
@@ -22,99 +22,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  format:
+    name: Format
+    uses: ./.github/workflows/format.yml
 
-  # Build and test natively with pixi on Linux, macOS, and Windows.
   pixi_build_and_test:
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        ros_distro: [rolling, lyrical, kilted, jazzy, humble]
+    name: Pixi
+    uses: ./.github/workflows/pixi_build_and_test.yml
 
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        # On Windows, this ensures bash stops at the first failing command.
-        shell: bash
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Cache sccache
-        uses: actions/cache@v4
-        with:
-          path: .sccache
-          key: ${{ runner.os }}-${{ matrix.ros_distro }}-sccache-${{ github.head_ref || github.ref_name }}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.ros_distro }}-sccache-main
-            ${{ runner.os }}-${{ matrix.ros_distro }}-sccache
-      - uses: prefix-dev/setup-pixi@v0.10.0
-        with:
-          cache: true
-          cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-          environments: ${{ matrix.ros_distro }}
-      - name: Build and test
-        env:
-          SCCACHE_DIR: ${{ github.workspace }}/.sccache
-        run: |
-          pixi run -e ${{ matrix.ros_distro }} setup
-          pixi run -e ${{ matrix.ros_distro }} build
-          pixi run -e ${{ matrix.ros_distro }} test
-          pixi run -e ${{ matrix.ros_distro }} test-result
-      - name: Check bindings stub files
-        if: runner.os == 'Linux'
-        run: |
-          STUB_PATHS="
-            roboplan_ros_cpp/roboplan_ros_cpp/*.pyi
-            roboplan_ros_visualization/roboplan_ros_visualization/*.pyi
-          "
-          if ! git diff --exit-code --shortstat -- $STUB_PATHS; then
-            echo "::error::The .pyi stub files are out of sync with the source code. Make sure to rebuild the Python bindings with 'pixi run -e ${ROS_DISTRO} build' and commit the changes."
-            echo "Git Diff:"
-            git diff -- $STUB_PATHS
-            exit 1
-          fi
-          echo "✅ .pyi stub files look good!"
-
-  # Build ROS docker images and run tests.
   ros_build_and_test:
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        ros_distro: [humble, jazzy, kilted, lyrical, rolling]
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: roboplan_ros_wrapper
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: .docker/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
-          build-args: |
-            ROS_DISTRO=${{ matrix.ros_distro }}
-          push: false
-          load: true
-          cache-from: type=gha,scope=${{ matrix.ros_distro }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.ros_distro }}
-      - name: Run tests
-        run: |
-          docker run --rm \
-            ${{ steps.meta.outputs.tags }} \
-            bash -c "
-              colcon test && \
-              colcon test-result --verbose
-            "
+    name: ROS
+    uses: ./.github/workflows/ros_build_and_test.yml

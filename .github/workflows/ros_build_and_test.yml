@@ -1,0 +1,48 @@
+name: "ROS Docker Build and Test"
+
+on:
+  workflow_call: {}
+
+jobs:
+  ros_build_and_test:
+    name: ${{ matrix.ros_distro }} - Build, test
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        ros_distro: [humble, jazzy, kilted, lyrical, rolling]
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: roboplan_ros_wrapper
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: .docker/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            ROS_DISTRO=${{ matrix.ros_distro }}
+          push: false
+          load: true
+          cache-from: type=gha,scope=${{ matrix.ros_distro }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.ros_distro }}
+      - name: Run tests
+        run: |
+          docker run --rm \
+            ${{ steps.meta.outputs.tags }} \
+            bash -c "
+              colcon test && \
+              colcon test-result --verbose
+            "
