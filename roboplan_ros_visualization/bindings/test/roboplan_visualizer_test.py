@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from roboplan.core import Scene
+from roboplan.core import Scene, UrdfSceneDescription
 from roboplan_ros.visualization import RoboplanVisualizer
 
 
@@ -88,7 +88,7 @@ def test_import():
 
 
 def test_visualize_configuration():
-    scene = Scene(name="test", urdf=BOX_URDF, srdf=EMPTY_SRDF)
+    scene = Scene(name="test", description=UrdfSceneDescription(BOX_URDF, EMPTY_SRDF))
     viz = RoboplanVisualizer(scene=scene, urdf_xml=BOX_URDF)
 
     q = scene.getCurrentJointPositions()
@@ -104,7 +104,9 @@ def test_visualize_configuration():
 
 
 def test_visualize_joint_group():
-    scene = Scene(name="test", urdf=TWO_LINK_URDF, srdf=TWO_LINK_SRDF)
+    scene = Scene(
+        name="test", description=UrdfSceneDescription(TWO_LINK_URDF, TWO_LINK_SRDF)
+    )
     viz = RoboplanVisualizer(scene=scene, urdf_xml=TWO_LINK_URDF)
 
     q = scene.getCurrentJointPositions()
@@ -131,7 +133,9 @@ def test_visualize_joint_group():
 
 
 def test_constructor_group_name():
-    scene = Scene(name="test", urdf=TWO_LINK_URDF, srdf=TWO_LINK_SRDF)
+    scene = Scene(
+        name="test", description=UrdfSceneDescription(TWO_LINK_URDF, TWO_LINK_SRDF)
+    )
     # Configure the group at construction time.
     viz = RoboplanVisualizer(scene=scene, urdf_xml=TWO_LINK_URDF, group_name="first")
 

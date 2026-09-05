@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 from roboplan.example_models import get_package_models_dir, get_package_share_dir
-from roboplan.core import Scene
+from roboplan.core import Scene, loadUrdfSceneDescription
 from roboplan.simple_ik import SimpleIkOptions
 
 from roboplan_ros_py.kinematics import RoboPlanIK
@@ -16,7 +16,9 @@ def test_scene() -> Scene:
     srdf_path = roboplan_models_dir / "ur_robot_model" / "ur5_gripper.srdf"
     package_paths = [get_package_share_dir()]
 
-    return Scene("test_scene", urdf_path, srdf_path, package_paths)
+    return Scene(
+        "test_scene", loadUrdfSceneDescription(urdf_path, srdf_path), package_paths
+    )
 
 
 @pytest.fixture

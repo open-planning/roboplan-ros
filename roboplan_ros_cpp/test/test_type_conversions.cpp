@@ -34,7 +34,8 @@ protected:
 
 TEST_F(TypeConversionsTest, TestJointStateMapping) {
   // Setup the Scene and ROS JointState message
-  const auto scene = roboplan::Scene("test_scene", urdf_path, srdf_path);  // Load here
+  const auto scene = roboplan::Scene(
+      "test_scene", roboplan::loadUrdfSceneDescription(urdf_path, srdf_path));  // Load here
   sensor_msgs::msg::JointState joint_state;
   joint_state.name = {"continuous_joint", "revolute_joint"};
 
@@ -64,7 +65,8 @@ TEST_F(TypeConversionsTest, TestJointStateMapping) {
 
 TEST_F(TypeConversionsTest, TestConvertJointState) {
   // Setup the Scene and ROS JointState message
-  auto scene = roboplan::Scene("test_scene", urdf_path, srdf_path);
+  auto scene =
+      roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(urdf_path, srdf_path));
   scene.setRngSeed(1234);
   sensor_msgs::msg::JointState joint_state;
   joint_state.name = scene.getJointNames();
