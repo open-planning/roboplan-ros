@@ -16,15 +16,18 @@ ENV CMAKE_POLICY_VERSION_MINIMUM=3.5
 SHELL ["/bin/bash", "-c"]
 
 # Install core dependencies.
-RUN apt update -y \
-    && apt upgrade -y \
-    && apt install -y libgmock-dev python3-pip
+RUN --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update -y \
+    && apt-get upgrade -y \
+    && apt-get install -y libgmock-dev python3-pip
 
 # Install Python dependencies needed for bindings.
 # Note that since Pinocchio in ROS is built with Numpy 1.x on Ubuntu 24.04 and older,
 # we must preserve this by pinning a bunch of other versions that vary per distro.
 COPY .docker/ros_python_requirements_${ROS_DISTRO}.txt /tmp/ros_python_requirements.txt
-RUN pip3 install -r /tmp/ros_python_requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip,sharing=locked \
+    pip3 install -r /tmp/ros_python_requirements.txt
 
 # Create a ROS 2 workspace and copy in the source code.
 RUN mkdir -p /workspace/roboplan_ws/src/roboplan_ros
@@ -39,8 +42,10 @@ RUN cd src \
 
 # Copy package manifests for installing rosdeps
 COPY --from=package-manifests /roboplan_ros ./src/roboplan_ros
-RUN source /opt/ros/${ROS_DISTRO}/setup.bash \
-    && apt update -y \
+RUN --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && apt-get update -y \
     && rosdep install --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} -y --skip-keys proxsuite
 
 # Copy in remaining source and build
