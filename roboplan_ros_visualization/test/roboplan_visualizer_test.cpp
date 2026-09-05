@@ -119,7 +119,8 @@ static const std::string TWO_LINK_SRDF = R"(<?xml version="1.0"?>
 class RoboplanVisualizerTest : public ::testing::Test {};
 
 TEST_F(RoboplanVisualizerTest, VisualizeFixedJointConfiguration) {
-  const auto scene = std::make_shared<roboplan::Scene>("test", BOX_URDF, EMPTY_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>(
+      "test", roboplan::UrdfSceneDescription{.urdf_xml = BOX_URDF, .srdf_xml = EMPTY_SRDF});
   RoboplanVisualizer viz(scene, BOX_URDF);
 
   const Eigen::VectorXd q = scene->getCurrentJointPositions();
@@ -134,7 +135,8 @@ TEST_F(RoboplanVisualizerTest, VisualizeFixedJointConfiguration) {
 }
 
 TEST_F(RoboplanVisualizerTest, VisualizeRevoluteJointConfiguration) {
-  const auto scene = std::make_shared<roboplan::Scene>("test", REVOLUTE_URDF, EMPTY_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>(
+      "test", roboplan::UrdfSceneDescription{.urdf_xml = REVOLUTE_URDF, .srdf_xml = EMPTY_SRDF});
   RoboplanVisualizer viz(scene, REVOLUTE_URDF);
 
   const Eigen::VectorXd q = scene->getCurrentJointPositions();
@@ -152,7 +154,8 @@ TEST_F(RoboplanVisualizerTest, VisualizeRevoluteJointConfiguration) {
 }
 
 TEST_F(RoboplanVisualizerTest, VisualizeFullSceneByDefault) {
-  const auto scene = std::make_shared<roboplan::Scene>("test", TWO_LINK_URDF, TWO_LINK_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>(
+      "test", roboplan::UrdfSceneDescription{.urdf_xml = TWO_LINK_URDF, .srdf_xml = TWO_LINK_SRDF});
   RoboplanVisualizer viz(scene, TWO_LINK_URDF);
 
   const Eigen::VectorXd q = scene->getCurrentJointPositions();
@@ -167,7 +170,8 @@ TEST_F(RoboplanVisualizerTest, VisualizeFullSceneByDefault) {
 }
 
 TEST_F(RoboplanVisualizerTest, VisualizeSingleJointGroupViaSetGroup) {
-  const auto scene = std::make_shared<roboplan::Scene>("test", TWO_LINK_URDF, TWO_LINK_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>(
+      "test", roboplan::UrdfSceneDescription{.urdf_xml = TWO_LINK_URDF, .srdf_xml = TWO_LINK_SRDF});
   RoboplanVisualizer viz(scene, TWO_LINK_URDF);
 
   const Eigen::VectorXd q = scene->getCurrentJointPositions();
@@ -184,7 +188,8 @@ TEST_F(RoboplanVisualizerTest, VisualizeSingleJointGroupViaSetGroup) {
 }
 
 TEST_F(RoboplanVisualizerTest, VisualizeGroupWithExplicitLink) {
-  const auto scene = std::make_shared<roboplan::Scene>("test", TWO_LINK_URDF, TWO_LINK_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>(
+      "test", roboplan::UrdfSceneDescription{.urdf_xml = TWO_LINK_URDF, .srdf_xml = TWO_LINK_SRDF});
   // The "second_plus" group drives link2 (sphere) and additionally lists link1 (box) explicitly,
   // so both geometries should be rendered.
   RoboplanVisualizer viz(scene, TWO_LINK_URDF, "world", "/roboplan", "second_plus");
@@ -204,7 +209,8 @@ TEST_F(RoboplanVisualizerTest, VisualizeGroupWithExplicitLink) {
 }
 
 TEST_F(RoboplanVisualizerTest, ConstructorGroupIsUsed) {
-  const auto scene = std::make_shared<roboplan::Scene>("test", TWO_LINK_URDF, TWO_LINK_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>(
+      "test", roboplan::UrdfSceneDescription{.urdf_xml = TWO_LINK_URDF, .srdf_xml = TWO_LINK_SRDF});
   // Configure the visualizer with the "first" group as its selection.
   RoboplanVisualizer viz(scene, TWO_LINK_URDF, "world", "/roboplan", "first");
 
@@ -217,7 +223,8 @@ TEST_F(RoboplanVisualizerTest, ConstructorGroupIsUsed) {
 }
 
 TEST_F(RoboplanVisualizerTest, UnknownGroupThrows) {
-  const auto scene = std::make_shared<roboplan::Scene>("test", TWO_LINK_URDF, TWO_LINK_SRDF);
+  const auto scene = std::make_shared<roboplan::Scene>(
+      "test", roboplan::UrdfSceneDescription{.urdf_xml = TWO_LINK_URDF, .srdf_xml = TWO_LINK_SRDF});
 
   // An unknown group is rejected both at construction and via set_group.
   EXPECT_THROW(RoboplanVisualizer(scene, TWO_LINK_URDF, "world", "/roboplan", "does_not_exist"),
