@@ -1,10 +1,10 @@
-name: "Pixi Build and Test"
+name: "Pixi ROS Build and Test"
 
 on:
   workflow_call: {}
 
 jobs:
-  pixi_build_and_test:
+  pixi_ros_build_and_test:
     name: ${{ matrix.os }} - Build, test (${{ matrix.ros_distro }})
     timeout-minutes: 60
     env:

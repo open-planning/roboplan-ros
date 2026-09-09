@@ -27,7 +27,7 @@ jobs:
     uses: ./.github/workflows/format.yml
 
   pixi_build_and_test:
-    name: Pixi
+    name: Pixi ROS
     uses: ./.github/workflows/pixi_build_and_test.yml
 
   ros_build_and_test:
