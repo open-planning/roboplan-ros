@@ -1,7 +1,9 @@
 # Compile the nanobind python bindings for roboplan_ros_visualization.
 
-# For nanobind python bindings
-find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+# For nanobind python bindings, ensure stable ABI module is loaded
+# if it is available to match the upstream.
+find_package(Python 3.8 COMPONENTS Interpreter Development
+             OPTIONAL_COMPONENTS Development.SABIModule REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_generator_cpp REQUIRED)
@@ -18,13 +20,60 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
 find_package(nanobind CONFIG REQUIRED)
 
+# nanobind cannot share C++ types between a STABLE_ABI module and a
+# non-STABLE_ABI one, regardless of matching nanobind versions, so this must
+# match however *this environment's* roboplan core was built (conda-forge:
+# STABLE_ABI; apt/rosdep's much older nanobind-dev: not). Detect it from the
+# already-installed artifact rather than hardcoding one answer.
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -c
+    "import roboplan.core as m, os; print(os.path.dirname(m.__file__))"
+  OUTPUT_VARIABLE _roboplan_core_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+file(GLOB _roboplan_core_ext "${_roboplan_core_dir}/_core_ext*.so")
+if(_roboplan_core_ext MATCHES "abi3")
+  set(_roboplan_ros_stable_abi_default ON)
+else()
+  set(_roboplan_ros_stable_abi_default OFF)
+endif()
+option(ROBOPLAN_ROS_STABLE_ABI
+  "Match roboplan core's stable-ABI status (auto-detected; override if wrong)."
+  ${_roboplan_ros_stable_abi_default})
+message(STATUS
+  "roboplan_ros_visualization: ROBOPLAN_ROS_STABLE_ABI=${ROBOPLAN_ROS_STABLE_ABI} "
+  "(roboplan core: ${_roboplan_core_ext})")
+
+# nanobind_add_module parses its arguments at configure time via
+# cmake_parse_arguments, so STABLE_ABI must be a plain conditional token
+# here, not a generator expression (those only resolve at generate time).
+set(_stable_abi_arg)
+if(ROBOPLAN_ROS_STABLE_ABI)
+  set(_stable_abi_arg STABLE_ABI)
+endif()
+
 # Compile the nanobind python bindings as a subpackage of the python package.
 nanobind_add_module(
   _visualization_ext
-  STABLE_ABI
+  ${_stable_abi_arg}
   NB_STATIC
   src/roboplan_ros_visualization_bindings.cpp
 )
+
+# Fail loudly if we asked for the stable ABI and didn't get it -- otherwise
+# nanobind silently drops it and we won't know until we see `std::bad_cast`
+# errors at runtime.
+if(ROBOPLAN_ROS_STABLE_ABI)
+  get_target_property(_visualization_ext_suffix _visualization_ext SUFFIX)
+  if(NOT _visualization_ext_suffix MATCHES "abi3")
+    message(FATAL_ERROR
+      "_visualization_ext was built without the stable Python ABI (SUFFIX="
+      "'${_visualization_ext_suffix}', expected it to contain 'abi3') even "
+      "though ROBOPLAN_ROS_STABLE_ABI is ON, almost certainly because "
+      "Python::SABIModule was not found -- check that the find_package(Python "
+      "...) call above requests 'OPTIONAL_COMPONENTS Development.SABIModule'.")
+  endif()
+endif()
+
 target_include_directories(_visualization_ext PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
