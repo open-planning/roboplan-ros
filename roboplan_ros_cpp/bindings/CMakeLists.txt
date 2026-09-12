@@ -1,7 +1,9 @@
 # Compile the nanobind python bindings for roboplan_ros_cpp.
 
-# For nanobind python bindings
-find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+# For nanobind python bindings, ensure stable ABI module is loaded
+# if it is available to match the upstream.
+find_package(Python 3.8 COMPONENTS Interpreter Development
+             OPTIONAL_COMPONENTS Development.SABIModule REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_generator_cpp REQUIRED)
@@ -24,6 +26,20 @@ nanobind_add_module(
   NB_STATIC
   src/roboplan_ros_cpp_bindings.cpp
 )
+
+# Fail loudly if there is a STABLE_ABI mismatch between core roboplan and here.
+# Otherwise nanobind may silently drop the module and we will not know until
+# we see `std::bad_cast` errors at runtime.
+get_target_property(_cpp_ext_suffix _cpp_ext SUFFIX)
+if(NOT _cpp_ext_suffix MATCHES "abi3")
+  message(FATAL_ERROR
+    "_cpp_ext was built without the stable Python ABI (SUFFIX="
+    "'${_cpp_ext_suffix}', expected it to contain 'abi3'). STABLE_ABI was "
+    "requested but silently ignored, almost certainly because "
+    "Python::SABIModule was not found -- check that the find_package(Python "
+    "...) call above requests 'OPTIONAL_COMPONENTS Development.SABIModule'.")
+endif()
+
 target_include_directories(_cpp_ext PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>

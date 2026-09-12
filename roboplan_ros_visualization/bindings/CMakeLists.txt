@@ -1,7 +1,9 @@
 # Compile the nanobind python bindings for roboplan_ros_visualization.
 
-# For nanobind python bindings
-find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+# For nanobind python bindings, ensure stable ABI module is loaded
+# if it is available to match the upstream.
+find_package(Python 3.8 COMPONENTS Interpreter Development
+             OPTIONAL_COMPONENTS Development.SABIModule REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_generator_cpp REQUIRED)
