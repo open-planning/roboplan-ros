@@ -21,12 +21,6 @@ build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
 test = { cmd = ["colcon", "test"] }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
 
-# Use the mold linker on Linux. Added here rather than in colcon_defaults.yaml,
-# since the defaults file applies to all platforms.
-[target.linux.tasks]
-build = { cmd = ["colcon", "build", "--mixin", "mold"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--mixin", "mold"] }
-
 # Use the MSVC-compatible clang driver: conda-forge packages are built with
 # MSVC and export MSVC-style flags that the GNU-style clang++ driver rejects.
 [target.win.tasks]
@@ -61,6 +55,7 @@ libtoppra  = ">=0.6.9,<0.7"
 proxsuite = ">=0.7.3,<0.8"
 
 viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
+plyfile = ">=1.1,<2"
 pycollada = ">=0.9.2, <0.10"
 nodeenv = ">=1.10.0, <2"
 
@@ -97,6 +92,8 @@ LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LIBRARY_PATH}"
 LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
 
+# On Linux, we want to use the mold linker. Rather than a special-case colcon mixin,
+# we just append to the CXXFLAGS so it's additive over what is in colcon_defaults.yaml.
 [target.linux.activation.env]
 CXXFLAGS = "-fuse-ld=mold"
 
