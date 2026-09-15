@@ -26,7 +26,12 @@ find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(interactive_markers REQUIRED)
-find_package(roboplan_core REQUIRED)
+# TODO: Remove after the next release to ensure correct linking,
+# this should just be `roboplan_core`.
+find_package(roboplan_core QUIET)
+if(NOT roboplan_core_FOUND)
+  find_package(roboplan REQUIRED)
+endif()
 find_package(roboplan_simple_ik REQUIRED)
 find_package(roboplan_ros_cpp REQUIRED)
 find_package(sensor_msgs REQUIRED)

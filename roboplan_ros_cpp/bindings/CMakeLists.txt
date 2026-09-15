@@ -1,7 +1,9 @@
 # Compile the nanobind python bindings for roboplan_ros_cpp.
 
-# For nanobind python bindings
-find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+# For nanobind python bindings, ensure stable ABI module is loaded
+# if it is available to match the upstream.
+find_package(Python 3.8 COMPONENTS Interpreter Development
+             OPTIONAL_COMPONENTS Development.SABIModule REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_generator_cpp REQUIRED)
@@ -18,12 +20,38 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
 find_package(nanobind CONFIG REQUIRED)
 
+# Optionally set STABLE_ABI depending on upstream RoboPlan's build.
+# Essentially, the ROS build farm will have it off by default, but other
+# builds (Conda / Robostack) will require it.
+option(ROBOPLAN_ROS_STABLE_ABI
+  "Build nanobind extensions with the stable Python ABI, to match roboplan core built via RoboStack/conda-forge."
+  OFF)
+set(_stable_abi_arg)
+if(ROBOPLAN_ROS_STABLE_ABI)
+  set(_stable_abi_arg STABLE_ABI)
+endif()
+
 nanobind_add_module(
   _cpp_ext
-  STABLE_ABI
+  ${_stable_abi_arg}
   NB_STATIC
   src/roboplan_ros_cpp_bindings.cpp
 )
+
+# Check for stable ABI mismatches and fail if it is found but not requested.
+# Skipped on Windows, where stable ABI modules are named without an 'abi3' tag.
+if(ROBOPLAN_ROS_STABLE_ABI AND NOT WIN32)
+  get_target_property(_cpp_ext_suffix _cpp_ext SUFFIX)
+  if(NOT _cpp_ext_suffix MATCHES "abi3")
+    message(FATAL_ERROR
+      "_cpp_ext was built without the stable Python ABI (SUFFIX="
+      "'${_cpp_ext_suffix}', expected it to contain 'abi3') even though "
+      "ROBOPLAN_ROS_STABLE_ABI is ON, almost certainly because "
+      "Python::SABIModule was not found -- check that the find_package(Python "
+      "...) call above requests 'OPTIONAL_COMPONENTS Development.SABIModule'.")
+  endif()
+endif()
+
 target_include_directories(_cpp_ext PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>

@@ -1,7 +1,9 @@
 # Compile the nanobind python bindings for roboplan_ros_visualization.
 
-# For nanobind python bindings
-find_package(Python 3.8 COMPONENTS Interpreter Development REQUIRED)
+# For nanobind python bindings, ensure stable ABI module is loaded
+# if it is available to match the upstream.
+find_package(Python 3.8 COMPONENTS Interpreter Development
+             OPTIONAL_COMPONENTS Development.SABIModule REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_generator_cpp REQUIRED)
@@ -18,10 +20,21 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
 find_package(nanobind CONFIG REQUIRED)
 
+# Optionally set STABLE_ABI depending on upstream RoboPlan's build.
+# Essentially, the ROS build farm will have it off by default, but other
+# builds (Conda / Robostack) will require it.
+option(ROBOPLAN_ROS_STABLE_ABI
+  "Build nanobind extensions with the stable Python ABI, to match roboplan core built via RoboStack/conda-forge."
+  OFF)
+set(_stable_abi_arg)
+if(ROBOPLAN_ROS_STABLE_ABI)
+  set(_stable_abi_arg STABLE_ABI)
+endif()
+
 # Compile the nanobind python bindings as a subpackage of the python package.
 nanobind_add_module(
   _visualization_ext
-  STABLE_ABI
+  ${_stable_abi_arg}
   NB_STATIC
   src/roboplan_ros_visualization_bindings.cpp
 )
