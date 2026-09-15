@@ -6,7 +6,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(roboplan REQUIRED)
+find_package(roboplan_core REQUIRED)
 find_package(roboplan_example_models REQUIRED)
 
 install(DIRECTORY config description launch

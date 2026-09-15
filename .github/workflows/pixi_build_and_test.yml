@@ -1,0 +1,58 @@
+name: "Pixi ROS Build and Test"
+
+on:
+  workflow_call: {}
+
+jobs:
+  pixi_ros_build_and_test:
+    name: ${{ matrix.os }} - Build, test (${{ matrix.ros_distro }})
+    timeout-minutes: 60
+    env:
+      SCCACHE_DIR: ${{ github.workspace }}/.sccache
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        ros_distro: [rolling, lyrical, kilted, jazzy, humble]
+
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        # On Windows, this ensures bash stops at the first failing command.
+        shell: bash
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Cache sccache
+        uses: actions/cache@v4
+        with:
+          path: .sccache
+          key: ${{ runner.os }}-${{ matrix.ros_distro }}-sccache-${{ github.head_ref || github.ref_name }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.ros_distro }}-sccache-main
+            ${{ runner.os }}-${{ matrix.ros_distro }}-sccache
+      - uses: prefix-dev/setup-pixi@v0.10.0
+        with:
+          cache: true
+          cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
+          environments: ${{ matrix.ros_distro }}
+      - name: Build and test
+        run: |
+          pixi run -e ${{ matrix.ros_distro }} setup
+          pixi run -e ${{ matrix.ros_distro }} build
+          pixi run -e ${{ matrix.ros_distro }} test
+          pixi run -e ${{ matrix.ros_distro }} test-result
+      - name: Check bindings stub files
+        if: runner.os == 'Linux'
+        run: |
+          STUB_PATHS="
+            roboplan_ros_cpp/roboplan_ros_cpp/*.pyi
+            roboplan_ros_visualization/roboplan_ros_visualization/*.pyi
+          "
+          if ! git diff --exit-code --shortstat -- $STUB_PATHS; then
+            echo "::error::The .pyi stub files are out of sync with the source code. Make sure to rebuild the Python bindings with 'pixi run -e ${ROS_DISTRO} build' and commit the changes."
+            echo "Git Diff:"
+            git diff -- $STUB_PATHS
+            exit 1
+          fi
+          echo "✅ .pyi stub files look good!"

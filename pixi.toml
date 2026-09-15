@@ -57,7 +57,7 @@ matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
 numpy = ">=1.26.4,<3"
 nanobind = ">=2.12.0,<3"
-libtoppra  = ">=0.6.4,<0.7"
+libtoppra  = ">=0.6.9,<0.7"
 proxsuite = ">=0.7.3,<0.8"
 
 viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
@@ -301,7 +301,16 @@ ros-humble-yaml-cpp-vendor = "*"
 
 # Pinocchio from conda-forge, since RoboStack does not build it for win-64.
 # Humble's boost pin limits Pinocchio to 4.0.0, unlike the newer distros.
-pinocchio = ">=4.0.0,<5"
+[feature.humble.target.win.dependencies]
+pinocchio = ">=4.0.0, <5"
+
+[feature.humble.target.linux.dependencies]
+ros-humble-pinocchio = "*"
+
+[feature.humble.target.osx.dependencies]
+ros-humble-pinocchio = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
+# ros-humble-pinocchio is 3.9.0, so skip RoboPlan's Pinocchio >= 4 import test.
+PYTEST_ADDOPTS = "-k 'not test_import_pinocchio'"

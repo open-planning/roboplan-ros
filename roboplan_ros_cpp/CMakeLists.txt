@@ -22,7 +22,7 @@ if(APPLE)
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(roboplan REQUIRED)
+find_package(roboplan_core REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(pinocchio REQUIRED)
