@@ -55,6 +55,7 @@ libtoppra  = ">=0.6.9,<0.7"
 proxsuite = ">=0.7.3,<0.8"
 
 viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
+plyfile = ">=1.1,<2"
 pycollada = ">=0.9.2, <0.10"
 nodeenv = ">=1.10.0, <2"
 
@@ -144,7 +145,6 @@ ros-rolling-xacro = "*"
 
 # Pinocchio from conda-forge, since RoboStack does not build it for win-64
 pinocchio = ">=4.1.0,<5"
-plyfile = ">=1.1,<2"
 
 [feature.rolling.activation.env]
 ROS_DISTRO = "rolling"
