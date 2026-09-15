@@ -57,7 +57,7 @@ matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
 numpy = ">=1.26.4,<3"
 nanobind = ">=2.12.0,<3"
-libtoppra  = ">=0.6.4,<0.7"
+libtoppra  = ">=0.6.9,<0.7"
 proxsuite = ">=0.7.3,<0.8"
 
 viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
