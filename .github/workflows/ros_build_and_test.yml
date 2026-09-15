@@ -6,7 +6,7 @@ on:
 jobs:
   ros_build_and_test:
     name: ${{ matrix.ros_distro }} - Build, test ${{ matrix.generate_python_stubs == 'ON' && 'with' || 'without' }} Python stubs
-    timeout-minutes: 30
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
