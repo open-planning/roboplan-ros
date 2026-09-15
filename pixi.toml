@@ -301,7 +301,14 @@ ros-humble-yaml-cpp-vendor = "*"
 
 # Pinocchio from conda-forge, since RoboStack does not build it for win-64.
 # Humble's boost pin limits Pinocchio to 4.0.0, unlike the newer distros.
-pinocchio = ">=4.0.0,<5"
+[feature.humble.target.win.dependencies]
+pinocchio = ">=4.0.0, <5"
+
+[feature.humble.target.linux.dependencies]
+ros-humble-pinocchio = "*"
+
+[feature.humble.target.osx.dependencies]
+ros-humble-pinocchio = "*"
 
 [feature.humble.activation.env]
 ROS_DISTRO = "humble"
