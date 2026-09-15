@@ -133,7 +133,7 @@ roboplan-simple-ik-python = "*"
 roboplan-oink-python = "*"
 
 # Must match the nanobind-abi generation roboplan-python (conda-forge) was
-# built against!
+# built against! TODO: drop once roboplan-feedstock exports this transitively.
 nanobind-abi = "==20"
 
 [feature.conda-roboplan.tasks]
