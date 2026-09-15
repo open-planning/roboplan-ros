@@ -30,6 +30,10 @@ jobs:
     name: Pixi ROS
     uses: ./.github/workflows/pixi_build_and_test.yml
 
+  pixi_conda_build_and_test:
+    name: Pixi Conda RoboPlan
+    uses: ./.github/workflows/pixi_conda_build_and_test.yml
+
   ros_build_and_test:
     name: ROS
     uses: ./.github/workflows/ros_build_and_test.yml

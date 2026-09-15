@@ -6,7 +6,7 @@ on:
 jobs:
   pixi_ros_build_and_test:
     name: ${{ matrix.os }} - Build, test (${{ matrix.ros_distro }})
-    timeout-minutes: 60
+    timeout-minutes: 30
     env:
       SCCACHE_DIR: ${{ github.workspace }}/.sccache
     strategy:
