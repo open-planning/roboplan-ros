@@ -89,16 +89,28 @@ RoboplanVisualizer::geometry_indices_for_group(const std::string& group_name) co
   if (!maybe_info) {
     throw std::runtime_error("RoboplanVisualizer: " + maybe_info.error());
   }
-  const auto& link_names = maybe_info.value().link_names;
-  const std::unordered_set<std::string> link_set(link_names.begin(), link_names.end());
-
-  // A geometry object belongs to the group when the link (body frame) it is attached to is one
-  // of the group's links.
+  const auto& info = maybe_info.value();
   const auto& model = scene_->getModel();
+
+  // A geometry object moves with the group when the joint it is attached to is one of the group's
+  // joints or sits anywhere below one in the kinematic tree.
+  std::vector<bool> moved_by_group(static_cast<std::size_t>(model.njoints), false);
+  for (const auto joint_id : info.joint_indices) {
+    for (const auto descendant : model.subtrees.at(joint_id)) {
+      moved_by_group.at(descendant) = true;
+    }
+  }
+
+  // Links explicitly listed in the group's SRDF definition are rendered as well.
+  const std::unordered_set<std::string> link_set(info.link_names.begin(), info.link_names.end());
+
   for (std::size_t idx = 0; idx < visual_model_.geometryObjects.size(); ++idx) {
     const auto& geom_obj = visual_model_.geometryObjects.at(idx);
-    if (geom_obj.parentFrame < model.frames.size() &&
-        link_set.count(model.frames.at(geom_obj.parentFrame).name) > 0) {
+    const bool below_group_joint =
+        geom_obj.parentJoint < moved_by_group.size() && moved_by_group[geom_obj.parentJoint];
+    const bool listed_link = geom_obj.parentFrame < model.frames.size() &&
+                             link_set.count(model.frames.at(geom_obj.parentFrame).name) > 0;
+    if (below_group_joint || listed_link) {
       indices.push_back(idx);
     }
   }

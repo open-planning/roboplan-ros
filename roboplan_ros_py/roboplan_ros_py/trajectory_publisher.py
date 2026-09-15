@@ -1,4 +1,6 @@
 import threading
+import time
+
 import numpy as np
 
 
@@ -41,6 +43,10 @@ class TrajectoryPublisher:
         Stops any active playback before starting. Waypoints are published
         at a fixed interval on a background thread.
 
+        The first message also clears every marker previously published on
+        the topic, so a preview never leaves geometry from an earlier one
+        (e.g. from a different joint group) behind at a stale pose.
+
         Args:
             trajectory: A roboplan JointTrajectory.
             dt: Time in seconds between published waypoints.
@@ -54,14 +60,34 @@ class TrajectoryPublisher:
         q_full = np.array(self._scene.getCurrentJointPositions())
 
         def _run():
-            for pos in positions:
+            start_time = time.monotonic()
+            last_index = len(positions) - 1
+            index = 0
+            while index <= last_index:
                 if self._stop_event.is_set():
                     return
-                q_full[self._q_indices] = pos
-                self._marker_pub.publish(
-                    self._visualizer.markers_from_configuration(q_full)
-                )
-                self._stop_event.wait(dt)
+                q_full[self._q_indices] = positions[index]
+                markers = self._visualizer.markers_from_configuration(q_full)
+                if index == 0:
+                    # Clearing in the same message as the first waypoint avoids
+                    # a blank frame between the delete and the redraw.
+                    markers.markers = (
+                        self._visualizer.clear_markers().markers + markers.markers
+                    )
+                self._marker_pub.publish(markers)
+                if index == last_index:
+                    break
+
+                # Wait for the next waypoint's wall-clock deadline. If publishing
+                # fell behind, skip ahead to the waypoint that is due now, but
+                # always end on the final waypoint so the preview settles at the goal.
+                next_index = index + 1
+                remaining = start_time + next_index * dt - time.monotonic()
+                if remaining > 0.0:
+                    self._stop_event.wait(remaining)
+                else:
+                    next_index = int((time.monotonic() - start_time) / dt)
+                index = min(next_index, last_index)
             if self._on_complete and not self._stop_event.is_set():
                 self._on_complete()
 
