@@ -21,12 +21,6 @@ build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
 test = { cmd = ["colcon", "test"] }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
 
-# Use the mold linker on Linux. Added here rather than in colcon_defaults.yaml,
-# since the defaults file applies to all platforms.
-[target.linux.tasks]
-build = { cmd = ["colcon", "build", "--mixin", "mold"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--mixin", "mold"] }
-
 # Use the MSVC-compatible clang driver: conda-forge packages are built with
 # MSVC and export MSVC-style flags that the GNU-style clang++ driver rejects.
 [target.win.tasks]
@@ -97,6 +91,8 @@ LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LIBRARY_PATH}"
 LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
 
+# On Linux, we want to use the mold linker. Rather than a special-case colcon mixin,
+# we just append to the CXXFLAGS so it's additive over what is in colcon_defaults.yaml.
 [target.linux.activation.env]
 CXXFLAGS = "-fuse-ld=mold"
 
@@ -148,6 +144,7 @@ ros-rolling-xacro = "*"
 
 # Pinocchio from conda-forge, since RoboStack does not build it for win-64
 pinocchio = ">=4.1.0,<5"
+plyfile = ">=1.1,<2"
 
 [feature.rolling.activation.env]
 ROS_DISTRO = "rolling"
