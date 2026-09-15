@@ -21,12 +21,6 @@ build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
 test = { cmd = ["colcon", "test"] }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
 
-# Use the mold linker on Linux. Added here rather than in colcon_defaults.yaml,
-# since the defaults file applies to all platforms.
-[target.linux.tasks]
-build = { cmd = ["colcon", "build", "--mixin", "mold"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--mixin", "mold"] }
-
 # Use the MSVC-compatible clang driver: conda-forge packages are built with
 # MSVC and export MSVC-style flags that the GNU-style clang++ driver rejects.
 [target.win.tasks]
@@ -97,6 +91,8 @@ LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LIBRARY_PATH}"
 LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
 LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
 
+# On Linux, we want to use the mold linker. Rather than a special-case colcon mixin
+# (which drops the other mixins from colcon_defaults.yaml), we append to CXXFLAGS.
 [target.linux.activation.env]
 CXXFLAGS = "-fuse-ld=mold"
 
@@ -133,7 +129,8 @@ roboplan-simple-ik-python = "*"
 roboplan-oink-python = "*"
 
 # Must match the nanobind-abi generation roboplan-python (conda-forge) was
-# built against! TODO: drop once roboplan-feedstock exports this transitively.
+# built against!
+# TODO: drop once roboplan-feedstock exports this transitively.
 nanobind-abi = "==20"
 
 [feature.conda-roboplan.tasks]
@@ -141,28 +138,11 @@ setup = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-# colcon's --cmake-args is a single global list per invocation, so it has to
-# be repeated alongside each platform's own build command below rather than
-# layered on via a shared defaults file: a colcon_defaults.yaml combining
-# `mixin` and `cmake-args` silently drops the cmake-args when both are set
-# (see colcon/colcon-defaults#35) -- confirmed by reproducing it here.
-build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
 
-[feature.conda-roboplan.target.linux.tasks]
-build = { cmd = ["colcon", "build", "--mixin", "mold", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--mixin", "mold", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
-
-[feature.conda-roboplan.target.win.tasks]
-build = { cmd = [
-  "colcon", "build", "--cmake-args",
-  "-GNinja",
-  "-DCMAKE_C_COMPILER=clang-cl",
-  "-DCMAKE_CXX_COMPILER=clang-cl",
-  "-DCMAKE_LINKER=lld-link",
-  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
-  "-DROBOPLAN_ROS_STABLE_ABI=ON",
-] }
+# Picked up by the bindings' CMakeLists.txt as the default for
+# ROBOPLAN_ROS_STABLE_ABI, so the base build/build-symlink tasks need no override.
+[feature.conda-roboplan.activation.env]
+ROBOPLAN_ROS_STABLE_ABI = "ON"
 
 ###################
 ## ROS 2 Rolling ##
