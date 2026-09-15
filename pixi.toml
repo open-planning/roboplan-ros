@@ -116,6 +116,54 @@ kilted = { features = ["kilted"] }
 jazzy = { features = ["jazzy"] }
 humble = { features = ["humble"] }
 
+# Composing existing packages with core RoboPlan from Conda to supporting
+# building against Conda built
+rolling-conda-roboplan = { features = ["rolling", "conda-roboplan"] }
+lyrical-conda-roboplan = { features = ["lyrical", "conda-roboplan"] }
+kilted-conda-roboplan = { features = ["kilted", "conda-roboplan"] }
+jazzy-conda-roboplan = { features = ["jazzy", "conda-roboplan"] }
+# Humble is not supported on Conda.
+
+# Adds conda-forge's prebuilt roboplan core on top of a ROS-distro
+# feature above, instead of cloning/building roboplan from source in the
+# same environment. Must be used with the conda feature above.
+[feature.conda-roboplan.dependencies]
+roboplan-python = "*"
+roboplan-simple-ik-python = "*"
+roboplan-oink-python = "*"
+
+# Must match the nanobind-abi generation roboplan-python (conda-forge) was
+# built against!
+nanobind-abi = "==20"
+
+[feature.conda-roboplan.tasks]
+setup = { cmd = """
+colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
+colcon mixin update default
+""" }
+# colcon's --cmake-args is a single global list per invocation, so it has to
+# be repeated alongside each platform's own build command below rather than
+# layered on via a shared defaults file: a colcon_defaults.yaml combining
+# `mixin` and `cmake-args` silently drops the cmake-args when both are set
+# (see colcon/colcon-defaults#35) -- confirmed by reproducing it here.
+build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
+build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
+
+[feature.conda-roboplan.target.linux.tasks]
+build = { cmd = ["colcon", "build", "--mixin", "mold", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
+build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--mixin", "mold", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
+
+[feature.conda-roboplan.target.win.tasks]
+build = { cmd = [
+  "colcon", "build", "--cmake-args",
+  "-GNinja",
+  "-DCMAKE_C_COMPILER=clang-cl",
+  "-DCMAKE_CXX_COMPILER=clang-cl",
+  "-DCMAKE_LINKER=lld-link",
+  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+  "-DROBOPLAN_ROS_STABLE_ABI=ON",
+] }
+
 ###################
 ## ROS 2 Rolling ##
 ###################
