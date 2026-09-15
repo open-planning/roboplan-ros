@@ -39,7 +39,8 @@ nanobind_add_module(
 )
 
 # Check for stable ABI mismatches and fail if it is found but not requested.
-if(ROBOPLAN_ROS_STABLE_ABI)
+# Skipped on Windows, where stable ABI modules are named without an 'abi3' tag.
+if(ROBOPLAN_ROS_STABLE_ABI AND NOT WIN32)
   get_target_property(_cpp_ext_suffix _cpp_ext SUFFIX)
   if(NOT _cpp_ext_suffix MATCHES "abi3")
     message(FATAL_ERROR
