@@ -16,8 +16,9 @@
   <depend>builtin_interfaces</depend>
   <depend>trajectory_msgs</depend>
   <depend>sensor_msgs</depend>
-  <depend>roboplan</depend>
+  <depend>roboplan_core</depend>
   <depend>roboplan_ros_cpp</depend>
+  <depend>roboplan_ros_visualization</depend>
 
   <test_depend>python3-pytest</test_depend>
 

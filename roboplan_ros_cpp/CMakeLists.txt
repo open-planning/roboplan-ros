@@ -25,8 +25,11 @@ find_package(ament_cmake REQUIRED)
 # TODO: Remove after the next release to ensure correct linking,
 # this should just be `roboplan_core`.
 find_package(roboplan_core QUIET)
-if(NOT roboplan_core_FOUND)
+if(roboplan_core_FOUND)
+  set(roboplan_package roboplan_core)
+else()
   find_package(roboplan REQUIRED)
+  set(roboplan_package roboplan)
 endif()
 find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
@@ -55,7 +58,7 @@ target_link_libraries(roboplan_ros_cpp
 )
 set_property(TARGET roboplan_ros_cpp PROPERTY CXX_STANDARD 20)
 ament_export_dependencies(
-  roboplan
+  ${roboplan_package}
   Eigen3
   pinocchio
   tf2_eigen

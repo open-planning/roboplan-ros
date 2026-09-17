@@ -22,7 +22,7 @@
   <depend>eigen</depend>
   <depend>geometry_msgs</depend>
   <depend>pinocchio</depend>
-  <depend>roboplan</depend>
+  <depend>roboplan_core</depend>
   <depend>rosidl_generator_cpp</depend>
   <depend>sensor_msgs</depend>
   <depend>trajectory_msgs</depend>

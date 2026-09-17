@@ -24,13 +24,14 @@
   <depend>interactive_markers</depend>
   <depend>rclcpp</depend>
   <depend>rclpy</depend>
-  <depend>roboplan</depend>
+  <depend>roboplan_core</depend>
   <depend>roboplan_ros_cpp</depend>
-  <depend>roboplan_simple_ik</depend>
   <depend>sensor_msgs</depend>
   <depend>visualization_msgs</depend>
 
   <exec_depend>rviz2</exec_depend>
+
+  <test_depend>roboplan_simple_ik</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
