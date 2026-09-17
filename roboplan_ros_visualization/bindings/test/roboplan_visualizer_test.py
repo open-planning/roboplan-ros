@@ -77,6 +77,9 @@ TWO_LINK_SRDF = """<?xml version="1.0"?>
   <group name="first">
     <joint name="joint1"/>
   </group>
+  <group name="second">
+    <joint name="joint2"/>
+  </group>
 </robot>
 """
 
@@ -115,12 +118,21 @@ def test_visualize_joint_group():
         len(all_markers.markers) == 2
     ), f"Expected 2 markers, got {len(all_markers.markers)}"
 
-    # The "first" group only drives link1, so a single marker should be returned.
-    viz.set_group("first")
+    # The "second" group only drives link2, so a single marker is drawn. The box on
+    # link1 sits above the group in the kinematic tree and does not move with it.
+    viz.set_group("second")
     group_markers = viz.markers_from_configuration(q)
     assert (
         len(group_markers.markers) == 1
     ), f"Expected 1 marker, got {len(group_markers.markers)}"
+
+    # The "first" group only contains joint1, but link2 hangs below it and moves
+    # whenever joint1 does, so both geometries are drawn.
+    viz.set_group("first")
+    group_markers = viz.markers_from_configuration(q)
+    assert (
+        len(group_markers.markers) == 2
+    ), f"Expected 2 markers, got {len(group_markers.markers)}"
 
     # Switching back to the whole scene renders both geometries again.
     viz.set_group("")
@@ -133,10 +145,10 @@ def test_visualize_joint_group():
 def test_constructor_group_name():
     scene = Scene(name="test", urdf=TWO_LINK_URDF, srdf=TWO_LINK_SRDF)
     # Configure the group at construction time.
-    viz = RoboplanVisualizer(scene=scene, urdf_xml=TWO_LINK_URDF, group_name="first")
+    viz = RoboplanVisualizer(scene=scene, urdf_xml=TWO_LINK_URDF, group_name="second")
 
     q = scene.getCurrentJointPositions()
 
-    # The constructor's group ("first") is used.
+    # The constructor's group ("second") is used.
     markers = viz.markers_from_configuration(q)
     assert len(markers.markers) == 1, f"Expected 1 marker, got {len(markers.markers)}"

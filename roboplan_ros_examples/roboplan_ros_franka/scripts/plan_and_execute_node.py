@@ -312,6 +312,7 @@ class PlanAndExecuteNode(Node):
             self._traj_visualizer,
             self._traj_marker_pub,
             self._q_indices,
+            clock=self.get_clock(),
         )
 
         # Publish the planned end-effector path as a light green line upon planning.

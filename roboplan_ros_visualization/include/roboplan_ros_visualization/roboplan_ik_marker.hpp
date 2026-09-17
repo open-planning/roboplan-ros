@@ -10,7 +10,6 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <roboplan/core/scene.hpp>
-#include <roboplan_simple_ik/simple_ik.hpp>
 #include <visualization_msgs/msg/interactive_marker.hpp>
 #include <visualization_msgs/msg/interactive_marker_control.hpp>
 #include <visualization_msgs/msg/interactive_marker_feedback.hpp>

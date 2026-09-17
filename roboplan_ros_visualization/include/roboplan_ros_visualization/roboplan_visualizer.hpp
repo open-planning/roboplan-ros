@@ -29,7 +29,7 @@ public:
   /// @param frame_id The frame_id written into every marker header.
   /// @param ns Marker namespace prefix.
   /// @param group_name Default joint group to render. When empty, the entire scene is rendered.
-  ///                   Otherwise, only the geometries of to the named group's links are emitted.
+  ///                   Otherwise, only the geometries of the named group's links are emitted.
   /// @param color Optional override color applied to every marker.
   RoboplanVisualizer(std::shared_ptr<const roboplan::Scene> scene, const std::string& urdf_xml,
                      const std::string& frame_id = "world", const std::string& ns = "/roboplan",
