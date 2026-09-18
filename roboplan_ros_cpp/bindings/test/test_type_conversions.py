@@ -5,7 +5,12 @@ from ament_index_python.packages import get_package_share_path
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose, TransformStamped
 
-from roboplan.core import Scene, JointConfiguration, JointTrajectory
+from roboplan.core import (
+    Scene,
+    JointConfiguration,
+    JointTrajectory,
+    loadUrdfSceneDescription,
+)
 from roboplan_ros.cpp import (
     buildConversionMap,
     toJointState,
@@ -25,7 +30,7 @@ srdf_path = resource_path / "test_robot.srdf"
 
 
 def test_joint_state_mapping():
-    scene = Scene("test_scene", urdf_path, srdf_path)
+    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path, srdf_path))
     joint_state = JointState()
     joint_state.name = ["continuous_joint", "revolute_joint"]
     conversion_map = buildConversionMap(scene, joint_state)
@@ -39,7 +44,7 @@ def test_joint_state_mapping():
 
 def test_convert_joint_state():
     """Test converting between JointConfiguration and JointState."""
-    scene = Scene("test_scene", urdf_path, srdf_path)
+    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path, srdf_path))
     scene.setRngSeed(1234)
 
     joint_state = JointState()

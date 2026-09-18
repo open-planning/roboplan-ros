@@ -42,6 +42,7 @@ from roboplan.core import (
     PathShortcuttingOptions,
     PathShortcutter,
     Scene,
+    UrdfSceneDescription,
 )
 from roboplan.simple_ik import SimpleIk, SimpleIkOptions
 from roboplan.rrt import RRT, RRTOptions
@@ -151,8 +152,7 @@ class PlanAndExecuteNode(Node):
         package_paths = [pkg_share_dir]
         self._scene = Scene(
             name="plan_execute_scene",
-            urdf=urdf_xml,
-            srdf=srdf_xml,
+            description=UrdfSceneDescription(urdf_xml, srdf_xml),
             package_paths=package_paths,
             yaml_config_path=yaml_config_path,
         )
