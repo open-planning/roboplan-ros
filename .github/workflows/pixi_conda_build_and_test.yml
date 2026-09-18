@@ -5,6 +5,8 @@ on:
 
 jobs:
   pixi_conda_roboplan_build_and_test:
+    # TODO: Re-enable once the next release of core RoboPlan is released and updated here.
+    if: false
     name: ${{ matrix.os }} - Build, test against conda roboplan (${{ matrix.ros_distro }})
     timeout-minutes: 30
     strategy:

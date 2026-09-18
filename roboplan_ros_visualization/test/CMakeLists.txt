@@ -1,6 +1,7 @@
 find_package(GTest REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
+find_package(roboplan_simple_ik REQUIRED)
 
 add_executable(roboplan_visualizer_test_cpp roboplan_visualizer_test.cpp)
 set_property(TARGET roboplan_visualizer_test_cpp PROPERTY CXX_STANDARD 20)
@@ -19,4 +20,5 @@ target_link_libraries(
   roboplan_ros_visualization
   GTest::gtest_main
   ament_index_cpp::ament_index_cpp
+  roboplan_simple_ik::roboplan_simple_ik
 )
