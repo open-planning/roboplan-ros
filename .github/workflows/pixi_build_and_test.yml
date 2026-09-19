@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        ros_distro: [rolling, lyrical, kilted, jazzy, humble]
+        ros_distro: [rolling, lyrical, kilted, jazzy]
 
     runs-on: ${{ matrix.os }}
     defaults:

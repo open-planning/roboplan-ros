@@ -11,8 +11,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - ros_distro: humble
-            generate_python_stubs: "OFF"
           - ros_distro: jazzy
             generate_python_stubs: "ON"
           - ros_distro: kilted
