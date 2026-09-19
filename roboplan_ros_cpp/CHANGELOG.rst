@@ -2,8 +2,8 @@
 Changelog for package roboplan_ros_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2026-09-19)
+------------------
 * Update Scene Construction Post SRDF Changes (`#76 <https://github.com/open-planning/roboplan-ros/issues/76>`_)
 * Use helper function to load descriptions for Scene construction (`#66 <https://github.com/open-planning/roboplan-ros/issues/66>`_)
 * Remove roboplan_core vs. roboplan CMakeLists conditionals (`#74 <https://github.com/open-planning/roboplan-ros/issues/74>`_)

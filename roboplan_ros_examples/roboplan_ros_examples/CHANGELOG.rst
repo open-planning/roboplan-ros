@@ -2,8 +2,8 @@
 Changelog for package roboplan_ros_examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2026-09-19)
+------------------
 * Fix rosdeps after roboplan_core package transition (`#73 <https://github.com/open-planning/roboplan-ros/issues/73>`_)
 * Fix ament_cmake dependency in roboplan_ros_examples (`#65 <https://github.com/open-planning/roboplan-ros/issues/65>`_)
 * Contributors: Sebastian Castro
