@@ -33,6 +33,7 @@ from std_srvs.srv import Trigger
 from roboplan.core import (
     CartesianConfiguration,
     Scene,
+    loadJointLimitsConfig,
     loadUrdfSceneDescriptionFromXml,
 )
 from roboplan.filters import SE3LowPassFilter
@@ -163,9 +164,9 @@ class CartesianServoNode(Node):
         self._scene = Scene(
             name="cartesian_servo_scene",
             description=loadUrdfSceneDescriptionFromXml(urdf_xml, package_paths),
-            yaml_config_path=yaml_config_path,
         )
         self._scene.importSrdf(srdf_xml)
+        self._scene.importJointLimitsFromConfig(loadJointLimitsConfig(yaml_config_path))
 
         # Optionally add obstacles (e.g., a tabletop) to the scene.
         self._obstacles = []
