@@ -30,7 +30,11 @@ from visualization_msgs.msg import MarkerArray
 from interactive_markers import InteractiveMarkerServer, MenuHandler
 from std_srvs.srv import Trigger
 
-from roboplan.core import CartesianConfiguration, Scene, UrdfSceneDescription
+from roboplan.core import (
+    CartesianConfiguration,
+    Scene,
+    loadUrdfSceneDescriptionFromXml,
+)
 from roboplan.filters import SE3LowPassFilter
 from roboplan.optimal_ik import (
     ConfigurationTask,
@@ -158,10 +162,10 @@ class CartesianServoNode(Node):
         package_paths = [pkg_share_dir]
         self._scene = Scene(
             name="cartesian_servo_scene",
-            description=UrdfSceneDescription(urdf_xml, srdf_xml),
-            package_paths=package_paths,
+            description=loadUrdfSceneDescriptionFromXml(urdf_xml, package_paths),
             yaml_config_path=yaml_config_path,
         )
+        self._scene.importSrdf(srdf_xml)
 
         # Optionally add obstacles (e.g., a tabletop) to the scene.
         self._obstacles = []
