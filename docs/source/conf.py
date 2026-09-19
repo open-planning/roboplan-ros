@@ -31,7 +31,7 @@ copyright = "2025-2026, Open Planning"
 author = "Erik Holum"
 
 # The full version, including alpha/beta/rc tags
-version = release = "0.6.1"
+version = release = "0.7.0"
 
 
 # -- General configuration ---------------------------------------------------
