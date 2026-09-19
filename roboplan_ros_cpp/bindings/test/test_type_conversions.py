@@ -9,6 +9,7 @@ from roboplan.core import (
     Scene,
     JointConfiguration,
     JointTrajectory,
+    loadTextFile,
     loadUrdfSceneDescription,
 )
 from roboplan_ros.cpp import (
@@ -30,7 +31,8 @@ srdf_path = resource_path / "test_robot.srdf"
 
 
 def test_joint_state_mapping():
-    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path, srdf_path))
+    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path))
+    scene.importSrdf(loadTextFile(srdf_path))
     joint_state = JointState()
     joint_state.name = ["continuous_joint", "revolute_joint"]
     conversion_map = buildConversionMap(scene, joint_state)
@@ -44,7 +46,8 @@ def test_joint_state_mapping():
 
 def test_convert_joint_state():
     """Test converting between JointConfiguration and JointState."""
-    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path, srdf_path))
+    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path))
+    scene.importSrdf(loadTextFile(srdf_path))
     scene.setRngSeed(1234)
 
     joint_state = JointState()

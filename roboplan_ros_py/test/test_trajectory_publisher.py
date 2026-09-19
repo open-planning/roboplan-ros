@@ -6,7 +6,7 @@ import pytest
 from rclpy.clock import Clock, ClockType
 from rclpy.time import Time
 from rclpy.time_source import TimeSource
-from roboplan.core import JointTrajectory, Scene, loadUrdfSceneDescription
+from roboplan.core import JointTrajectory, Scene, loadTextFile, loadUrdfSceneDescription
 from roboplan.example_models import get_package_models_dir, get_package_share_dir
 from roboplan_ros.visualization import RoboplanVisualizer
 from visualization_msgs.msg import Marker
@@ -38,11 +38,12 @@ def scene() -> Scene:
     models_dir = get_package_models_dir() / "ur_robot_model"
     urdf_path = models_dir / "ur5_gripper.urdf"
     srdf_path = models_dir / "ur5_gripper.srdf"
-    return Scene(
+    scene = Scene(
         "test_scene",
-        loadUrdfSceneDescription(urdf_path, srdf_path),
-        [get_package_share_dir()],
+        loadUrdfSceneDescription(urdf_path, [get_package_share_dir()]),
     )
+    scene.importSrdf(loadTextFile(srdf_path))
+    return scene
 
 
 @pytest.fixture

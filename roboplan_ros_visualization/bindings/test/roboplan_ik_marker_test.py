@@ -7,6 +7,7 @@ from roboplan.core import (
     Scene,
     CartesianConfiguration,
     JointConfiguration,
+    loadTextFile,
     loadUrdfSceneDescription,
 )
 from roboplan.example_models import get_package_models_dir, get_package_share_dir
@@ -28,7 +29,8 @@ def test_process_feedback():
     package_paths = [get_package_share_dir()]
 
     # Just start right next to IK pose to make the IK trivial
-    scene = Scene("test", loadUrdfSceneDescription(urdf_path, srdf_path), package_paths)
+    scene = Scene("test", loadUrdfSceneDescription(urdf_path, package_paths))
+    scene.importSrdf(loadTextFile(srdf_path))
     q_init = np.array(scene.getCurrentJointPositions())
     q_init[:] = [0.0, -1.57, 1.57, -1.57, -1.57, 0.0]
     scene.setJointPositions(q_init)
@@ -85,7 +87,8 @@ def test_process_feedback_oink():
     srdf_path = models_dir / "ur_robot_model" / "ur5_gripper.srdf"
     package_paths = [get_package_share_dir()]
 
-    scene = Scene("test", loadUrdfSceneDescription(urdf_path, srdf_path), package_paths)
+    scene = Scene("test", loadUrdfSceneDescription(urdf_path, package_paths))
+    scene.importSrdf(loadTextFile(srdf_path))
     q_init = np.array(scene.getCurrentJointPositions())
     q_init[:] = [0.0, -1.57, 1.57, -1.57, -1.57, 0.0]
     scene.setJointPositions(q_init)

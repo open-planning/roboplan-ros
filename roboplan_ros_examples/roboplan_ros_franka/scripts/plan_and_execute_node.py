@@ -42,7 +42,8 @@ from roboplan.core import (
     PathShortcuttingOptions,
     PathShortcutter,
     Scene,
-    UrdfSceneDescription,
+    loadJointLimitsConfig,
+    loadUrdfSceneDescriptionFromXml,
 )
 from roboplan.simple_ik import SimpleIk, SimpleIkOptions
 from roboplan.rrt import RRT, RRTOptions
@@ -152,10 +153,10 @@ class PlanAndExecuteNode(Node):
         package_paths = [pkg_share_dir]
         self._scene = Scene(
             name="plan_execute_scene",
-            description=UrdfSceneDescription(urdf_xml, srdf_xml),
-            package_paths=package_paths,
-            yaml_config_path=yaml_config_path,
+            description=loadUrdfSceneDescriptionFromXml(urdf_xml, package_paths),
         )
+        self._scene.importSrdf(srdf_xml)
+        self._scene.importJointLimitsFromConfig(loadJointLimitsConfig(yaml_config_path))
         self._q_indices = self._scene.getJointGroupInfo(self._joint_group).q_indices
 
         # Optionally add obstacles (e.g., a tabletop) to the planning scene so
