@@ -2,6 +2,17 @@
 Changelog for package roboplan_ros_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.0 (2026-09-19)
+------------------
+* Update Scene Construction Post SRDF Changes (`#76 <https://github.com/open-planning/roboplan-ros/issues/76>`_)
+* Use helper function to load descriptions for Scene construction (`#66 <https://github.com/open-planning/roboplan-ros/issues/66>`_)
+* Remove roboplan_core vs. roboplan CMakeLists conditionals (`#74 <https://github.com/open-planning/roboplan-ros/issues/74>`_)
+* Robot visualization improvements (`#72 <https://github.com/open-planning/roboplan-ros/issues/72>`_)
+* Fix rosdeps after roboplan_core package transition (`#73 <https://github.com/open-planning/roboplan-ros/issues/73>`_)
+* Add stable ABI modules for nanobind bindings to match core roboplan (`#69 <https://github.com/open-planning/roboplan-ros/issues/69>`_)
+* Consolidate build jobs as per roboplan (`#67 <https://github.com/open-planning/roboplan-ros/issues/67>`_)
+* Contributors: Erik Holum, Sebastian Castro
+
 0.6.1 (2026-08-20)
 ------------------
 * Depend on typing_extensions via rosdep (`#62 <https://github.com/open-planning/roboplan-ros/issues/62>`_)
