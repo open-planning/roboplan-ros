@@ -61,7 +61,7 @@ def get_robot_description(node, topic="/robot_description"):
             future.set_result(msg.data)
 
     sub = node.create_subscription(String, topic, description_cb, LATCHED_QOS)
-    while not future.done():
+    while rclpy.ok() and not future.done():
         node.get_logger().info(f"Waiting for robot description on {topic}...")
         rclpy.spin_until_future_complete(node, future, timeout_sec=1.0)
     node.destroy_subscription(sub)
