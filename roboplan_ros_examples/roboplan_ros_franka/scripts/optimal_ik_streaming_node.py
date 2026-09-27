@@ -56,6 +56,7 @@ from roboplan_ros_examples.utils import (
     JointStateSubscriber,
     ParallelGripperClient,
     add_box_obstacles,
+    get_robot_description,
     obstacle_marker_array,
 )
 
@@ -72,12 +73,13 @@ class CartesianServoNode(Node):
     def __init__(self):
         super().__init__("cartesian_servo_node")
 
-        # Scene file params, defaults to FR3 packages
+        # The URDF comes from a topic; the SRDF and joint limits come from files,
+        # which default to the FR3 packages
+        self.declare_parameter("robot_description_topic", "/robot_description")
         self.declare_parameter("robot_description_package", "roboplan_example_models")
         self.declare_parameter(
             "robot_descriptions_model_path", "models/franka_robot_model"
         )
-        self.declare_parameter("urdf_filename", "fr3.urdf")
         self.declare_parameter("srdf_filename", "fr3.srdf")
         self.declare_parameter("yaml_config_filename", "fr3_config.yaml")
 
@@ -116,13 +118,13 @@ class CartesianServoNode(Node):
         self.declare_parameter("safe_displacement_gain", 0.01)
 
         # Get parameter values
+        robot_description_topic = self.get_parameter("robot_description_topic").value
         robot_description_package = self.get_parameter(
             "robot_description_package"
         ).value
         robot_descriptions_model_path = self.get_parameter(
             "robot_descriptions_model_path"
         ).value
-        urdf_filename = self.get_parameter("urdf_filename").value
         srdf_filename = self.get_parameter("srdf_filename").value
         yaml_config_filename = self.get_parameter("yaml_config_filename").value
 
@@ -154,16 +156,15 @@ class CartesianServoNode(Node):
         # Control loop time step for Cartesian tracking
         self._dt = 1.0 / control_freq
 
-        # Get robot description files and setup the scene
+        # Get the robot description and setup the scene
+        urdf_xml = get_robot_description(self, robot_description_topic)
         pkg_share_dir = get_package_share_path(robot_description_package).as_posix()
         models_dir = os.path.join(pkg_share_dir, robot_descriptions_model_path)
-        urdf_xml = xacro.process_file(os.path.join(models_dir, urdf_filename)).toxml()
         srdf_xml = xacro.process_file(os.path.join(models_dir, srdf_filename)).toxml()
         yaml_config_path = os.path.join(models_dir, yaml_config_filename)
-        package_paths = [pkg_share_dir]
         self._scene = Scene(
             name="cartesian_servo_scene",
-            description=loadUrdfSceneDescriptionFromXml(urdf_xml, package_paths),
+            description=loadUrdfSceneDescriptionFromXml(urdf_xml),
         )
         self._scene.importSrdf(srdf_xml)
         self._scene.importJointLimitsFromConfig(loadJointLimitsConfig(yaml_config_path))

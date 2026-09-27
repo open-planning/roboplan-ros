@@ -7,11 +7,13 @@ import threading
 import numpy as np
 import yaml
 
+import rclpy
 from rclpy.action import ActionClient
 from rclpy.node import Node
 from rclpy.executors import SingleThreadedExecutor
+from rclpy.task import Future
 from sensor_msgs.msg import JointState
-from std_msgs.msg import ColorRGBA
+from std_msgs.msg import ColorRGBA, String
 from visualization_msgs.msg import Marker, MarkerArray
 from rclpy.qos import (
     QoSProfile,
@@ -43,6 +45,27 @@ LATCHED_QOS = QoSProfile(
     history=QoSHistoryPolicy.KEEP_LAST,
     durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
 )
+
+
+def get_robot_description(node, topic="/robot_description"):
+    """
+    Blocks until a URDF is published on the robot description topic, and returns
+    it as an XML string.
+
+    Must be called before the node is added to an executor, e.g., in __init__.
+    """
+    future = Future()
+
+    def description_cb(msg):
+        if not future.done():
+            future.set_result(msg.data)
+
+    sub = node.create_subscription(String, topic, description_cb, LATCHED_QOS)
+    while not future.done():
+        node.get_logger().info(f"Waiting for robot description on {topic}...")
+        rclpy.spin_until_future_complete(node, future, timeout_sec=1.0)
+    node.destroy_subscription(sub)
+    return future.result()
 
 
 class JointStateSubscriber:
