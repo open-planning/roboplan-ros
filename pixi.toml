@@ -80,6 +80,7 @@ llvm-tools = ">=22.1.8,<23"
 
 [pypi-dependencies]
 obj2mjcf = ">=0.0.25, <0.0.26"
+robot_descriptions = ">=1.12,<2"
 
 [activation]
 scripts = ["install/setup.sh"]
