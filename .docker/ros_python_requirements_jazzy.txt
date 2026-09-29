@@ -1,8 +1,10 @@
 matplotlib
+mujoco>=3.2,<4
 numpy<2.0.0
 obj2mjcf
 opencv-contrib-python-headless
 plyfile
+robot_descriptions>=1.12,<2
 typing_extensions==4.10.0
 tyro
 viser>=1.0.29
