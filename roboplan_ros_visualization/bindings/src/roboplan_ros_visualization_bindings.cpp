@@ -25,7 +25,6 @@ NB_MODULE(_visualization_ext, m) {
   // Otherwise we end up with bad casts when importing everything at once without pre-importing
   // the deps.
   nb::module_::import_("roboplan.core");
-  nb::module_::import_("roboplan.simple_ik");
   nb::module_::import_("roboplan_ros.cpp");
 
   // Pre-import Python messages to avoid repeated lookups
