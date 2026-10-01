@@ -5,7 +5,13 @@ authors = [
 ]
 channels = ["conda-forge"]
 name = "roboplan-ros"
-platforms = ["linux-64", "linux-aarch64", "osx-arm64", "win-64"]
+platforms = [
+    "linux-64",
+    "linux-aarch64",
+    # RoboStack osx-arm64 builds require macOS 14+
+    { name = "osx-arm64-macos14", platform = "osx-arm64", macos = "14.0" },
+    "win-64",
+]
 version = "0.7.0"
 
 [tasks]
@@ -16,8 +22,8 @@ git -C roboplan checkout "$(cat ROBOPLAN_VERSION)" && \
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = { cmd = ["colcon", "build"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
+build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI"] }
+build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI"] }
 test = { cmd = ["colcon", "test"] }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
 
@@ -31,6 +37,16 @@ build = { cmd = [
   "-DCMAKE_CXX_COMPILER=clang-cl",
   "-DCMAKE_LINKER=lld-link",
   "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+  "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI",
+] }
+build-symlink = { cmd = [
+  "colcon", "build", "--symlink-install", "--cmake-args",
+  "-GNinja",
+  "-DCMAKE_C_COMPILER=clang-cl",
+  "-DCMAKE_CXX_COMPILER=clang-cl",
+  "-DCMAKE_LINKER=lld-link",
+  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+  "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI",
 ] }
 
 [dependencies]
@@ -50,7 +66,7 @@ tyro = ">=0.9.32,<0.10"
 matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
 numpy = ">=1.26.4,<3"
-nanobind = ">=2.12.0,<3"
+nanobind = ">=2.12.0,<4"
 libtoppra  = ">=0.6.9,<0.7"
 proxsuite = ">=0.7.3,<0.8"
 
@@ -85,6 +101,11 @@ robot_descriptions = ">=1.12,<2"
 [activation]
 scripts = ["install/setup.sh"]
 
+[activation.env]
+# Build nanobind extensions with the stable Python ABI. Must be ON when using
+# prebuilt roboplan core from conda-forge/RoboStack (see *-roboplan features).
+ROBOPLAN_ROS_STABLE_ABI = "OFF"
+
 [target.unix.activation.env]
 # Prioritize pixi installed packages
 CMAKE_PREFIX_PATH = "${CONDA_PREFIX}:${CMAKE_PREFIX_PATH}"
@@ -113,10 +134,11 @@ lyrical = { features = ["lyrical"] }
 kilted = { features = ["kilted"] }
 jazzy = { features = ["jazzy"] }
 
-# Composing existing packages with core RoboPlan from Conda to supporting
-# building against Conda built
+# Composing existing packages with core RoboPlan from Conda/RoboStack to
+# supporting building against Conda built core.
+# Note that not all distros are yet on RoboStack.
 rolling-conda-roboplan = { features = ["rolling", "conda-roboplan"] }
-lyrical-conda-roboplan = { features = ["lyrical", "conda-roboplan"] }
+lyrical-conda-roboplan = { features = ["lyrical", "robostack-roboplan"] }
 kilted-conda-roboplan = { features = ["kilted", "conda-roboplan"] }
 jazzy-conda-roboplan = { features = ["jazzy", "conda-roboplan"] }
 
@@ -127,28 +149,30 @@ jazzy-conda-roboplan = { features = ["jazzy", "conda-roboplan"] }
 channels = ["https://prefix.dev/robostack-rolling"]
 
 [feature.rolling.dependencies]
-ros-rolling-ros-base = "*"
+ros2-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
-ros-rolling-builtin-interfaces = "*"
-ros-rolling-console-bridge-vendor = "*"
-ros-rolling-controller-manager = "*"
-ros-rolling-geometry-msgs = "*"
-ros-rolling-interactive-markers = "*"
-ros-rolling-joint-state-broadcaster = "*"
-ros-rolling-joint-trajectory-controller = "*"
-ros-rolling-parallel-gripper-controller = "*"
-ros-rolling-robot-state-publisher = "*"
-ros-rolling-ros2controlcli = "*"
-ros-rolling-rviz2 = "*"
-ros-rolling-sensor-msgs = "*"
-ros-rolling-tf2-eigen = "*"
-ros-rolling-tinyxml2-vendor = "*"
-ros-rolling-topic-tools = "*"
-ros-rolling-trajectory-msgs = "*"
-ros-rolling-urdfdom = "*"
-ros-rolling-visualization-msgs = "*"
-ros-rolling-xacro = "*"
+ros2-builtin-interfaces = "*"
+ros2-console-bridge-vendor = "*"
+ros2-controller-manager = "*"
+ros2-geometry-msgs = "*"
+ros2-interactive-markers = "*"
+ros2-joint-state-broadcaster = "*"
+ros2-joint-trajectory-controller = "*"
+ros2-parallel-gripper-controller = "*"
+ros2-robot-state-publisher = "*"
+ros2-ros2controlcli = "*"
+ros2-rviz2 = "*"
+ros2-sensor-msgs = "*"
+ros2-tf2-eigen = "*"
+ros2-topic-tools = "*"
+ros2-trajectory-msgs = "*"
+ros2-urdfdom = "*"
+ros2-visualization-msgs = "*"
+ros2-xacro = "*"
+
+# roboplan_core uses plain tinyxml2 (not the vendor package) on this distro
+tinyxml2 = "*"
 
 # Pinocchio from conda-forge, since RoboStack does not build it for win-64
 pinocchio = ">=4.1.0,<5"
@@ -163,28 +187,30 @@ ROS_DISTRO = "rolling"
 channels = ["https://prefix.dev/robostack-lyrical"]
 
 [feature.lyrical.dependencies]
-ros-lyrical-ros-base = "*"
+ros2-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
-ros-lyrical-builtin-interfaces = "*"
-ros-lyrical-console-bridge-vendor = "*"
-ros-lyrical-controller-manager = "*"
-ros-lyrical-geometry-msgs = "*"
-ros-lyrical-interactive-markers = "*"
-ros-lyrical-joint-state-broadcaster = "*"
-ros-lyrical-joint-trajectory-controller = "*"
-ros-lyrical-parallel-gripper-controller = "*"
-ros-lyrical-robot-state-publisher = "*"
-ros-lyrical-ros2controlcli = "*"
-ros-lyrical-rviz2 = "*"
-ros-lyrical-sensor-msgs = "*"
-ros-lyrical-tf2-eigen = "*"
-ros-lyrical-tinyxml2-vendor = "*"
-ros-lyrical-topic-tools = "*"
-ros-lyrical-trajectory-msgs = "*"
-ros-lyrical-urdfdom = "*"
-ros-lyrical-visualization-msgs = "*"
-ros-lyrical-xacro = "*"
+ros2-builtin-interfaces = "*"
+ros2-console-bridge-vendor = "*"
+ros2-controller-manager = "*"
+ros2-geometry-msgs = "*"
+ros2-interactive-markers = "*"
+ros2-joint-state-broadcaster = "*"
+ros2-joint-trajectory-controller = "*"
+ros2-parallel-gripper-controller = "*"
+ros2-robot-state-publisher = "*"
+ros2-ros2controlcli = "*"
+ros2-rviz2 = "*"
+ros2-sensor-msgs = "*"
+ros2-tf2-eigen = "*"
+ros2-topic-tools = "*"
+ros2-trajectory-msgs = "*"
+ros2-urdfdom = "*"
+ros2-visualization-msgs = "*"
+ros2-xacro = "*"
+
+# roboplan_core uses plain tinyxml2 (not the vendor package) on this distro
+tinyxml2 = "*"
 
 # Pinocchio from conda-forge, since RoboStack does not build it for win-64
 pinocchio = ">=4.1.0,<5"
@@ -237,37 +263,37 @@ ROS_DISTRO = "kilted"
 channels = ["https://prefix.dev/robostack-jazzy"]
 
 [feature.jazzy.dependencies]
-ros-jazzy-ros-base = "*"
+ros2-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
-ros-jazzy-builtin-interfaces = "*"
-ros-jazzy-console-bridge-vendor = "*"
-ros-jazzy-controller-manager = "*"
-ros-jazzy-geometry-msgs = "*"
-ros-jazzy-interactive-markers = "*"
-ros-jazzy-joint-state-broadcaster = "*"
-ros-jazzy-joint-trajectory-controller = "*"
-ros-jazzy-parallel-gripper-controller = "*"
-ros-jazzy-robot-state-publisher = "*"
-ros-jazzy-ros2controlcli = "*"
-ros-jazzy-rviz2 = "*"
-ros-jazzy-sensor-msgs = "*"
-ros-jazzy-tf2-eigen = "*"
-ros-jazzy-tinyxml2-vendor = "*"
-ros-jazzy-tl-expected = "*"
-ros-jazzy-topic-tools = "*"
-ros-jazzy-trajectory-msgs = "*"
-ros-jazzy-urdfdom = "*"
-ros-jazzy-visualization-msgs = "*"
-ros-jazzy-xacro = "*"
-ros-jazzy-yaml-cpp-vendor = "*"
+ros2-builtin-interfaces = "*"
+ros2-console-bridge-vendor = "*"
+ros2-controller-manager = "*"
+ros2-geometry-msgs = "*"
+ros2-interactive-markers = "*"
+ros2-joint-state-broadcaster = "*"
+ros2-joint-trajectory-controller = "*"
+ros2-parallel-gripper-controller = "*"
+ros2-robot-state-publisher = "*"
+ros2-ros2controlcli = "*"
+ros2-rviz2 = "*"
+ros2-sensor-msgs = "*"
+ros2-tf2-eigen = "*"
+ros2-tinyxml2-vendor = "*"
+ros2-tl-expected = "*"
+ros2-topic-tools = "*"
+ros2-trajectory-msgs = "*"
+ros2-urdfdom = "*"
+ros2-visualization-msgs = "*"
+ros2-xacro = "*"
+ros2-yaml-cpp-vendor = "*"
 
 # Pinocchio from conda-forge, since RoboStack does not build it for win-64
 pinocchio = ">=4.1.0,<5"
 
 # RoboStack only builds mujoco_ros2_control for Linux
 [feature.jazzy.target.linux.dependencies]
-ros-jazzy-mujoco-ros2-control = "*"
+ros2-mujoco-ros2-control = "*"
 
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
@@ -276,30 +302,37 @@ ROS_DISTRO = "jazzy"
 # feature above, instead of cloning/building roboplan from source in the
 # same environment. Must be used with the conda feature above.
 [feature.conda-roboplan.dependencies]
-roboplan-python = "*"
-roboplan-simple-ik-python = "*"
-roboplan-oink-python = "*"
+roboplan-python = ">=0.7.0,<0.8.0"
 
 # Must match the nanobind-abi generation roboplan-python (conda-forge) was
 # built against!
 # TODO: drop once roboplan-feedstock exports this transitively.
-nanobind-abi = "==20"
+nanobind-abi = "==22"
+
+[feature.robostack-roboplan.dependencies]
+ros2-roboplan = ">=0.7.0,<0.8.0"
+
+# Same as above
+nanobind-abi = "==22"
+
+# RoboStack only builds this for linux-64 on some distros
+[feature.robostack-roboplan.target.linux-64.dependencies]
+ros2-roboplan-ros-franka = "*"
+
+[feature.conda-roboplan.activation.env]
+ROBOPLAN_ROS_STABLE_ABI = "ON"
 
 [feature.conda-roboplan.tasks]
 setup = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
 
-[feature.conda-roboplan.target.win.tasks]
-build = { cmd = [
-  "colcon", "build", "--cmake-args",
-  "-GNinja",
-  "-DCMAKE_C_COMPILER=clang-cl",
-  "-DCMAKE_CXX_COMPILER=clang-cl",
-  "-DCMAKE_LINKER=lld-link",
-  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
-  "-DROBOPLAN_ROS_STABLE_ABI=ON",
-] }
+[feature.robostack-roboplan.activation.env]
+ROBOPLAN_ROS_STABLE_ABI = "ON"
+
+[feature.robostack-roboplan.tasks]
+setup = { cmd = """
+colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
+colcon mixin update default
+""" }
