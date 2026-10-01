@@ -38,6 +38,14 @@ build = { cmd = [
   "-DCMAKE_LINKER=lld-link",
   "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
 ] }
+build-symlink = { cmd = [
+  "colcon", "build", "--symlink-install", "--cmake-args",
+  "-GNinja",
+  "-DCMAKE_C_COMPILER=clang-cl",
+  "-DCMAKE_CXX_COMPILER=clang-cl",
+  "-DCMAKE_LINKER=lld-link",
+  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+] }
 
 [dependencies]
 # Build deps
@@ -323,6 +331,35 @@ build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args",
 [feature.conda-roboplan.target.win.tasks]
 build = { cmd = [
   "colcon", "build", "--cmake-args",
+  "-GNinja",
+  "-DCMAKE_C_COMPILER=clang-cl",
+  "-DCMAKE_CXX_COMPILER=clang-cl",
+  "-DCMAKE_LINKER=lld-link",
+  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+  "-DROBOPLAN_ROS_STABLE_ABI=ON",
+] }
+build-symlink = { cmd = [
+  "colcon", "build", "--symlink-install", "--cmake-args",
+  "-GNinja",
+  "-DCMAKE_C_COMPILER=clang-cl",
+  "-DCMAKE_CXX_COMPILER=clang-cl",
+  "-DCMAKE_LINKER=lld-link",
+  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+  "-DROBOPLAN_ROS_STABLE_ABI=ON",
+] }
+
+[feature.robostack-roboplan.target.win.tasks]
+build = { cmd = [
+  "colcon", "build", "--cmake-args",
+  "-GNinja",
+  "-DCMAKE_C_COMPILER=clang-cl",
+  "-DCMAKE_CXX_COMPILER=clang-cl",
+  "-DCMAKE_LINKER=lld-link",
+  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+  "-DROBOPLAN_ROS_STABLE_ABI=ON",
+] }
+build-symlink = { cmd = [
+  "colcon", "build", "--symlink-install", "--cmake-args",
   "-GNinja",
   "-DCMAKE_C_COMPILER=clang-cl",
   "-DCMAKE_CXX_COMPILER=clang-cl",
