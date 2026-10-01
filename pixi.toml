@@ -22,8 +22,8 @@ git -C roboplan checkout "$(cat ROBOPLAN_VERSION)" && \
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = { cmd = ["colcon", "build"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install"] }
+build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI"] }
+build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI"] }
 test = { cmd = ["colcon", "test"] }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
 
@@ -37,6 +37,7 @@ build = { cmd = [
   "-DCMAKE_CXX_COMPILER=clang-cl",
   "-DCMAKE_LINKER=lld-link",
   "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+  "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI",
 ] }
 build-symlink = { cmd = [
   "colcon", "build", "--symlink-install", "--cmake-args",
@@ -45,6 +46,7 @@ build-symlink = { cmd = [
   "-DCMAKE_CXX_COMPILER=clang-cl",
   "-DCMAKE_LINKER=lld-link",
   "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
+  "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI",
 ] }
 
 [dependencies]
@@ -98,6 +100,11 @@ robot_descriptions = ">=1.12,<2"
 
 [activation]
 scripts = ["install/setup.sh"]
+
+[activation.env]
+# Build nanobind extensions with the stable Python ABI. Must be ON when using
+# prebuilt roboplan core from conda-forge/RoboStack (see *-roboplan features).
+ROBOPLAN_ROS_STABLE_ABI = "OFF"
 
 [target.unix.activation.env]
 # Prioritize pixi installed packages
@@ -312,58 +319,20 @@ nanobind-abi = "==22"
 [feature.robostack-roboplan.target.linux-64.dependencies]
 ros2-roboplan-ros-franka = "*"
 
+[feature.conda-roboplan.activation.env]
+ROBOPLAN_ROS_STABLE_ABI = "ON"
+
 [feature.conda-roboplan.tasks]
 setup = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
+
+[feature.robostack-roboplan.activation.env]
+ROBOPLAN_ROS_STABLE_ABI = "ON"
 
 [feature.robostack-roboplan.tasks]
 setup = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
 """ }
-build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
-build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=ON"] }
-
-[feature.conda-roboplan.target.win.tasks]
-build = { cmd = [
-  "colcon", "build", "--cmake-args",
-  "-GNinja",
-  "-DCMAKE_C_COMPILER=clang-cl",
-  "-DCMAKE_CXX_COMPILER=clang-cl",
-  "-DCMAKE_LINKER=lld-link",
-  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
-  "-DROBOPLAN_ROS_STABLE_ABI=ON",
-] }
-build-symlink = { cmd = [
-  "colcon", "build", "--symlink-install", "--cmake-args",
-  "-GNinja",
-  "-DCMAKE_C_COMPILER=clang-cl",
-  "-DCMAKE_CXX_COMPILER=clang-cl",
-  "-DCMAKE_LINKER=lld-link",
-  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
-  "-DROBOPLAN_ROS_STABLE_ABI=ON",
-] }
-
-[feature.robostack-roboplan.target.win.tasks]
-build = { cmd = [
-  "colcon", "build", "--cmake-args",
-  "-GNinja",
-  "-DCMAKE_C_COMPILER=clang-cl",
-  "-DCMAKE_CXX_COMPILER=clang-cl",
-  "-DCMAKE_LINKER=lld-link",
-  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
-  "-DROBOPLAN_ROS_STABLE_ABI=ON",
-] }
-build-symlink = { cmd = [
-  "colcon", "build", "--symlink-install", "--cmake-args",
-  "-GNinja",
-  "-DCMAKE_C_COMPILER=clang-cl",
-  "-DCMAKE_CXX_COMPILER=clang-cl",
-  "-DCMAKE_LINKER=lld-link",
-  "-DPython3_EXECUTABLE=$CONDA_PREFIX/python.exe",  # conda envs ship no python3.exe on Windows
-  "-DROBOPLAN_ROS_STABLE_ABI=ON",
-] }
