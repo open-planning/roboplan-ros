@@ -11,12 +11,9 @@ Intended as an example _only_. Consumers are expected to use this as a
 reference, rather than hardened application code.
 """
 
-import os
 import time
 import threading
 import xacro
-
-from ament_index_python.packages import get_package_share_path
 
 import rclpy
 from rclpy.action import ActionClient
@@ -84,15 +81,12 @@ class PlanAndExecuteNode(Node):
     def __init__(self):
         super().__init__("plan_and_execute_node")
 
-        # The URDF comes from a topic; the SRDF and joint limits come from files,
-        # which default to the FR3 packages
+        # The URDF comes from a topic; the SRDF and joint limits come from files
         self.declare_parameter("robot_description_topic", "/robot_description")
-        self.declare_parameter("robot_description_package", "roboplan_example_models")
-        self.declare_parameter(
-            "robot_descriptions_model_path", "models/franka_robot_model"
-        )
-        self.declare_parameter("srdf_filename", "fr3.srdf")
-        self.declare_parameter("yaml_config_filename", "fr3_config.yaml")
+        self.declare_parameter("srdf_file", "")
+        self.declare_parameter("yaml_config_file", "")
+        # Paths used to resolve package:// mesh URIs in the URDF
+        self.declare_parameter("package_paths", [""])
 
         # HW connection params
         self.declare_parameter("joint_state_topic", "/joint_states")
@@ -119,14 +113,9 @@ class PlanAndExecuteNode(Node):
 
         # Get parameter values
         robot_description_topic = self.get_parameter("robot_description_topic").value
-        robot_description_package = self.get_parameter(
-            "robot_description_package"
-        ).value
-        robot_descriptions_model_path = self.get_parameter(
-            "robot_descriptions_model_path"
-        ).value
-        srdf_filename = self.get_parameter("srdf_filename").value
-        yaml_config_filename = self.get_parameter("yaml_config_filename").value
+        srdf_file = self.get_parameter("srdf_file").value
+        yaml_config_file = self.get_parameter("yaml_config_file").value
+        package_paths = [p for p in self.get_parameter("package_paths").value if p]
 
         joint_state_topic = self.get_parameter("joint_state_topic").value
         action_server_name = self.get_parameter("action_server_name").value
@@ -145,19 +134,13 @@ class PlanAndExecuteNode(Node):
 
         # Get the robot description and setup the scene
         urdf_xml = get_robot_description(self, robot_description_topic)
-        pkg_share_dir = get_package_share_path(robot_description_package).as_posix()
-        models_dir = os.path.join(
-            pkg_share_dir,
-            robot_descriptions_model_path,
-        )
-        srdf_xml = xacro.process_file(os.path.join(models_dir, srdf_filename)).toxml()
-        yaml_config_path = os.path.join(models_dir, yaml_config_filename)
+        srdf_xml = xacro.process_file(srdf_file).toxml()
         self._scene = Scene(
             name="plan_execute_scene",
-            description=loadUrdfSceneDescriptionFromXml(urdf_xml),
+            description=loadUrdfSceneDescriptionFromXml(urdf_xml, package_paths),
         )
         self._scene.importSrdf(srdf_xml)
-        self._scene.importJointLimitsFromConfig(loadJointLimitsConfig(yaml_config_path))
+        self._scene.importJointLimitsFromConfig(loadJointLimitsConfig(yaml_config_file))
         self._q_indices = self._scene.getJointGroupInfo(self._joint_group).q_indices
 
         # Optionally add obstacles (e.g., a tabletop) to the planning scene so

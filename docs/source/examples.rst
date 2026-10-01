@@ -28,7 +28,7 @@ To launch the demo,
 
 ::
 
-    ros2 launch roboplan_ros_franka franka_example_planning.launch.yaml
+    ros2 launch roboplan_ros_franka franka_example_planning.launch.py
 
 .. figure:: media/sample_rrt_execution.gif
    :width: 600px
@@ -54,7 +54,7 @@ To launch the demo,
 
 ::
 
-    ros2 launch roboplan_ros_franka franka_optimal_ik_streaming.launch.yaml
+    ros2 launch roboplan_ros_franka franka_optimal_ik_streaming.launch.py
 
 .. figure:: media/sample_oink.gif
    :width: 600px
@@ -77,6 +77,6 @@ To launch the demos, set the ``hardware_type:=mujoco`` launch argument.
 
 ::
 
-    ros2 launch roboplan_ros_franka franka_example_planning.launch.yaml hardware_type:=mujoco
+    ros2 launch roboplan_ros_franka franka_example_planning.launch.py hardware_type:=mujoco
 
-    ros2 launch roboplan_ros_franka franka_optimal_ik_streaming.launch.yaml hardware_type:=mujoco
+    ros2 launch roboplan_ros_franka franka_optimal_ik_streaming.launch.py hardware_type:=mujoco
