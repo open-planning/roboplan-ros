@@ -276,9 +276,7 @@ ROS_DISTRO = "jazzy"
 # feature above, instead of cloning/building roboplan from source in the
 # same environment. Must be used with the conda feature above.
 [feature.conda-roboplan.dependencies]
-roboplan-python = "*"
-roboplan-simple-ik-python = "*"
-roboplan-oink-python = "*"
+roboplan-python = ">=0.7.0,<0.8.0"
 
 # Must match the nanobind-abi generation roboplan-python (conda-forge) was
 # built against!

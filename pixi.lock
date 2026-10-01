@@ -4344,7 +4344,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nspr-4.40-h29cc59b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nss-3.118-h445c969_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.5.3-py312he827f4e_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/octomap-1.10.0-h4dbf13b_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openexr-3.4.15-ha9edf89_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjpeg-2.5.4-heb1ab33_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjph-0.31.0-h8d634f6_0.conda
@@ -4376,10 +4375,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/qt6-main-6.11.2-pl5321h9df5c37_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/readline-8.3-hd6e31c0_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/rhash-1.4.6-hb03c661_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-example-models-python-0.6.1-py312h069df0d_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-oink-python-0.6.1-py312h8c10cca_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-python-0.6.1-py312hf955722_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-simple-ik-python-0.6.1-py312h8c10cca_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ruby-3.4.2-he7af4c9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/sccache-0.16.0-he64ecbb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/scipy-1.18.1-py312h106c528_0.conda
@@ -4564,6 +4559,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/viser-1.1.0-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/wheel-0.48.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/zipp-4.1.0-pyhcf101f3_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-cartesian-planning-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-core-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-example-models-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-oink-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-rrt-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-simple-ik-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-toppra-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/octomap-1.10.1-h4dbf13b_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-cartesian-planning-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-common-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-core-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-example-models-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-oink-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-python-0.7.0-hfc2019e_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-rrt-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-simple-ik-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-toppra-python-0.7.0-np2py312hbfe1cb0_2.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-action-msgs-2.0.4-np2py312h2ed9cc7_21.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-ament-cmake-2.5.6-np2py312h2ed9cc7_21.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-ament-cmake-core-2.5.6-np2py312h2ed9cc7_21.conda
@@ -5219,7 +5231,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/nspr-4.40-h3ad9384_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/nss-3.118-h544fa81_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/numpy-2.5.3-py312hfb93532_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/octomap-1.10.0-h45ce4d5_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openexr-3.4.15-h6af3ce4_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openjpeg-2.5.4-h504851f_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openjph-0.31.0-h55827e0_0.conda
@@ -5251,10 +5262,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/qt6-main-6.11.2-pl5321h2856613_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/readline-8.3-ha7194a6_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/rhash-1.4.6-he30d5cf_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-example-models-python-0.6.1-py312h898df7b_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-oink-python-0.6.1-py312h8d8f5a6_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-python-0.6.1-py312h5ae76e9_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.6.1-py312h8d8f5a6_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/ruby-3.4.2-hf77cb2b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/sccache-0.16.0-hb434046_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/scipy-1.18.1-py312h3e7234c_0.conda
@@ -5438,6 +5445,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/viser-1.1.0-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/wheel-0.48.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/zipp-4.1.0-pyhcf101f3_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-cartesian-planning-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-core-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-example-models-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-oink-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-rrt-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-simple-ik-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-toppra-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/octomap-1.10.1-h45ce4d5_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-cartesian-planning-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-common-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-core-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-example-models-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-oink-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-python-0.7.0-h22914b5_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-rrt-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-toppra-python-0.7.0-np2py312h122dcda_2.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-action-msgs-2.0.4-np2py312h61f2ce4_21.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-ament-cmake-2.5.6-np2py312h61f2ce4_21.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-aarch64/ros-jazzy-ament-cmake-core-2.5.6-np2py312h61f2ce4_21.conda
@@ -6161,7 +6185,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nspr-4.40-hdcbdcf5_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nss-3.118-h1c710a3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.5.3-py312hff34920_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/octomap-1.10.0-hfbe1efa_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openexr-3.4.15-h3105456_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openjpeg-2.5.4-h4d1e80c_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openjph-0.31.0-h2a4d681_0.conda
@@ -6190,10 +6213,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/qt-main-5.15.15-he8aa932_8.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/readline-8.3-h8b90a29_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/rhash-1.4.6-h84a0fba_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-example-models-python-0.6.1-py312h75fbf8a_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-oink-python-0.6.1-py312h707dcf1_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-python-0.6.1-py312h4655fa0_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-simple-ik-python-0.6.1-py312h707dcf1_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ruby-3.4.2-he7d92ad_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/sccache-0.16.0-h6fdd925_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/scipy-1.18.1-py312h84b0c4e_0.conda
@@ -6232,6 +6251,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstandard-0.25.0-py312hbd136b4_4.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-hf451053_7.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zziplib-0.13.69-h57f5043_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-cartesian-planning-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-core-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-example-models-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-oink-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-rrt-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-simple-ik-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-toppra-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/octomap-1.10.1-hfbe1efa_1.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-cartesian-planning-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-common-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-core-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-example-models-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-oink-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-python-0.7.0-h820172f_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-rrt-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-simple-ik-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-toppra-python-0.7.0-np2py312h8c4fe88_2.conda
       - conda: https://prefix.dev/robostack-jazzy/osx-arm64/ros-jazzy-action-msgs-2.0.3-np2py312hd441986_18.conda
       - conda: https://prefix.dev/robostack-jazzy/osx-arm64/ros-jazzy-actionlib-msgs-5.3.7-np2py312hd441986_18.conda
       - conda: https://prefix.dev/robostack-jazzy/osx-arm64/ros-jazzy-ament-cmake-2.5.6-np2py312hd441986_18.conda
@@ -6758,7 +6794,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/mumps-seq-5.8.2-h607cc0b_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/ninja-1.13.2-h477610d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.5.3-py312ha3f287d_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/octomap-1.10.0-h477610d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openexr-3.4.15-hea798b2_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openjpeg-2.5.4-h90fa87c_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openjph-0.31.0-hf13a347_0.conda
@@ -6787,10 +6822,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/qhull-2020.2-hc790b64_5.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qt-main-5.15.15-hc95f6a6_8.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qt6-main-6.11.2-pl5321hfcac499_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-example-models-python-0.6.1-py312h69c959b_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-oink-python-0.6.1-py312hafd0f87_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-python-0.6.1-py312ha5db6d3_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-simple-ik-python-0.6.1-py312hafd0f87_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/ruby-3.4.2-h79e22a9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/sccache-0.16.0-h18a1a76_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/scipy-1.18.1-py312h8847828_0.conda
@@ -6829,6 +6860,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.25.0-py312he5662c2_4.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-h534d264_7.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zziplib-0.13.69-h3ca93ac_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-cartesian-planning-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-core-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-example-models-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-oink-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-rrt-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-simple-ik-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-toppra-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/octomap-1.10.1-h477610d_1.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-cartesian-planning-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-common-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-core-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-example-models-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-oink-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-python-0.7.0-h11686cb_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-rrt-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-simple-ik-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-toppra-python-0.7.0-np2py312hd46b15b_2.conda
       - conda: https://prefix.dev/robostack-jazzy/win-64/ros-jazzy-action-msgs-2.0.4-np2py312hf80f32c_21.conda
       - conda: https://prefix.dev/robostack-jazzy/win-64/ros-jazzy-ament-cmake-2.5.6-np2py312hf80f32c_21.conda
       - conda: https://prefix.dev/robostack-jazzy/win-64/ros-jazzy-ament-cmake-core-2.5.6-np2py312hf80f32c_21.conda
@@ -10134,7 +10182,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nspr-4.40-h29cc59b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nss-3.118-h445c969_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.5.3-py312he827f4e_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/octomap-1.10.0-h4dbf13b_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openexr-3.4.15-ha9edf89_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjpeg-2.5.4-heb1ab33_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjph-0.31.0-h8d634f6_0.conda
@@ -10167,10 +10214,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/qt6-main-6.11.2-pl5321h9df5c37_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/readline-8.3-hd6e31c0_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/rhash-1.4.6-hb03c661_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-example-models-python-0.6.1-py312h069df0d_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-oink-python-0.6.1-py312h8c10cca_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-python-0.6.1-py312hf955722_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-simple-ik-python-0.6.1-py312h8c10cca_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ruby-3.4.2-he7af4c9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/sccache-0.16.0-he64ecbb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/scipy-1.18.1-py312h106c528_0.conda
@@ -10345,6 +10388,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/urllib3-2.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/viser-1.1.0-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/zipp-4.1.0-pyhcf101f3_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-cartesian-planning-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-core-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-example-models-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-oink-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-rrt-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-simple-ik-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-toppra-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/octomap-1.10.1-h4dbf13b_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-cartesian-planning-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-common-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-core-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-example-models-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-oink-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-python-0.7.0-hfc2019e_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-rrt-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-simple-ik-python-0.7.0-np2py312hbfe1cb0_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-toppra-python-0.7.0-np2py312hbfe1cb0_2.conda
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-action-msgs-2.3.1-np2py312h2ed9cc7_21.conda
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-actionlib-msgs-5.5.2-np2py312h2ed9cc7_21.conda
       - conda: https://prefix.dev/robostack-kilted/linux-64/ros-kilted-ament-cmake-2.7.5-np2py312h2ed9cc7_21.conda
@@ -10850,7 +10910,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/nspr-4.40-h3ad9384_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/nss-3.118-h544fa81_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/numpy-2.5.3-py312hfb93532_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/octomap-1.10.0-h45ce4d5_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openexr-3.4.15-h6af3ce4_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openjpeg-2.5.4-h504851f_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openjph-0.31.0-h55827e0_0.conda
@@ -10883,10 +10942,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/qt6-main-6.11.2-pl5321h2856613_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/readline-8.3-ha7194a6_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/rhash-1.4.6-he30d5cf_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-example-models-python-0.6.1-py312h898df7b_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-oink-python-0.6.1-py312h8d8f5a6_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-python-0.6.1-py312h5ae76e9_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.6.1-py312h8d8f5a6_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/ruby-3.4.2-hf77cb2b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/sccache-0.16.0-hb434046_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/scipy-1.18.1-py312h3e7234c_0.conda
@@ -11060,6 +11115,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/urllib3-2.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/viser-1.1.0-pyhcf101f3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/zipp-4.1.0-pyhcf101f3_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-cartesian-planning-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-core-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-example-models-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-oink-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-rrt-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-simple-ik-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-toppra-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/octomap-1.10.1-h45ce4d5_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-cartesian-planning-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-common-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-core-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-example-models-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-oink-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-python-0.7.0-h22914b5_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-rrt-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.7.0-np2py312h122dcda_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-toppra-python-0.7.0-np2py312h122dcda_2.conda
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-action-msgs-2.3.1-np2py312h61f2ce4_21.conda
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-actionlib-msgs-5.5.2-np2py312h61f2ce4_21.conda
       - conda: https://prefix.dev/robostack-kilted/linux-aarch64/ros-kilted-ament-cmake-2.7.5-np2py312h61f2ce4_21.conda
@@ -11631,7 +11703,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nspr-4.40-hdcbdcf5_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/nss-3.118-h1c710a3_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.5.3-py312hff34920_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/octomap-1.10.0-hfbe1efa_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openexr-3.4.15-h3105456_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openjpeg-2.5.4-h4d1e80c_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openjph-0.31.0-h2a4d681_0.conda
@@ -11660,10 +11731,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/qt-main-5.15.15-he8aa932_8.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/readline-8.3-h8b90a29_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/rhash-1.4.6-h84a0fba_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-example-models-python-0.6.1-py312h75fbf8a_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-oink-python-0.6.1-py312h707dcf1_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-python-0.6.1-py312h4655fa0_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-simple-ik-python-0.6.1-py312h707dcf1_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ruby-3.4.2-he7d92ad_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/sccache-0.16.0-h6fdd925_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/scipy-1.18.1-py312h84b0c4e_0.conda
@@ -11703,6 +11770,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstandard-0.25.0-py312hbd136b4_4.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-hf451053_7.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zziplib-0.13.69-h57f5043_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-cartesian-planning-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-core-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-example-models-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-oink-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-rrt-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-simple-ik-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-toppra-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/octomap-1.10.1-hfbe1efa_1.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-cartesian-planning-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-common-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-core-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-example-models-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-oink-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-python-0.7.0-h820172f_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-rrt-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-simple-ik-python-0.7.0-np2py312h8c4fe88_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-toppra-python-0.7.0-np2py312h8c4fe88_2.conda
       - conda: https://prefix.dev/robostack-kilted/osx-arm64/ros-kilted-action-msgs-2.3.1-np2py312h50b1e4c_21.conda
       - conda: https://prefix.dev/robostack-kilted/osx-arm64/ros-kilted-actionlib-msgs-5.5.2-np2py312h50b1e4c_21.conda
       - conda: https://prefix.dev/robostack-kilted/osx-arm64/ros-kilted-ament-cmake-2.7.5-np2py312h50b1e4c_21.conda
@@ -12232,7 +12316,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/mumps-seq-5.8.2-h607cc0b_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/ninja-1.13.2-h477610d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.5.3-py312ha3f287d_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/octomap-1.10.0-h477610d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openexr-3.4.15-hea798b2_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openjpeg-2.5.4-h90fa87c_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openjph-0.31.0-hf13a347_0.conda
@@ -12261,10 +12344,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/qhull-2020.2-hc790b64_5.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qt-main-5.15.15-hc95f6a6_8.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qt6-main-6.11.2-pl5321hfcac499_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-example-models-python-0.6.1-py312h69c959b_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-oink-python-0.6.1-py312hafd0f87_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-python-0.6.1-py312ha5db6d3_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-simple-ik-python-0.6.1-py312hafd0f87_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/ruby-3.4.2-h79e22a9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/sccache-0.16.0-h18a1a76_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/scipy-1.18.1-py312h8847828_0.conda
@@ -12304,6 +12383,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.25.0-py312he5662c2_4.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-h534d264_7.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zziplib-0.13.69-h3ca93ac_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-cartesian-planning-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-core-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-example-models-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-oink-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-rrt-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-simple-ik-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-toppra-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/octomap-1.10.1-h477610d_1.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-cartesian-planning-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-common-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-core-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-example-models-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-oink-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-python-0.7.0-h11686cb_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-rrt-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-simple-ik-python-0.7.0-np2py312hd46b15b_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-toppra-python-0.7.0-np2py312hd46b15b_2.conda
       - conda: https://prefix.dev/robostack-kilted/win-64/ros-kilted-action-msgs-2.3.1-np2py312hf80f32c_21.conda
       - conda: https://prefix.dev/robostack-kilted/win-64/ros-kilted-actionlib-msgs-5.5.2-np2py312hf80f32c_21.conda
       - conda: https://prefix.dev/robostack-kilted/win-64/ros-kilted-ament-cmake-2.7.5-np2py312hf80f32c_21.conda
@@ -15412,7 +15508,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nettle-3.10.1-h5ef0d04_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ninja-1.13.2-h171cf75_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.5.3-py314hd3a7d6b_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/octomap-1.10.0-h4dbf13b_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openexr-3.4.15-ha9edf89_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjpeg-2.5.4-heb1ab33_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjph-0.31.0-h8d634f6_0.conda
@@ -15444,10 +15539,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/qt6-main-6.11.2-pl5321h9df5c37_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/readline-8.3-hd6e31c0_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/rhash-1.4.6-hb03c661_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-example-models-python-0.6.1-py314h96998c8_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-oink-python-0.6.1-py314h55dfbe2_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-python-0.6.1-py314ha3bb396_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-simple-ik-python-0.6.1-py314h55dfbe2_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ruby-3.4.2-he7af4c9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/sccache-0.16.0-he64ecbb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/scipy-1.18.1-py314h36f0660_0.conda
@@ -15622,6 +15713,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/urllib3-2.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/viser-1.1.0-pyhcf101f3_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-cartesian-planning-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-core-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-example-models-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-oink-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-rrt-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-simple-ik-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-toppra-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/octomap-1.10.1-h4dbf13b_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-cartesian-planning-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-common-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-core-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-example-models-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-oink-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-python-0.7.0-hfc2019e_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-rrt-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-simple-ik-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-toppra-python-0.7.0-np2py314he091a44_2.conda
       - conda: https://prefix.dev/robostack-lyrical/linux-64/ros-lyrical-action-msgs-2.4.5-np2py314hb48eaa3_22.conda
       - conda: https://prefix.dev/robostack-lyrical/linux-64/ros-lyrical-ament-cmake-2.8.7-np2py314hb48eaa3_22.conda
       - conda: https://prefix.dev/robostack-lyrical/linux-64/ros-lyrical-ament-cmake-auto-2.8.7-np2py314hb48eaa3_22.conda
@@ -16110,7 +16218,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/nettle-3.10.1-h52582f6_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/ninja-1.13.2-hdc560ac_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/numpy-2.5.3-py314h6cbe925_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/octomap-1.10.0-h45ce4d5_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openexr-3.4.15-h6af3ce4_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openjpeg-2.5.4-h504851f_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openjph-0.31.0-h55827e0_0.conda
@@ -16142,10 +16249,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/qt6-main-6.11.2-pl5321h2856613_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/readline-8.3-ha7194a6_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/rhash-1.4.6-he30d5cf_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-example-models-python-0.6.1-py314hd302b67_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-oink-python-0.6.1-py314ha8bcd55_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-python-0.6.1-py314h948e7c7_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.6.1-py314ha8bcd55_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/ruby-3.4.2-hf77cb2b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/sccache-0.16.0-hb434046_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/scipy-1.18.1-py314hb3ba6a9_0.conda
@@ -16319,6 +16422,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/urllib3-2.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/viser-1.1.0-pyhcf101f3_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-cartesian-planning-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-core-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-example-models-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-oink-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-rrt-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-simple-ik-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-toppra-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/octomap-1.10.1-h45ce4d5_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-cartesian-planning-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-common-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-core-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-example-models-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-oink-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-python-0.7.0-h22914b5_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-rrt-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-toppra-python-0.7.0-np2py314h8e5a143_2.conda
       - conda: https://prefix.dev/robostack-lyrical/linux-aarch64/ros-lyrical-action-msgs-2.4.5-np2py314h2824dc6_22.conda
       - conda: https://prefix.dev/robostack-lyrical/linux-aarch64/ros-lyrical-ament-cmake-2.8.7-np2py314h2824dc6_22.conda
       - conda: https://prefix.dev/robostack-lyrical/linux-aarch64/ros-lyrical-ament-cmake-auto-2.8.7-np2py314h2824dc6_22.conda
@@ -16878,7 +16998,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ncurses-6.6-he64c551_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ninja-1.13.2-h3feff0a_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.5.3-py314he06036b_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/octomap-1.10.0-hfbe1efa_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openexr-3.4.15-h3105456_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openjpeg-2.5.4-h4d1e80c_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openjph-0.31.0-h2a4d681_0.conda
@@ -16908,10 +17027,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/qt6-main-6.11.1-pl5321h7775a44_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/readline-8.3-h8b90a29_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/rhash-1.4.6-h84a0fba_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-example-models-python-0.6.1-py314he98e1d9_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-oink-python-0.6.1-py314h0a27780_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-python-0.6.1-py314h5adaf0e_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-simple-ik-python-0.6.1-py314h0a27780_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ruby-3.4.2-he7d92ad_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/sccache-0.16.0-h6fdd925_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/scipy-1.18.1-py314hd9f3d4e_0.conda
@@ -16951,6 +17066,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstandard-0.25.0-py314hd98292b_4.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-hf451053_7.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zziplib-0.13.69-h57f5043_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-cartesian-planning-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-core-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-example-models-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-oink-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-rrt-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-simple-ik-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-toppra-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/octomap-1.10.1-hfbe1efa_1.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-cartesian-planning-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-common-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-core-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-example-models-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-oink-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-python-0.7.0-h820172f_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-rrt-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-simple-ik-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-toppra-python-0.7.0-np2py314h728bd26_2.conda
       - conda: https://prefix.dev/robostack-lyrical/osx-arm64/ros-lyrical-action-msgs-2.4.5-np2py314h1e5664e_22.conda
       - conda: https://prefix.dev/robostack-lyrical/osx-arm64/ros-lyrical-ament-cmake-2.8.7-np2py314h1e5664e_22.conda
       - conda: https://prefix.dev/robostack-lyrical/osx-arm64/ros-lyrical-ament-cmake-auto-2.8.7-np2py314h1e5664e_22.conda
@@ -17473,7 +17605,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/mypy-2.3.1-py314hc5dbbe4_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/ninja-1.13.2-h477610d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.5.3-py314h02f10f6_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/octomap-1.10.0-h477610d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openexr-3.4.15-hea798b2_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openjpeg-2.5.4-h90fa87c_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openjph-0.31.0-hf13a347_0.conda
@@ -17502,10 +17633,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/pyyaml-6.0.3-py314h2359020_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qhull-2020.2-hc790b64_5.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qt6-main-6.11.2-pl5321hfcac499_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-example-models-python-0.6.1-py314h417cb87_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-oink-python-0.6.1-py314h81608ea_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-python-0.6.1-py314h3b978fa_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-simple-ik-python-0.6.1-py314h81608ea_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/ruby-3.4.2-h79e22a9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/sccache-0.16.0-h18a1a76_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/scipy-1.18.1-py314h67d5eaa_0.conda
@@ -17545,6 +17672,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.25.0-py314hc5dbbe4_4.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-h534d264_7.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zziplib-0.13.69-h3ca93ac_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-cartesian-planning-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-core-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-example-models-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-oink-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-rrt-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-simple-ik-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-toppra-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/octomap-1.10.1-h477610d_1.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-cartesian-planning-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-common-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-core-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-example-models-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-oink-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-python-0.7.0-h11686cb_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-rrt-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-simple-ik-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-toppra-python-0.7.0-np2py314hed8631d_2.conda
       - conda: https://prefix.dev/robostack-lyrical/win-64/ros-lyrical-action-msgs-2.4.5-np2py314ha8c8437_22.conda
       - conda: https://prefix.dev/robostack-lyrical/win-64/ros-lyrical-ament-cmake-2.8.7-np2py314ha8c8437_22.conda
       - conda: https://prefix.dev/robostack-lyrical/win-64/ros-lyrical-ament-cmake-auto-2.8.7-np2py314ha8c8437_22.conda
@@ -20647,7 +20791,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/nettle-3.10.1-h5ef0d04_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ninja-1.13.2-h171cf75_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/numpy-2.5.3-py314hd3a7d6b_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/octomap-1.10.0-h4dbf13b_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openexr-3.4.15-ha9edf89_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjpeg-2.5.4-heb1ab33_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/openjph-0.31.0-h8d634f6_0.conda
@@ -20679,10 +20822,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/qt6-main-6.11.2-pl5321h9df5c37_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/readline-8.3-hd6e31c0_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/rhash-1.4.6-hb03c661_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-example-models-python-0.6.1-py314h96998c8_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-oink-python-0.6.1-py314h55dfbe2_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-python-0.6.1-py314ha3bb396_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-simple-ik-python-0.6.1-py314h55dfbe2_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ruby-3.4.2-he7af4c9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/sccache-0.16.0-he64ecbb_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/scipy-1.18.1-py314h36f0660_0.conda
@@ -20857,6 +20996,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/urllib3-2.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/viser-1.1.0-pyhcf101f3_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-cartesian-planning-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-core-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-example-models-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-oink-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-rrt-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-simple-ik-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/libroboplan-toppra-0.7.0-hf690a14_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/octomap-1.10.1-h4dbf13b_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-cartesian-planning-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-common-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-core-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-example-models-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-oink-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-python-0.7.0-hfc2019e_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-rrt-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-simple-ik-python-0.7.0-np2py314he091a44_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-64/roboplan-toppra-python-0.7.0-np2py314he091a44_2.conda
       - conda: https://prefix.dev/robostack-rolling/linux-64/ros-rolling-action-msgs-2.5.0-np2py314hb48eaa3_23.conda
       - conda: https://prefix.dev/robostack-rolling/linux-64/ros-rolling-ament-cmake-2.9.0-np2py314hb48eaa3_23.conda
       - conda: https://prefix.dev/robostack-rolling/linux-64/ros-rolling-ament-cmake-auto-2.9.0-np2py314hb48eaa3_23.conda
@@ -21344,7 +21500,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/nettle-3.10.1-h52582f6_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/ninja-1.13.2-hdc560ac_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/numpy-2.5.3-py314h6cbe925_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/octomap-1.10.0-h45ce4d5_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openexr-3.4.15-h6af3ce4_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openjpeg-2.5.4-h504851f_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/openjph-0.31.0-h55827e0_0.conda
@@ -21376,10 +21531,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/qt6-main-6.11.2-pl5321h2856613_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/readline-8.3-ha7194a6_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/rhash-1.4.6-he30d5cf_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-example-models-python-0.6.1-py314hd302b67_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-oink-python-0.6.1-py314ha8bcd55_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-python-0.6.1-py314h948e7c7_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.6.1-py314ha8bcd55_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/ruby-3.4.2-hf77cb2b_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/sccache-0.16.0-hb434046_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/scipy-1.18.1-py314hb3ba6a9_0.conda
@@ -21553,6 +21704,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/urllib3-2.7.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/viser-1.1.0-pyhcf101f3_0.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-cartesian-planning-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-core-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-example-models-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-oink-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-rrt-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-simple-ik-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-toppra-0.7.0-h6309326_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/octomap-1.10.1-h45ce4d5_1.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-cartesian-planning-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-common-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-core-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-example-models-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-oink-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-python-0.7.0-h22914b5_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-rrt-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.7.0-np2py314h8e5a143_2.conda
+      - conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-toppra-python-0.7.0-np2py314h8e5a143_2.conda
       - conda: https://prefix.dev/robostack-rolling/linux-aarch64/ros-rolling-action-msgs-2.5.0-np2py314h2824dc6_23.conda
       - conda: https://prefix.dev/robostack-rolling/linux-aarch64/ros-rolling-ament-cmake-2.9.0-np2py314h2824dc6_23.conda
       - conda: https://prefix.dev/robostack-rolling/linux-aarch64/ros-rolling-ament-cmake-auto-2.9.0-np2py314h2824dc6_23.conda
@@ -22112,7 +22280,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ncurses-6.6-he64c551_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ninja-1.13.2-h3feff0a_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/numpy-2.5.3-py314he06036b_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/octomap-1.10.0-hfbe1efa_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openexr-3.4.15-h3105456_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openjpeg-2.5.4-h4d1e80c_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/openjph-0.31.0-h2a4d681_0.conda
@@ -22142,10 +22309,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/qt6-main-6.11.1-pl5321h7775a44_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/readline-8.3-h8b90a29_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/rhash-1.4.6-h84a0fba_2.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-example-models-python-0.6.1-py314he98e1d9_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-oink-python-0.6.1-py314h0a27780_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-python-0.6.1-py314h5adaf0e_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-simple-ik-python-0.6.1-py314h0a27780_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ruby-3.4.2-he7d92ad_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/sccache-0.16.0-h6fdd925_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/scipy-1.18.1-py314hd9f3d4e_0.conda
@@ -22185,6 +22348,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstandard-0.25.0-py314hd98292b_4.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.7-hf451053_7.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zziplib-0.13.69-h57f5043_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-cartesian-planning-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-core-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-example-models-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-oink-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-rrt-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-simple-ik-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-toppra-0.7.0-hd0ac3da_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/octomap-1.10.1-hfbe1efa_1.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-cartesian-planning-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-common-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-core-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-example-models-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-oink-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-python-0.7.0-h820172f_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-rrt-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-simple-ik-python-0.7.0-np2py314h728bd26_2.conda
+      - conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-toppra-python-0.7.0-np2py314h728bd26_2.conda
       - conda: https://prefix.dev/robostack-rolling/osx-arm64/ros-rolling-action-msgs-2.5.0-np2py314h1e5664e_23.conda
       - conda: https://prefix.dev/robostack-rolling/osx-arm64/ros-rolling-ament-cmake-2.9.0-np2py314h1e5664e_23.conda
       - conda: https://prefix.dev/robostack-rolling/osx-arm64/ros-rolling-ament-cmake-auto-2.9.0-np2py314h1e5664e_23.conda
@@ -22707,7 +22887,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/mypy-2.3.1-py314hc5dbbe4_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/ninja-1.13.2-h477610d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/numpy-2.5.3-py314h02f10f6_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/octomap-1.10.0-h477610d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openexr-3.4.15-hea798b2_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openjpeg-2.5.4-h90fa87c_2.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/openjph-0.31.0-hf13a347_0.conda
@@ -22736,10 +22915,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/pyyaml-6.0.3-py314h2359020_1.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qhull-2020.2-hc790b64_5.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/qt6-main-6.11.2-pl5321hfcac499_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-example-models-python-0.6.1-py314h417cb87_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-oink-python-0.6.1-py314h81608ea_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-python-0.6.1-py314h3b978fa_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-simple-ik-python-0.6.1-py314h81608ea_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/ruby-3.4.2-h79e22a9_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/sccache-0.16.0-h18a1a76_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/scipy-1.18.1-py314h67d5eaa_0.conda
@@ -22779,6 +22954,23 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstandard-0.25.0-py314hc5dbbe4_4.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zstd-1.5.7-h534d264_7.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/zziplib-0.13.69-h3ca93ac_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-cartesian-planning-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-core-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-example-models-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-oink-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-rrt-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-simple-ik-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/libroboplan-toppra-0.7.0-h43f8cbe_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/octomap-1.10.1-h477610d_1.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-cartesian-planning-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-common-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-core-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-example-models-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-oink-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-python-0.7.0-h11686cb_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-rrt-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-simple-ik-python-0.7.0-np2py314hed8631d_2.conda
+      - conda: https://prefix.dev/conda-forge/win-64/roboplan-toppra-python-0.7.0-np2py314hed8631d_2.conda
       - conda: https://prefix.dev/robostack-rolling/win-64/ros-rolling-action-msgs-2.5.0-np2py314ha8c8437_23.conda
       - conda: https://prefix.dev/robostack-rolling/win-64/ros-rolling-ament-cmake-2.9.0-np2py314ha8c8437_23.conda
       - conda: https://prefix.dev/robostack-rolling/win-64/ros-rolling-ament-cmake-auto-2.9.0-np2py314ha8c8437_23.conda
@@ -28797,184 +28989,6 @@ packages:
     - rhash >=1.4.6,<2.0a0
   size: 194994
   timestamp: 1786731436520
-- conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-example-models-python-0.6.1-py312h069df0d_0.conda
-  sha256: f5c9b062215f064bfa806b49e6aad43f3b381cd944aed2a2390a4f40fb7799c9
-  md5: 72406e4eda55e0acbcae96764cd5dbd1
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - __glibc >=2.17,<3.0.a0
-  - libstdcxx >=15
-  - libgcc >=15
-  - python_abi 3.12.* *_cp312
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  size: 26248267
-  timestamp: 1787279466421
-- conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-example-models-python-0.6.1-py314h96998c8_0.conda
-  sha256: 715bf9704e8b45d87f51b82a2ceb99355b21cffb595ec6c7a96630173d30562f
-  md5: 6a35072fec32f9a8a0a3ac7e0cc60198
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - libstdcxx >=15
-  - libgcc >=15
-  - __glibc >=2.17,<3.0.a0
-  - python_abi 3.14.* *_cp314
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  size: 26248245
-  timestamp: 1787279466421
-- conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-oink-python-0.6.1-py312h8c10cca_0.conda
-  sha256: dd9eeee061142d35e2f9d6bc860f32b28d3d9280a8a9fd6c6e777a3cbbb16eb2
-  md5: 6d8a623dd425332466b4d50b74456aa3
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - __glibc >=2.17,<3.0.a0
-  - libstdcxx >=15
-  - libgcc >=15
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.12.* *_cp312
-  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-oink-python >=0.6.1,<0.6.2.0a0
-  size: 461317
-  timestamp: 1787279466421
-- conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-oink-python-0.6.1-py314h55dfbe2_0.conda
-  sha256: a9650d861671eb012530a7964c61eb5ee437a4284ee567c60892b6b5e984d42c
-  md5: eb8b678282183c323c211b89d9f9efb7
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - __glibc >=2.17,<3.0.a0
-  - libstdcxx >=15
-  - libgcc >=15
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.14.* *_cp314
-  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-oink-python >=0.6.1,<0.6.2.0a0
-  size: 461339
-  timestamp: 1787279466421
-- conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-python-0.6.1-py312hf955722_0.conda
-  sha256: d22de29eb543d7416dac88618ef74601c6334f0a1f5efedfff3b93ee336172f2
-  md5: 3079885d01d6c6818d503c95099e233e
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - roboplan-example-models-python ==0.6.1
-  - __glibc >=2.17,<3.0.a0
-  - libstdcxx >=15
-  - libgcc >=15
-  - libcoal >=3.0.4,<3.0.5.0a0
-  - python_abi 3.12.* *_cp312
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - tinyxml2 >=11.0.0,<11.1.0a0
-  - libpinocchio >=4.1.0,<4.1.1.0a0
-  - yaml-cpp >=0.8.0,<0.9.0a0
-  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-python >=0.6.1,<0.6.2.0a0
-  size: 602099
-  timestamp: 1787279466421
-- conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-python-0.6.1-py314ha3bb396_0.conda
-  sha256: dcaa886fa580c51e9ed4bcf8f9e2e766f3238d7d0dbb8b9c0e8172400d93e7b6
-  md5: 4e67445207905dbaf9433725b4816c59
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - roboplan-example-models-python ==0.6.1
-  - libstdcxx >=15
-  - libgcc >=15
-  - __glibc >=2.17,<3.0.a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - tinyxml2 >=11.0.0,<11.1.0a0
-  - yaml-cpp >=0.8.0,<0.9.0a0
-  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
-  - libcoal >=3.0.4,<3.0.5.0a0
-  - libpinocchio >=4.1.0,<4.1.1.0a0
-  - python_abi 3.14.* *_cp314
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-python >=0.6.1,<0.6.2.0a0
-  size: 602568
-  timestamp: 1787279466421
-- conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-simple-ik-python-0.6.1-py312h8c10cca_0.conda
-  sha256: 6fa6a123ac98844ce99d9c9bfb541171a6403d9e43fdd48f22154ad9b945ca3e
-  md5: 70e58d7b151b6877d4b89d5eb21aeace
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - __glibc >=2.17,<3.0.a0
-  - libstdcxx >=15
-  - libgcc >=15
-  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
-  - python_abi 3.12.* *_cp312
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-simple-ik-python >=0.6.1,<0.6.2.0a0
-  size: 245089
-  timestamp: 1787279466421
-- conda: https://conda.anaconda.org/conda-forge/linux-64/roboplan-simple-ik-python-0.6.1-py314h55dfbe2_0.conda
-  sha256: 65ebe18748c7c3011c368620ab2e7159d4edef1078ca2f5f4fe791e1bf7df5ab
-  md5: e1d3e08bccb35736b6ac1ec0cb1f01c0
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - __glibc >=2.17,<3.0.a0
-  - libstdcxx >=15
-  - libgcc >=15
-  - python_abi 3.14.* *_cp314
-  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-simple-ik-python >=0.6.1,<0.6.2.0a0
-  size: 245089
-  timestamp: 1787279466421
 - conda: https://conda.anaconda.org/conda-forge/linux-64/ruby-3.4.2-he7af4c9_0.conda
   sha256: 9c40914caa97e850931706913e5e1d40e7ef19ec37250cf3fc97c8e79a5f3d03
   md5: 6b218126ad00e168cc94d6fe96fe77b9
@@ -35581,176 +35595,6 @@ packages:
     - rhash >=1.4.6,<2.0a0
   size: 211434
   timestamp: 1786731457243
-- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-example-models-python-0.6.1-py312h898df7b_0.conda
-  sha256: 65fdc9910acc83b65c1249c5dd096bd7ecc4e24bb5d80e3cf021e3ceb755525a
-  md5: e8e877655173ac1266e1dea8146a484c
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - libstdcxx >=15
-  - libgcc >=15
-  - python_abi 3.12.* *_cp312
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  size: 26248039
-  timestamp: 1787279459360
-- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-example-models-python-0.6.1-py314hd302b67_0.conda
-  sha256: 8ce2431dd0a43beb0b7bf51f4d739d85570acd6e3a9a94e797dfc0756cd7f010
-  md5: 242af86f1287423c0b5acce17df38077
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - libstdcxx >=15
-  - libgcc >=15
-  - python_abi 3.14.* *_cp314
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  size: 26248028
-  timestamp: 1787279459360
-- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-oink-python-0.6.1-py312h8d8f5a6_0.conda
-  sha256: 24c7f8ccc705c7da83fdf9c90e30fc5265881bcbc387acaeee4e47877c4e42ea
-  md5: 1aac0056244d809669e0ab3eecc7f6e0
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - libstdcxx >=15
-  - libgcc >=15
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - python_abi 3.12.* *_cp312
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-oink-python >=0.6.1,<0.6.2.0a0
-  size: 451209
-  timestamp: 1787279459360
-- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-oink-python-0.6.1-py314ha8bcd55_0.conda
-  sha256: 6eaa063a6b0ce97963b47381ad7e97d87e714e0f6d74d20b404bc1a1ac2e28b0
-  md5: 0168595487530cac8fc1792d65502840
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - libstdcxx >=15
-  - libgcc >=15
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.14.* *_cp314
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-oink-python >=0.6.1,<0.6.2.0a0
-  size: 451312
-  timestamp: 1787279459360
-- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-python-0.6.1-py312h5ae76e9_0.conda
-  sha256: 58a1f3f3e5a1a31ab9058a6f3bbbc44d5900103d17e96573cb73247a6f962945
-  md5: 3e3dcf4da89bbe7b719df51aebd1ede3
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - roboplan-example-models-python ==0.6.1
-  - libstdcxx >=15
-  - libgcc >=15
-  - python_abi 3.12.* *_cp312
-  - libpinocchio >=4.1.0,<4.1.1.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - libcoal >=3.0.4,<3.0.5.0a0
-  - tinyxml2 >=11.0.0,<11.1.0a0
-  - yaml-cpp >=0.8.0,<0.9.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-python >=0.6.1,<0.6.2.0a0
-  size: 583191
-  timestamp: 1787279459360
-- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-python-0.6.1-py314h948e7c7_0.conda
-  sha256: 4fed604db0007c0387a0c01c2791ff5fe96887475a2f0a52a94e8055f9a92e74
-  md5: 38f30b8866184ba0bddbcf48e147245c
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - roboplan-example-models-python ==0.6.1
-  - libstdcxx >=15
-  - libgcc >=15
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.14.* *_cp314
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - tinyxml2 >=11.0.0,<11.1.0a0
-  - yaml-cpp >=0.8.0,<0.9.0a0
-  - libpinocchio >=4.1.0,<4.1.1.0a0
-  - libcoal >=3.0.4,<3.0.5.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-python >=0.6.1,<0.6.2.0a0
-  size: 583716
-  timestamp: 1787279459360
-- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.6.1-py312h8d8f5a6_0.conda
-  sha256: ba8bf9dcf6dcd647d66110933d6e6300f213fef27e858dba36f01a09b954eaa6
-  md5: 2d7f0ca704df79d0d93ee47843bb0fab
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - libstdcxx >=15
-  - libgcc >=15
-  - python_abi 3.12.* *_cp312
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-simple-ik-python >=0.6.1,<0.6.2.0a0
-  size: 243101
-  timestamp: 1787279459360
-- conda: https://conda.anaconda.org/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.6.1-py314ha8bcd55_0.conda
-  sha256: 07016711fe9723b11277369b9aba97017ad642f4773bf8dcd8a593979bb1a409
-  md5: ffff56a6cd75b60ca227bea7c20233cc
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - libstdcxx >=15
-  - libgcc >=15
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.14.* *_cp314
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-simple-ik-python >=0.6.1,<0.6.2.0a0
-  size: 243153
-  timestamp: 1787279459360
 - conda: https://conda.anaconda.org/conda-forge/linux-aarch64/ruby-3.4.2-hf77cb2b_0.conda
   sha256: e63ab0ef7c1b7d7f345b97d3d4f09607b810a4ac79f1c525f63f3cf499f59999
   md5: 5546b060eaf3431e71792fd65e927ec8
@@ -43247,176 +43091,6 @@ packages:
     - rhash >=1.4.6,<2.0a0
   size: 185483
   timestamp: 1786732022220
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-example-models-python-0.6.1-py312h75fbf8a_0.conda
-  sha256: 7b1a80b3288b37688b42f2eb2501b71c68538ede28f5775933e193710c202332
-  md5: 1a71a786f204dbe3003b939fc96854e7
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - libcxx >=21
-  - __osx >=11.0
-  - python_abi 3.12.* *_cp312
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  size: 26239197
-  timestamp: 1787279620517
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-example-models-python-0.6.1-py314he98e1d9_0.conda
-  sha256: 94c201050783208ef11e01e5d739faa22a8c129c5d40210d6d747f4b90d5f3b1
-  md5: b024fd28be3b200b00345b58b618407b
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - __osx >=11.0
-  - libcxx >=21
-  - python_abi 3.14.* *_cp314
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  size: 26239514
-  timestamp: 1787279620517
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-oink-python-0.6.1-py312h707dcf1_0.conda
-  sha256: c86f71f6f11c27d6e60df687e678bafd1f08e7897cd4540b68cdae611f34c034
-  md5: b1e6495c660d9056500c9bb8b06bffe6
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - __osx >=11.0
-  - libcxx >=21
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.12.* *_cp312
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-oink-python >=0.6.1,<0.6.2.0a0
-  size: 339010
-  timestamp: 1787279620517
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-oink-python-0.6.1-py314h0a27780_0.conda
-  sha256: 8424d8b51e470eeacc853827539fb00834740ab1722dc14836bf35df19cf74a6
-  md5: 1de7aa312da4f83436c7ebe60637b751
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - libcxx >=21
-  - __osx >=11.0
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.14.* *_cp314
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-oink-python >=0.6.1,<0.6.2.0a0
-  size: 339200
-  timestamp: 1787279620517
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-python-0.6.1-py312h4655fa0_0.conda
-  sha256: 1006bb52c7d880a96bdb63749f49581b992d6b5db908fd132c190217fed4baf3
-  md5: 969c9c6d4f208c73a16976f630834b12
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - roboplan-example-models-python ==0.6.1
-  - __osx >=11.0
-  - libcxx >=21
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - yaml-cpp >=0.8.0,<0.9.0a0
-  - python_abi 3.12.* *_cp312
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - libcoal >=3.0.4,<3.0.5.0a0
-  - libpinocchio >=4.1.0,<4.1.1.0a0
-  - tinyxml2 >=11.0.0,<11.1.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-python >=0.6.1,<0.6.2.0a0
-  size: 484347
-  timestamp: 1787279620517
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-python-0.6.1-py314h5adaf0e_0.conda
-  sha256: c5f61865aaec710d3dc34dcb9621c475fbd06eaa9c52e1b3fc18f78140d7b75c
-  md5: 2cf110c9e9860ea85013fdde0a4f3884
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - roboplan-example-models-python ==0.6.1
-  - libcxx >=21
-  - __osx >=11.0
-  - libpinocchio >=4.1.0,<4.1.1.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - python_abi 3.14.* *_cp314
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - libcoal >=3.0.4,<3.0.5.0a0
-  - yaml-cpp >=0.8.0,<0.9.0a0
-  - tinyxml2 >=11.0.0,<11.1.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-python >=0.6.1,<0.6.2.0a0
-  size: 485260
-  timestamp: 1787279620517
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-simple-ik-python-0.6.1-py312h707dcf1_0.conda
-  sha256: ce316e4b75e28f32d4ced9cf4cd61353e4febe7cbfa4a89820af246ad1602f86
-  md5: 9fa16af857e8d2480bce8c61ca30bf4d
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - __osx >=11.0
-  - libcxx >=21
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.12.* *_cp312
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-simple-ik-python >=0.6.1,<0.6.2.0a0
-  size: 209202
-  timestamp: 1787279620517
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/roboplan-simple-ik-python-0.6.1-py314h0a27780_0.conda
-  sha256: 18158a98f4edb44cbe495228ca7bcc1cc62ea2841d715c6e845457ae74fe6cd8
-  md5: 2bf0251b6ab3abe3daa8976d3d8d121f
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - __osx >=11.0
-  - libcxx >=21
-  - python_abi 3.14.* *_cp314
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-simple-ik-python >=0.6.1,<0.6.2.0a0
-  size: 209249
-  timestamp: 1787279620517
 - conda: https://conda.anaconda.org/conda-forge/osx-arm64/ruby-3.4.2-he7d92ad_0.conda
   sha256: f29378b2a98124e77dd0cc95d68f40dde343ad34e7693c76198db5189496fab9
   md5: 8441686c0e77cf0ecd70982e83bc97d7
@@ -48314,192 +47988,6 @@ packages:
     - qt6-main >=6.11.2,<7.0a0
   size: 89682645
   timestamp: 1787049046883
-- conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-example-models-python-0.6.1-py312h69c959b_0.conda
-  sha256: 132e88fa5eb02149859f489fc15e138bfbbab61a52a2cdbc1a022679100dc8ea
-  md5: dcbb8e1494d9fcc138eb35a7608a7d19
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - vc >=14.3,<15
-  - vc14_runtime >=14.44.35208
-  - ucrt >=10.0.20348.0
-  - python_abi 3.12.* *_cp312
-  - dlfcn-win32 >=1.4.2,<2.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  size: 26281151
-  timestamp: 1787279468679
-- conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-example-models-python-0.6.1-py314h417cb87_0.conda
-  sha256: e83632366f5d46e4c40ac5dbcc6045cb9fc19c32d081249a47acd49f6604f2f6
-  md5: c91933fd0ec9dcb2654f8ff71110b85f
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - vc >=14.3,<15
-  - vc14_runtime >=14.44.35208
-  - ucrt >=10.0.20348.0
-  - dlfcn-win32 >=1.4.2,<2.0a0
-  - python_abi 3.14.* *_cp314
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  size: 26281395
-  timestamp: 1787279468679
-- conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-oink-python-0.6.1-py312hafd0f87_0.conda
-  sha256: d990d2daa2756dc7b2fed71b89af2e9a254412c6874b631b997a437d70e83d45
-  md5: 457933f5eb6a5b5d83f245b75d5b41c6
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - vc >=14.3,<15
-  - vc14_runtime >=14.44.35208
-  - ucrt >=10.0.20348.0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.12.* *_cp312
-  - dlfcn-win32 >=1.4.2,<2.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-oink-python >=0.6.1,<0.6.2.0a0
-  size: 1775662
-  timestamp: 1787279468679
-- conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-oink-python-0.6.1-py314h81608ea_0.conda
-  sha256: ced321b7492e7aae5b7f3a16074b4a3239c2e7afc86e62f3d2947a4b2be5ed84
-  md5: 8068d86b2acd2ef8aa134f76e9706a61
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - vc >=14.3,<15
-  - vc14_runtime >=14.44.35208
-  - ucrt >=10.0.20348.0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - dlfcn-win32 >=1.4.2,<2.0a0
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.14.* *_cp314
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-oink-python >=0.6.1,<0.6.2.0a0
-  size: 1775799
-  timestamp: 1787279468679
-- conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-python-0.6.1-py312ha5db6d3_0.conda
-  sha256: ed5006b7100759ac8a90ff67989eeed29ac7f967da03e31d041d85713ac82578
-  md5: b7e561b63bf080af5d21649939f34d27
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - roboplan-example-models-python ==0.6.1
-  - vc >=14.3,<15
-  - vc14_runtime >=14.44.35208
-  - ucrt >=10.0.20348.0
-  - libpinocchio >=4.1.0,<4.1.1.0a0
-  - libcoal >=3.0.4,<3.0.5.0a0
-  - dlfcn-win32 >=1.4.2,<2.0a0
-  - yaml-cpp >=0.8.0,<0.9.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - tinyxml2 >=11.0.0,<11.1.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.12.* *_cp312
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-python >=0.6.1,<0.6.2.0a0
-  size: 3337715
-  timestamp: 1787279468679
-- conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-python-0.6.1-py314h3b978fa_0.conda
-  sha256: 28b00e51fe3ef2caed381fa06537e6428b8dd7e18690757680137824c6718964
-  md5: 52f5484e0d18f1c94eadaaae8116f2da
-  depends:
-  - python
-  - numpy
-  - pinocchio-python >=4.0.0,<5.0.0
-  - roboplan-example-models-python ==0.6.1
-  - vc >=14.3,<15
-  - vc14_runtime >=14.44.35208
-  - ucrt >=10.0.20348.0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - libpinocchio >=4.1.0,<4.1.1.0a0
-  - python_abi 3.14.* *_cp314
-  - tinyxml2 >=11.0.0,<11.1.0a0
-  - dlfcn-win32 >=1.4.2,<2.0a0
-  - libcoal >=3.0.4,<3.0.5.0a0
-  - yaml-cpp >=0.8.0,<0.9.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-python >=0.6.1,<0.6.2.0a0
-  size: 3338909
-  timestamp: 1787279468679
-- conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-simple-ik-python-0.6.1-py312hafd0f87_0.conda
-  sha256: 7d4cd58097a195288d1d23f3005fe4be2bd64cc9410c33d69d0a750cd68cb6d7
-  md5: 73584fa5d8fa678b48a5070a3ca79b04
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - vc >=14.3,<15
-  - vc14_runtime >=14.44.35208
-  - ucrt >=10.0.20348.0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  - dlfcn-win32 >=1.4.2,<2.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - python_abi 3.12.* *_cp312
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-simple-ik-python >=0.6.1,<0.6.2.0a0
-  size: 2519540
-  timestamp: 1787279468679
-- conda: https://conda.anaconda.org/conda-forge/win-64/roboplan-simple-ik-python-0.6.1-py314h81608ea_0.conda
-  sha256: c06ba2fb3cf3d349c77f56d90e9c0c27dbdddeea3599b073453e59aa2280ab2b
-  md5: 2ebdd3e2e5afb1deec6d55ebd4bc08eb
-  depends:
-  - python
-  - roboplan-python ==0.6.1
-  - roboplan-example-models-python ==0.6.1
-  - vc >=14.3,<15
-  - vc14_runtime >=14.44.35208
-  - ucrt >=10.0.20348.0
-  - python_abi 3.14.* *_cp314
-  - roboplan-python >=0.6.1,<0.6.2.0a0
-  - dlfcn-win32 >=1.4.2,<2.0a0
-  - roboplan-example-models-python >=0.6.1,<0.6.2.0a0
-  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
-  license: MIT
-  license_family: MIT
-  purls: []
-  run_exports:
-    weak:
-    - roboplan-simple-ik-python >=0.6.1,<0.6.2.0a0
-  size: 2519680
-  timestamp: 1787279468679
 - conda: https://conda.anaconda.org/conda-forge/win-64/ruby-3.4.2-h79e22a9_0.conda
   sha256: da4a74055e03db9716c2b13c314b8bf22e048ab09542d3c20ea00f7282ea18eb
   md5: 5ff98e211a6e664c75cb8ba086dffb03
@@ -49273,6 +48761,2053 @@ packages:
     - zziplib >=0.13.69,<0.14.0a0
   size: 65791
   timestamp: 1719242575938
+- conda: https://prefix.dev/conda-forge/linux-64/libroboplan-cartesian-planning-0.7.0-hf690a14_2.conda
+  sha256: 3db9020d019e80d5d140c7925186a25e7b1a34f96681b45144058ab9cce86aa9
+  md5: c5e2a718c3d30151fb924af7c0932949
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  size: 88777
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/libroboplan-core-0.7.0-hf690a14_2.conda
+  sha256: 0174b75e02dac303f60c7ab3994bb640d243a13603f90953597ac43fe243b476
+  md5: 022b1e95d9d6f61bfbe9a30a02562f17
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - tinyxml2 >=11.0.0,<11.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - yaml-cpp >=0.8.0,<0.9.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/libroboplan-core
+  run_exports:
+    weak:
+    - libroboplan-core >=0.7.0,<0.7.1.0a0
+  size: 458668
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/libroboplan-example-models-0.7.0-hf690a14_2.conda
+  sha256: 605f12367faa2a4d70aaef24b67c3d1c9154d41782235ce1f5429db4c16ce2d6
+  md5: 737e53449178e7cb7817c5d667333aee
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  size: 26219368
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/libroboplan-oink-0.7.0-hf690a14_2.conda
+  sha256: b94e69c009b2b44f372ab43714f1c1f78fd6e661d9d8c863ea13684c6fe905ca
+  md5: 910c799b72376ec81788f1fb67b7e61d
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  size: 365393
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/libroboplan-rrt-0.7.0-hf690a14_2.conda
+  sha256: 65d58a1eca701f80d994e743fd2f1227aebccbcad2791755d9367ac8b968f300
+  md5: dc960b5759bb58bf578023278596a82c
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  size: 253968
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/libroboplan-simple-ik-0.7.0-hf690a14_2.conda
+  sha256: e7b4cc0966752d3df68306b95f5056e88278ab58a6382d5d97c3179c440e6bc0
+  md5: 0e2954b7d8faf86a3f92cc80128071cc
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  size: 145308
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/libroboplan-toppra-0.7.0-hf690a14_2.conda
+  sha256: 6c3e5946e72ff3cae9ecdfa68bc498a1c36aebfff29ebc466a49363691122d13
+  md5: b24aed091e30ef89920f78d7b7e1576e
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libtoppra >=0.6.10,<0.6.11.0a0
+  - eigen-abi >=5.0.1.80,<5.0.1.81.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  size: 89339
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/octomap-1.10.1-h4dbf13b_1.conda
+  sha256: 640090eb8e7090bc1f9a292e7ff07ae8a418832a1180f25d8ef053884a9fcbe8
+  md5: cc54a89bbacf4a207104e71b77d06f2f
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  license: BSD-3-Clause
+  license_family: BSD
+  purls: []
+  run_exports:
+    weak:
+    - octomap >=1.10.1,<1.11.0a0
+  size: 267108
+  timestamp: 1790285666748
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-cartesian-planning-python-0.7.0-np2py312hbfe1cb0_2.conda
+  sha256: 2f1256c71bf00b7d88b3ab1981f73cedc5c781c6808fa6d886cd52edb7a71311
+  md5: f82c699ea0ee4794b3360ec569191d77
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-cartesian-planning-python >=0.7.0,<0.7.1.0a0
+  size: 117463
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-cartesian-planning-python-0.7.0-np2py314he091a44_2.conda
+  sha256: 0fbdb9b38164b65ecb0c44075ad13fd02ebf33478797de649e666184f509f61d
+  md5: e0f54ca043331945b78de57d0d7eaf2a
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.14.* *_cp314
+  - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-cartesian-planning-python >=0.7.0,<0.7.1.0a0
+  size: 117603
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-common-0.7.0-np2py312hbfe1cb0_2.conda
+  sha256: b24f2cf3f6582816bd3c3e7d07218b8daf35c598627f519bba1f90855df78bae
+  md5: db5e9a8a0a21b44d10a331651332a97d
+  depends:
+  - python
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-common
+  run_exports:
+    weak:
+    - roboplan-common >=0.7.0,<0.7.1.0a0
+  size: 30963
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-common-0.7.0-np2py314he091a44_2.conda
+  sha256: c7d44509139e1490f248e365905f51d0b7d71bcbf4ad4acfcbb8aa2404691223
+  md5: 3135c8b7592c8aa306ae98dceb8e2f20
+  depends:
+  - python
+  - python_abi 3.14.* *_cp314
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-common
+  run_exports:
+    weak:
+    - roboplan-common >=0.7.0,<0.7.1.0a0
+  size: 30948
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-core-python-0.7.0-np2py312hbfe1cb0_2.conda
+  sha256: d08ad2eb6471dc31ac0560fd57537468fef19a0d8c049cbabf01f67a092f6c0d
+  md5: fd776030dc54d92ad78fd47e25252c20
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - octomap >=1.10.1,<1.11.0a0
+  - python_abi 3.12.* *_cp312
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-core-python
+  run_exports:
+    weak:
+    - roboplan-core-python >=0.7.0,<0.7.1.0a0
+  size: 258367
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-core-python-0.7.0-np2py314he091a44_2.conda
+  sha256: 569dd5e4f4dcc52e61997f159dd98f5b1ad064c190581424737624038d6d830b
+  md5: f2969965480972eee11dc297cdb4c4ed
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - roboplan-example-models-python ==0.7.0
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - octomap >=1.10.1,<1.11.0a0
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-core-python
+  run_exports:
+    weak:
+    - roboplan-core-python >=0.7.0,<0.7.1.0a0
+  size: 259296
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-example-models-python-0.7.0-np2py312hbfe1cb0_2.conda
+  sha256: f3e93ccf8ad1f8190d5f45c66dc2eb820105447b2de033b5e8ea28fbf8b29b23
+  md5: 2b2f1ab3a5ce9845cd1b2b01e26d83fc
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.12.* *_cp312
+  - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-example-models-python >=0.7.0,<0.7.1.0a0
+  size: 72180
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-example-models-python-0.7.0-np2py314he091a44_2.conda
+  sha256: 13dda0011d92b661c50145dd8c60d579154808dadcf2d427cca94ae084fbd065
+  md5: 8a58aae2c2c04db5f3d159f6cb3d2bf1
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-example-models-python >=0.7.0,<0.7.1.0a0
+  size: 71972
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-oink-python-0.7.0-np2py312hbfe1cb0_2.conda
+  sha256: a055a8e73eadac6e6a169ddb13d3fa4490dfdc70193fb07642af5401dd687215
+  md5: 1c5152e6b4159178befd4c211a8f194b
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - python_abi 3.12.* *_cp312
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-oink-python >=0.7.0,<0.7.1.0a0
+  size: 149258
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-oink-python-0.7.0-np2py314he091a44_2.conda
+  sha256: 489d21024a98578e8b3ee6effc6c5fbdbe38b85df3ebe3a5d77dbe8aadffdcea
+  md5: e2c398968e93d8951a19254f18722560
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-oink-python >=0.7.0,<0.7.1.0a0
+  size: 149170
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-python-0.7.0-hfc2019e_2.conda
+  sha256: cceafd8346ec7d0f901477716f8a91148e5a0c25d9c2af9cef9cbe8b9898dca1
+  md5: 498455501345e5a31e18d9500ef6f85e
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-rrt-python ==0.7.0
+  - roboplan-simple-ik-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - roboplan-cartesian-planning-python ==0.7.0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan?source=compressed-mapping
+  run_exports: {}
+  size: 7540
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-rrt-python-0.7.0-np2py312hbfe1cb0_2.conda
+  sha256: e8b33d42bd29a38079525d4b50dea0b8bf4f3d11bb014b3dfa25f17b310794e3
+  md5: e94d5a1589c259bc032019fe8570c593
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.12.* *_cp312
+  - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-rrt-python >=0.7.0,<0.7.1.0a0
+  size: 154156
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-rrt-python-0.7.0-np2py314he091a44_2.conda
+  sha256: 4c859eb409c22fbbbb8ef03fe7d99c9d5cdf1d61ed593cc90ffcf052bc910920
+  md5: 3ef7443dc96d7b361178f456ee72b722
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-rrt-python >=0.7.0,<0.7.1.0a0
+  size: 154175
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-simple-ik-python-0.7.0-np2py312hbfe1cb0_2.conda
+  sha256: bb0fa811b0a32f9cffabf909b2be440aa54aa8b2f36d62e6e770690cf80a2546
+  md5: 9a1e830f241514be198137a3aed86dba
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-simple-ik-python >=0.7.0,<0.7.1.0a0
+  size: 102777
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-simple-ik-python-0.7.0-np2py314he091a44_2.conda
+  sha256: 56312e0ab2927b473fb737c4197ddd1bdcb9753d871e6ec5acc5e1f660ae9d7d
+  md5: 7bada43af091bbc539b80b73a8179a1f
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-simple-ik-python >=0.7.0,<0.7.1.0a0
+  size: 102687
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-toppra-python-0.7.0-np2py312hbfe1cb0_2.conda
+  sha256: fb6e0bcb2a89acbeeafa8b9e442dd432bd140bc642075d3a7124d20f5c60819f
+  md5: b808e8f3ce1715893ba102174e232eb1
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - __glibc >=2.17,<3.0.a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-toppra-python >=0.7.0,<0.7.1.0a0
+  size: 114156
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-64/roboplan-toppra-python-0.7.0-np2py314he091a44_2.conda
+  sha256: e3176c5d1ecb4dca52a22a1464fb85424fa996f635829b134612e950bd192ec0
+  md5: 0b4186e7f7b2d988ff55360b0306e190
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - __glibc >=2.17,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-toppra-python >=0.7.0,<0.7.1.0a0
+  size: 114394
+  timestamp: 1789956822562
+- conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-cartesian-planning-0.7.0-h6309326_2.conda
+  sha256: 504a6ba6f163aff3db07926b02d0e12d33807703df9504f61225050f68724159
+  md5: 01439d85f9470117e043c00bc2d5eb76
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  size: 85734
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-core-0.7.0-h6309326_2.conda
+  sha256: 8990c71ca7815642ee316f543c2878786c04707f9fd6610953a8e77630545bbe
+  md5: 1e2f8375e8fa85fa8fa8debef50566d4
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - yaml-cpp >=0.8.0,<0.9.0a0
+  - tinyxml2 >=11.0.0,<11.1.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/libroboplan-core
+  run_exports:
+    weak:
+    - libroboplan-core >=0.7.0,<0.7.1.0a0
+  size: 437674
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-example-models-0.7.0-h6309326_2.conda
+  sha256: c8242a80ce680e36749e31461922148cb5f32c42d2e4eff35176c445412294c0
+  md5: df7b0ef7666149eb42caafe5914bcc52
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  size: 26215206
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-oink-0.7.0-h6309326_2.conda
+  sha256: d7a7272bac8eb3bbe250a0710c81c3e04814a8ce00769a1a7761a5239b31410a
+  md5: a96cad2984c1e800c4f9a52e1c8e5fd0
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  size: 358924
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-rrt-0.7.0-h6309326_2.conda
+  sha256: 88fb55a0bf89efb060d95f3ccd5626a76cbbe596c55a3f0900d68ed1f166a46e
+  md5: 68fbce5f1c66446a150f7edb3e8808be
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  size: 252052
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-simple-ik-0.7.0-h6309326_2.conda
+  sha256: 122a842c9aaee08936a264e7b0ecfe59212eaed2148f36de9b3d848474998e01
+  md5: 692ad9ab55010fe737956cf6d7333432
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - qhull >=2020.2,<2020.3.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  size: 145918
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/libroboplan-toppra-0.7.0-h6309326_2.conda
+  sha256: 152eaf3d05d0c08d9996bb2b23683140a899be17969b2e1b7bcfdac88cb9c2ad
+  md5: a40b9a76af567ede8a2f06e9e485c56c
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libtoppra >=0.6.10,<0.6.11.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  size: 85528
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/octomap-1.10.1-h45ce4d5_1.conda
+  sha256: 55dbfaecc12e7452d1bf16d0abaed5277ace36045ccafa712259a413342a09f0
+  md5: 95578310970237a2d7125931339f6b51
+  depends:
+  - libstdcxx >=15
+  - libgcc >=15
+  license: BSD-3-Clause
+  license_family: BSD
+  purls: []
+  run_exports:
+    weak:
+    - octomap >=1.10.1,<1.11.0a0
+  size: 274351
+  timestamp: 1790285664241
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-cartesian-planning-python-0.7.0-np2py312h122dcda_2.conda
+  sha256: fa169a9adfc876ff090f5aabf4573aba6954e749f7eb99ea2edd0f96143e1b5c
+  md5: bbdd8642b87a2ff8285cb699bdcb4046
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.12.* *_cp312
+  - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-cartesian-planning-python >=0.7.0,<0.7.1.0a0
+  size: 110394
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-cartesian-planning-python-0.7.0-np2py314h8e5a143_2.conda
+  sha256: 9f50dcba5a28a61b27d92e524cab5e3ea8a75085c462e1cfcaa50cf965fa81cd
+  md5: 1d7cbf0bd0958dadb1d20a1c50398e3a
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  - python_abi 3.14.* *_cp314
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-cartesian-planning-python >=0.7.0,<0.7.1.0a0
+  size: 110111
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-common-0.7.0-np2py312h122dcda_2.conda
+  sha256: db2e4fbf0523c20615df8045dc1ca303cb695d0fd662721e3fec956a3dc0c8ca
+  md5: 59e88971823a4c50a50d8e8295f7ca7e
+  depends:
+  - python
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-common
+  run_exports:
+    weak:
+    - roboplan-common >=0.7.0,<0.7.1.0a0
+  size: 30427
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-common-0.7.0-np2py314h8e5a143_2.conda
+  sha256: 97e7d42602dd9a5383a37b4e3b6304c49dbb09a781a0bafc7a480ba154436091
+  md5: 1f12fd256a6ee7f8e0b6f988f72abc6f
+  depends:
+  - python
+  - python_abi 3.14.* *_cp314
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-common
+  run_exports:
+    weak:
+    - roboplan-common >=0.7.0,<0.7.1.0a0
+  size: 30517
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-core-python-0.7.0-np2py312h122dcda_2.conda
+  sha256: 32b23571c177efb963077bb9b275466094d65449454a8d7acfa0800a1f10e8e5
+  md5: 45d6c6921cab16c1876861514d214bc3
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - octomap >=1.10.1,<1.11.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.12.* *_cp312
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-core-python
+  run_exports:
+    weak:
+    - roboplan-core-python >=0.7.0,<0.7.1.0a0
+  size: 247259
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-core-python-0.7.0-np2py314h8e5a143_2.conda
+  sha256: b4977a14dfd7197a03165afb64a48bc5ad90e557f14faecce4a40937c05557bf
+  md5: d568510fe5ea81a6a932a70d51db52aa
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.14.* *_cp314
+  - octomap >=1.10.1,<1.11.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-core-python
+  run_exports:
+    weak:
+    - roboplan-core-python >=0.7.0,<0.7.1.0a0
+  size: 247749
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-example-models-python-0.7.0-np2py312h122dcda_2.conda
+  sha256: 34039f091887b2aa738aa1092524ed27daf8a2f12d537e7356370eae1a39c228
+  md5: cfbda7771e42593d285f620a871ff29b
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-example-models-python >=0.7.0,<0.7.1.0a0
+  size: 70020
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-example-models-python-0.7.0-np2py314h8e5a143_2.conda
+  sha256: d47de637b4d53fa8e9bb9d503bf0fec567460bfb230a24e81119e4f2941422f0
+  md5: b66642a6d935ea7bcc910002856aed7d
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.14.* *_cp314
+  - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-example-models-python >=0.7.0,<0.7.1.0a0
+  size: 69771
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-oink-python-0.7.0-np2py312h122dcda_2.conda
+  sha256: 974b63a3368ddd54197102749ebca3b7e2bdd8cdc9894b457edb313af0a954c3
+  md5: b8d59e5f1e96a4132eeef1cf5c8ce657
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-oink-python >=0.7.0,<0.7.1.0a0
+  size: 141936
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-oink-python-0.7.0-np2py314h8e5a143_2.conda
+  sha256: 5a291983157636ff58f724c624a61120529155f159f4bd60f50f419818f9415d
+  md5: 657a13c8353d40c456324020be49b99b
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-oink-python >=0.7.0,<0.7.1.0a0
+  size: 141774
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-python-0.7.0-h22914b5_2.conda
+  sha256: 712422dfdba4a84b5ad2e94005ebb1f5fe19bfacf96320e3431636ca90c4ada0
+  md5: a695d74340622c53d798fbd7bbde0aa1
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-rrt-python ==0.7.0
+  - roboplan-simple-ik-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - roboplan-cartesian-planning-python ==0.7.0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan?source=compressed-mapping
+  run_exports: {}
+  size: 7544
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-rrt-python-0.7.0-np2py312h122dcda_2.conda
+  sha256: d2e5611f37cd45ce7991288b7ab0cd83d840ad0ead608ac88adaf8037a715613
+  md5: 3ae2055b60b08811cd26f170ac0d8310
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.12.* *_cp312
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-rrt-python >=0.7.0,<0.7.1.0a0
+  size: 149574
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-rrt-python-0.7.0-np2py314h8e5a143_2.conda
+  sha256: 905e6d99e66f90e69c8f0822cbb01d7108bdd2b9b195874dc5e4696c8ea04964
+  md5: c84b6ef49696cd134c03c1a3d3dd4e8c
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-rrt-python >=0.7.0,<0.7.1.0a0
+  size: 149735
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.7.0-np2py312h122dcda_2.conda
+  sha256: ae1e431efd409f18f680df779b25e198ba5dfa198900b49458db050a3daef52c
+  md5: f1e38cf7ee2b9b0704e8977e1f58075c
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-simple-ik-python >=0.7.0,<0.7.1.0a0
+  size: 96725
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-simple-ik-python-0.7.0-np2py314h8e5a143_2.conda
+  sha256: 8c846799c1acffb99e03bdf0570433d035ec675e377d0e7e794d8e818a3efead
+  md5: 58d5cdb11e7b23bc7ef8416e45e55a76
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-simple-ik-python >=0.7.0,<0.7.1.0a0
+  size: 96752
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-toppra-python-0.7.0-np2py312h122dcda_2.conda
+  sha256: 365f5ca846bd6476ab37f3da73ff557d7fd4c18e67f14d6d2981bbe9a0c718ce
+  md5: dc1e185125a65d7237827b0ca52ff83c
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-toppra-python >=0.7.0,<0.7.1.0a0
+  size: 106245
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/linux-aarch64/roboplan-toppra-python-0.7.0-np2py314h8e5a143_2.conda
+  sha256: a452bf4b0f4da23396a55cc489bb108aeaeeb92eb835587bb79e02203904f473
+  md5: 5bfcfdaeebb32423fe1587a64c153161
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libstdcxx >=15
+  - libgcc >=15
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-toppra-python >=0.7.0,<0.7.1.0a0
+  size: 106069
+  timestamp: 1789956822056
+- conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-cartesian-planning-0.7.0-hd0ac3da_2.conda
+  sha256: 1d6099c48f6aeadb275754acc6dc3bbc959625c7bb95c37dd19aee3c7b8ce564
+  md5: 730e549a0aa5cf18381cccdd7c54b088
+  depends:
+  - libcxx >=21
+  - __osx >=11.0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  size: 67099
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-core-0.7.0-hd0ac3da_2.conda
+  sha256: eabd0ee4b758db061445c6978879104b490ab18c89f724a7b8297adaf474bad0
+  md5: c313ef1b872ae06635b35cd63872c9f2
+  depends:
+  - libcxx >=21
+  - __osx >=11.0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - tinyxml2 >=11.0.0,<11.1.0a0
+  - yaml-cpp >=0.8.0,<0.9.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/libroboplan-core
+  run_exports:
+    weak:
+    - libroboplan-core >=0.7.0,<0.7.1.0a0
+  size: 351048
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-example-models-0.7.0-hd0ac3da_2.conda
+  sha256: 9d9b84b2e1caa6153d231b63acab83b8ea23b53a457681f9f4c16edad50ba682
+  md5: a9fcb82bf0ab095a83c6ba7620756f8f
+  depends:
+  - libcxx >=21
+  - __osx >=11.0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  size: 26214439
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-oink-0.7.0-hd0ac3da_2.conda
+  sha256: 73cf67b3b6bbc3d2a0243474e8fea270309e6bf126a325062cdf40a3ce535588
+  md5: 94e65e132a5b1e489e031ffabc5bc2b9
+  depends:
+  - libcxx >=21
+  - __osx >=11.0
+  - qhull >=2020.2,<2020.3.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  size: 270327
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-rrt-0.7.0-hd0ac3da_2.conda
+  sha256: 10df3bd7d0f184e93b97cd43443af7795ae9b0e44bdaa215da5589be2585ffab
+  md5: b0c1929000a651b31ab34538f15dc61a
+  depends:
+  - libcxx >=21
+  - __osx >=11.0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  size: 208907
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-simple-ik-0.7.0-hd0ac3da_2.conda
+  sha256: 5635ff23b2a1cdd30b432a8135e27808461631f249134648f340ce6eaf93faea
+  md5: 757908e6ec2e61d4d51b42ebb10a4cbc
+  depends:
+  - libcxx >=21
+  - __osx >=11.0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  size: 136713
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/libroboplan-toppra-0.7.0-hd0ac3da_2.conda
+  sha256: 82609abb88d7d32a4fb6ed9243fc26b85b289e64f54b64b8c621e965a4c70b03
+  md5: 98f9bbf5045fe3e2ab33e7005b6b855f
+  depends:
+  - __osx >=11.0
+  - libcxx >=21
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libtoppra >=0.6.10,<0.6.11.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  size: 69951
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/octomap-1.10.1-hfbe1efa_1.conda
+  sha256: 663ff1877ffad499d49aff7e55549af971300b9909f39af9506603462e5a0a39
+  md5: bcb406970b78d14b9a9b723640cbd48f
+  depends:
+  - __osx >=11.0
+  - libcxx >=21
+  license: BSD-3-Clause
+  license_family: BSD
+  purls: []
+  run_exports:
+    weak:
+    - octomap >=1.10.1,<1.11.0a0
+  size: 194827
+  timestamp: 1790285733853
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-cartesian-planning-python-0.7.0-np2py312h8c4fe88_2.conda
+  sha256: c1349aa2cff53c65045d0953dcf52585293a4f866c2aae4bb65b3b54d11e413d
+  md5: 5a2524b4a6d1d694c8c1f11d473b1fa7
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - libcxx >=21
+  - __osx >=11.0
+  - python_abi 3.12.* *_cp312
+  - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-cartesian-planning-python >=0.7.0,<0.7.1.0a0
+  size: 92327
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-cartesian-planning-python-0.7.0-np2py314h728bd26_2.conda
+  sha256: 8f8bcc473386d79c52788b732f17c502b44c298f99ab1dc012d765bc564144ef
+  md5: b2e2d85be1f8c5ddc15316a550ef73db
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - __osx >=11.0
+  - libcxx >=21
+  - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  - python_abi 3.14.* *_cp314
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-cartesian-planning-python >=0.7.0,<0.7.1.0a0
+  size: 92587
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-common-0.7.0-np2py312h8c4fe88_2.conda
+  sha256: b8cf564380ca68a9d0644046b673950a17077ad1085489672c024ebbb12dcdba
+  md5: 9940309c7b6cb9f2df7ebecdc458e010
+  depends:
+  - python
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-common
+  run_exports:
+    weak:
+    - roboplan-common >=0.7.0,<0.7.1.0a0
+  size: 30216
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-common-0.7.0-np2py314h728bd26_2.conda
+  sha256: d10a5ecc8a639e32b9050f5ac135df064be270997a2384ec9d5fd9f43f0bc805
+  md5: 21305e49762d176186b61190137fe2c9
+  depends:
+  - python
+  - python_abi 3.14.* *_cp314
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-common
+  run_exports:
+    weak:
+    - roboplan-common >=0.7.0,<0.7.1.0a0
+  size: 30411
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-core-python-0.7.0-np2py312h8c4fe88_2.conda
+  sha256: 87aba98115dcf82959fb835d5c27e2a0ad2b669e9fc504a4d4e02f883a132b1d
+  md5: d2243aaafe352856e5bbe2cda65bed85
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - roboplan-example-models-python ==0.7.0
+  - __osx >=11.0
+  - libcxx >=21
+  - octomap >=1.10.1,<1.11.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-core-python
+  run_exports:
+    weak:
+    - roboplan-core-python >=0.7.0,<0.7.1.0a0
+  size: 223325
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-core-python-0.7.0-np2py314h728bd26_2.conda
+  sha256: c8261708ffa4c74dd579543482538ab6b5b8fd01c8ba254397d86e46d10f85a4
+  md5: 14dc5af608ae12de30562db428ab9a76
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - roboplan-example-models-python ==0.7.0
+  - __osx >=11.0
+  - libcxx >=21
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - octomap >=1.10.1,<1.11.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-core-python
+  run_exports:
+    weak:
+    - roboplan-core-python >=0.7.0,<0.7.1.0a0
+  size: 224110
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-example-models-python-0.7.0-np2py312h8c4fe88_2.conda
+  sha256: ba9283d268462cfabd1eb9359f19ad063289ac9831ce92fa5e8809a56a4d8e6f
+  md5: 4b6e12e73ae89b545c02d64f150b5d57
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - libcxx >=21
+  - __osx >=11.0
+  - python_abi 3.12.* *_cp312
+  - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-example-models-python >=0.7.0,<0.7.1.0a0
+  size: 61427
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-example-models-python-0.7.0-np2py314h728bd26_2.conda
+  sha256: 16bc86401fc7dfbc27c70bc69986bad05e9bc509b3e9714a9af91f06c16a9cec
+  md5: 11b8dd646a73aabb74d350237a826aa9
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - libcxx >=21
+  - __osx >=11.0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-example-models-python >=0.7.0,<0.7.1.0a0
+  size: 61684
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-oink-python-0.7.0-np2py312h8c4fe88_2.conda
+  sha256: 51c93d9627c92d3aa3f96553ffe7a541b5384232b3f5225742383d15190042ad
+  md5: 9694c4154795bb793d10d052d06d32ef
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - __osx >=11.0
+  - libcxx >=21
+  - python_abi 3.12.* *_cp312
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-oink-python >=0.7.0,<0.7.1.0a0
+  size: 118998
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-oink-python-0.7.0-np2py314h728bd26_2.conda
+  sha256: ea0b20c1f745b8dd0a9ab6181a9cd6697ded965af916ed0c0adcdb64729eaace
+  md5: c261e9c2b70fb4d459e2e5b0199b1609
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - __osx >=11.0
+  - libcxx >=21
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-oink-python >=0.7.0,<0.7.1.0a0
+  size: 118968
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-python-0.7.0-h820172f_2.conda
+  sha256: 3ed94354c4fdde6558adebfeb8a29a99c44f2011a9716df05bb0b7c94558cd9a
+  md5: 9cb196db7619d3c34ef94cc3e260c71f
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-rrt-python ==0.7.0
+  - roboplan-simple-ik-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - roboplan-cartesian-planning-python ==0.7.0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan?source=compressed-mapping
+  run_exports: {}
+  size: 7570
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-rrt-python-0.7.0-np2py312h8c4fe88_2.conda
+  sha256: 367e0816ebe19789ef17f47e8be5c875addc417b4e9e8ded71f91d92ed28b827
+  md5: 4d56e2866759ecf13abc35aa7c255e43
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - __osx >=11.0
+  - libcxx >=21
+  - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-rrt-python >=0.7.0,<0.7.1.0a0
+  size: 133013
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-rrt-python-0.7.0-np2py314h728bd26_2.conda
+  sha256: c6191ab89541d09708acff1e0ecbc5ce2c6a1b0fe9db8c9cd74a84f1a5bd24c0
+  md5: 8d59fe3d9e20a6abbcaeb968f7cc75de
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - __osx >=11.0
+  - libcxx >=21
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - python_abi 3.14.* *_cp314
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-rrt-python >=0.7.0,<0.7.1.0a0
+  size: 133136
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-simple-ik-python-0.7.0-np2py312h8c4fe88_2.conda
+  sha256: 2ae0eb61ebb5aff8e8048722a95d52988863ccc8d73c14c8a44d05a8da467d00
+  md5: 24b90180ee0e248cd3ca0f9eb4684122
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libcxx >=21
+  - __osx >=11.0
+  - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-simple-ik-python >=0.7.0,<0.7.1.0a0
+  size: 79407
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-simple-ik-python-0.7.0-np2py314h728bd26_2.conda
+  sha256: 560e6844bbea9dfda32b0560de42598713a70fc9d061c558c06eb27de0d6fc35
+  md5: 4cab3296c8a4fccccf869dfad89fee65
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libcxx >=21
+  - __osx >=11.0
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-simple-ik-python >=0.7.0,<0.7.1.0a0
+  size: 79384
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-toppra-python-0.7.0-np2py312h8c4fe88_2.conda
+  sha256: 36a2cd4ed2a5ddb3dbc4c804e3ee8ce91a4e8694d6fe5b89690670060874c64e
+  md5: 5576a99d10361468c3e871f980e28ecd
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - __osx >=11.0
+  - libcxx >=21
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-toppra-python >=0.7.0,<0.7.1.0a0
+  size: 83943
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/osx-arm64/roboplan-toppra-python-0.7.0-np2py314h728bd26_2.conda
+  sha256: 213f43e8d464f5b41a63c70f6d14ffcde50fcfb1c9d70b370da94c939e28675c
+  md5: c0c5a9553e0efeaa73c498e3459eb375
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - libcxx >=21
+  - __osx >=11.0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-toppra-python >=0.7.0,<0.7.1.0a0
+  size: 83998
+  timestamp: 1789956886568
+- conda: https://prefix.dev/conda-forge/win-64/libroboplan-cartesian-planning-0.7.0-h43f8cbe_2.conda
+  sha256: 964723bf19be2a887b24b250486fe883585dd74f8b809b20b11e7b9f6eab2009
+  md5: 92e5f219fb834c31f3c91bc75d7d74fb
+  depends:
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - dlfcn-win32 >=1.4.2,<2.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  size: 205665
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/libroboplan-core-0.7.0-h43f8cbe_2.conda
+  sha256: be81f820ce622399f6c25f9c9983879f2f0f9d2a779a6ebc42efb7acd4cd12e3
+  md5: 80b28a80ecec2c3ce249197c46946583
+  depends:
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - tinyxml2 >=11.0.0,<11.1.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - dlfcn-win32 >=1.4.2,<2.0a0
+  - yaml-cpp >=0.8.0,<0.9.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/libroboplan-core
+  run_exports:
+    weak:
+    - libroboplan-core >=0.7.0,<0.7.1.0a0
+  size: 3200520
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/libroboplan-example-models-0.7.0-h43f8cbe_2.conda
+  sha256: 1faf8a39643af3b4a80cf1e7923b6a55d94d086ad0d1cf8dd84e3a4b3d51f5ba
+  md5: a1bc4158aa214e4d186b5694ad3e06f7
+  depends:
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - dlfcn-win32 >=1.4.2,<2.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  size: 26265490
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/libroboplan-oink-0.7.0-h43f8cbe_2.conda
+  sha256: 1dd3c333fd894b2cbb9e2c7c20413c80bef9351f724eeaf8557fd353065b7516
+  md5: ea7c21a6aab8af4100907b558f3c06d6
+  depends:
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - dlfcn-win32 >=1.4.2,<2.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  size: 1690008
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/libroboplan-rrt-0.7.0-h43f8cbe_2.conda
+  sha256: 8a1a6bc3304f1df6d4848eec2c6cce47e34474d47b005ae66d966261581a3659
+  md5: 1f15252b4a1110d810e3c39a47cb217d
+  depends:
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - dlfcn-win32 >=1.4.2,<2.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  size: 2475271
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/libroboplan-simple-ik-0.7.0-h43f8cbe_2.conda
+  sha256: e21120de09b50515091130b936567fd1b8585ee03d0dfcf852b86849ef2351f0
+  md5: e6e755256b93e106de756e72b234d6bf
+  depends:
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - dlfcn-win32 >=1.4.2,<2.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  size: 2300859
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/libroboplan-toppra-0.7.0-h43f8cbe_2.conda
+  sha256: d3f98b7f0ee358b289547413c50984e6ac13edbdd044d47ac3f7254af2e693a7
+  md5: ac4963070817142639f5756eedbed994
+  depends:
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - dlfcn-win32 >=1.4.2,<2.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - eigen-abi >=5.0.1.100,<5.0.1.101.0a0
+  - libtoppra >=0.6.10,<0.6.11.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  size: 248013
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/octomap-1.10.1-h477610d_1.conda
+  sha256: c0372555908298dbf8a00a6574e83811215cd6b40c2a8dd0e9d4b10626f704fe
+  md5: a3209fccb952a0460e29331225f01306
+  depends:
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  license: BSD-3-Clause
+  license_family: BSD
+  purls: []
+  run_exports:
+    weak:
+    - octomap >=1.10.1,<1.11.0a0
+  size: 324576
+  timestamp: 1790285690159
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-cartesian-planning-python-0.7.0-np2py312hd46b15b_2.conda
+  sha256: c08d8cf53c9533260b85ce2cee60fa7c8171104ff0619ac48a99aa8560aea892
+  md5: b882f30b203fe5688ab23665ab294fa2
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - python_abi 3.12.* *_cp312
+  - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-cartesian-planning-python >=0.7.0,<0.7.1.0a0
+  size: 109284
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-cartesian-planning-python-0.7.0-np2py314hed8631d_2.conda
+  sha256: dab6b5fb79c86108aa58d823fd22a85be593df7875554ccaf907281fcf67b2a3
+  md5: 7d8f2bfeea2a999d864bb9cc5e509b54
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-cartesian-planning >=0.7.0,<0.7.1.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-cartesian-planning-python >=0.7.0,<0.7.1.0a0
+  size: 109479
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-common-0.7.0-np2py312hd46b15b_2.conda
+  sha256: 12624ebdfc32b1767ad1af89f27d8e331efa8b7b599fd96163e09e3b2826948b
+  md5: 11df54fd84881b4c4dec01aba2addb8c
+  depends:
+  - python
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-common
+  run_exports:
+    weak:
+    - roboplan-common >=0.7.0,<0.7.1.0a0
+  size: 24961
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-common-0.7.0-np2py314hed8631d_2.conda
+  sha256: fda800afc02725040d03ed8ef0630dde7c2aaf7dae5a6bd6cf82394f1811753f
+  md5: a4824624e4f8424b6f06a1f489a269d4
+  depends:
+  - python
+  - python_abi 3.14.* *_cp314
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-common
+  run_exports:
+    weak:
+    - roboplan-common >=0.7.0,<0.7.1.0a0
+  size: 25313
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-core-python-0.7.0-np2py312hd46b15b_2.conda
+  sha256: 2bfd4e407234a1f4fdaf5be79409e119dab3ebb6517255523cb28ad40e822652
+  md5: 89ee43657febc110d1c038c60a941f54
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  - octomap >=1.10.1,<1.11.0a0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-core-python
+  run_exports:
+    weak:
+    - roboplan-core-python >=0.7.0,<0.7.1.0a0
+  size: 240132
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-core-python-0.7.0-np2py314hed8631d_2.conda
+  sha256: 04c166e29f157621a835ceec59c729d0fab272ffd2905c5acf81c4f147f3f116
+  md5: d8964971401312f3762d242d9661e215
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - libcoal >=3.0.4,<3.0.5.0a0
+  - libroboplan-core >=0.7.0,<0.7.1.0a0
+  - python_abi 3.14.* *_cp314
+  - octomap >=1.10.1,<1.11.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan-core-python
+  run_exports:
+    weak:
+    - roboplan-core-python >=0.7.0,<0.7.1.0a0
+  size: 240828
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-example-models-python-0.7.0-np2py312hd46b15b_2.conda
+  sha256: d4c9aa4692fd53464ece3ec71e7ab07f91d3dbaa173f00d1d2a4be7b976873b6
+  md5: 206de1417a76322c39c04d96a5f11252
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-example-models-python >=0.7.0,<0.7.1.0a0
+  size: 91977
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-example-models-python-0.7.0-np2py314hed8631d_2.conda
+  sha256: f17bda1f43c8a30cea44aadf4e036cc6e01c00712c5df5f26e57791df379a3d0
+  md5: 97210d84be1f3f91bd51928920298c33
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - numpy
+  - pinocchio-python >=4.1.0,<5.0.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-example-models >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-example-models-python >=0.7.0,<0.7.1.0a0
+  size: 92173
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-oink-python-0.7.0-np2py312hd46b15b_2.conda
+  sha256: e64b0f82e5428a348e4bbf2665a289b1de0bdf9a1383e58e128fad34c4bdc650
+  md5: de0a72cfc96215425c8bf04cab5eeaac
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - python_abi 3.12.* *_cp312
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-oink-python >=0.7.0,<0.7.1.0a0
+  size: 137736
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-oink-python-0.7.0-np2py314hed8631d_2.conda
+  sha256: 5aa245b898132ef3355e9e5520b602f4177119f94d7751c6a793c0f41acf6fec
+  md5: 6670dba8867a9fc4e49e78e35c123a17
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-oink >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-oink-python >=0.7.0,<0.7.1.0a0
+  size: 137837
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-python-0.7.0-h11686cb_2.conda
+  sha256: 55eec14e33aba59fd88b9e1b7c85e46a9062a52b2cc8b423658e696cceca7d45
+  md5: 73e3be2dd436c8e984dd0148e7cb2ab2
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - roboplan-oink-python ==0.7.0
+  - roboplan-rrt-python ==0.7.0
+  - roboplan-simple-ik-python ==0.7.0
+  - roboplan-toppra-python ==0.7.0
+  - roboplan-cartesian-planning-python ==0.7.0
+  license: MIT
+  license_family: MIT
+  purls:
+  - pkg:pypi/roboplan?source=compressed-mapping
+  run_exports: {}
+  size: 7622
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-rrt-python-0.7.0-np2py312hd46b15b_2.conda
+  sha256: 63ba6658cd4fea865f9f7df2473e9838efd6e1c1c0db9227056f928ecda7bcb2
+  md5: 885ed1fc27eec15dd324c053ee0b2e2d
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - python_abi 3.12.* *_cp312
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-rrt-python >=0.7.0,<0.7.1.0a0
+  size: 144308
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-rrt-python-0.7.0-np2py314hed8631d_2.conda
+  sha256: 7b9ad8061129c0d3aae3953f507b4fcf1b94da0634e663eb0dcd7ba9ce13e914
+  md5: 43111fa7b93e72ef7b1f259c77768bfc
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-rrt >=0.7.0,<0.7.1.0a0
+  - libpinocchio >=4.1.0,<4.1.1.0a0
+  - python_abi 3.14.* *_cp314
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-rrt-python >=0.7.0,<0.7.1.0a0
+  size: 144538
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-simple-ik-python-0.7.0-np2py312hd46b15b_2.conda
+  sha256: 9a0dd72344e9c14d544bb96b0d69a823dae9aa319d49a8c36cd12f95334fd192
+  md5: 6ca267dee1d55455d776e904bebebb18
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-simple-ik-python >=0.7.0,<0.7.1.0a0
+  size: 102066
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-simple-ik-python-0.7.0-np2py314hed8631d_2.conda
+  sha256: a283afde2bbac119bbb28c90f48a5ef417fc2d8836e116a8d09115e5c9790553
+  md5: 62c05e75bcc686a9b012486e5a4d6f51
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - qhull >=2020.2,<2020.3.0a0
+  - python_abi 3.14.* *_cp314
+  - libroboplan-simple-ik >=0.7.0,<0.7.1.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-simple-ik-python >=0.7.0,<0.7.1.0a0
+  size: 102282
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-toppra-python-0.7.0-np2py312hd46b15b_2.conda
+  sha256: 2f81ebbd9227cdad2e0a6644d0c36d51104a7f1a2a1ac29cc04bcd62b94e5f1b
+  md5: 1f6cffc8b1c0ec968da1808fb649d6eb
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - qhull >=2020.2,<2020.3.0a0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - python_abi 3.12.* *_cp312
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-toppra-python >=0.7.0,<0.7.1.0a0
+  size: 99770
+  timestamp: 1789956849552
+- conda: https://prefix.dev/conda-forge/win-64/roboplan-toppra-python-0.7.0-np2py314hed8631d_2.conda
+  sha256: 87113772b7ba167d04ce709cb1dd024c18b0f03967e845b23e2d015cdae17441
+  md5: 137378812f87639141fec3d8e0c35e86
+  depends:
+  - python
+  - roboplan-common ==0.7.0
+  - roboplan-core-python ==0.7.0
+  - roboplan-example-models-python ==0.7.0
+  - vc >=14.3,<15
+  - vc14_runtime >=14.44.35208
+  - ucrt >=10.0.20348.0
+  - libroboplan-toppra >=0.7.0,<0.7.1.0a0
+  - python_abi 3.14.* *_cp314
+  - qhull >=2020.2,<2020.3.0a0
+  license: MIT
+  license_family: MIT
+  purls: []
+  run_exports:
+    weak:
+    - roboplan-toppra-python >=0.7.0,<0.7.1.0a0
+  size: 99954
+  timestamp: 1789956849552
 - conda: https://prefix.dev/robostack-jazzy/linux-64/ros-jazzy-action-msgs-2.0.4-np2py312h2ed9cc7_21.conda
   sha256: 4fdfbe87c09a072e5e17226de9dc7a04e03d7458630a4254ed8781767b212b72
   md5: 28abff38cf7d1c37fb3bcfc0406ca600
