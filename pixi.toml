@@ -9,7 +9,7 @@ platforms = [
     "linux-64",
     "linux-aarch64",
     # RoboStack osx-arm64 builds require macOS 14+
-    { name = "osx-arm64-macos14", platform = "osx-arm64", macos = "14.0" },
+    { platform = "osx-arm64", macos = "14.0" },
     "win-64",
 ]
 version = "0.7.0"
