@@ -52,6 +52,9 @@ Once set up, you can run the ``pixi`` tasks as follows.
     # Show test results
     pixi run -e jazzy test-result
 
+    # Remove the build/install directories
+    pixi run clean
+
 Once the workspace is built, it can be used as a "normal" ROS 2 workspace.
 That is, the workspace can be sourced and used as expected.
 
@@ -80,7 +83,7 @@ The examples from the upstream repository should also be available, as well:
 
 
 **NOTE:** All ROS distros will share build/install directories by default.
-Be sure to ``rm -rf build/* install/*`` when switching between ROS versions or things will break.
+Be sure to run ``pixi run clean`` when switching between ROS versions or things will break.
 
 
 ---

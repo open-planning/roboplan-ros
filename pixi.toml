@@ -26,6 +26,7 @@ build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=$
 build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI"] }
 test = { cmd = ["colcon", "test"] }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
+clean = { cmd = "rm -rf build install" }
 
 # Use the MSVC-compatible clang driver: conda-forge packages are built with
 # MSVC and export MSVC-style flags that the GNU-style clang++ driver rejects.
@@ -70,6 +71,9 @@ nanobind = ">=2.12.0,<4"
 libtoppra  = ">=0.6.9,<0.7"
 proxsuite = ">=0.7.3,<0.8"
 nanoflann = ">=2.0.1,<3"
+# Pinocchio from conda-forge: RoboStack's ros2-pinocchio packages only wrap it,
+# and kilted has no win-64 build of that wrapper.
+pinocchio = ">=4.1.0,<5"
 
 viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
 plyfile = ">=1.1,<2"
@@ -104,7 +108,7 @@ scripts = ["install/setup.sh"]
 
 [activation.env]
 # Build nanobind extensions with the stable Python ABI. Must be ON when using
-# prebuilt roboplan core from conda-forge/RoboStack (see *-roboplan features).
+# prebuilt roboplan core from conda-forge/RoboStack (see the *-roboplan features).
 ROBOPLAN_ROS_STABLE_ABI = "OFF"
 
 [target.unix.activation.env]
@@ -130,26 +134,27 @@ CMAKE_PREFIX_PATH = '%CONDA_PREFIX%\Library;%CMAKE_PREFIX_PATH%'
 
 # Define one environment per ROS 2 distro.
 [environments]
-rolling = { features = ["rolling"] }
-lyrical = { features = ["lyrical"] }
+# The distro feature comes first so its RoboStack channel takes priority over
+# conda-forge (features without channels inherit the workspace channels).
+rolling = { features = ["rolling", "ros2"] }
+lyrical = { features = ["lyrical", "ros2"] }
 kilted = { features = ["kilted"] }
-jazzy = { features = ["jazzy"] }
+jazzy = { features = ["jazzy", "ros2"] }
 
-# Composing existing packages with core RoboPlan from Conda/RoboStack to
-# supporting building against Conda built core.
-# Note that not all distros are yet on RoboStack.
-rolling-conda-roboplan = { features = ["rolling", "conda-roboplan"] }
-lyrical-conda-roboplan = { features = ["lyrical", "robostack-roboplan"] }
+# Same as above, but building against prebuilt RoboPlan core from conda-forge
+# (or RoboStack, for distros that conda-forge's roboplan-python cannot serve).
+rolling-conda-roboplan = { features = ["rolling", "ros2", "conda-roboplan"] }
+lyrical-conda-roboplan = { features = ["lyrical", "ros2", "robostack-roboplan"] }
 kilted-conda-roboplan = { features = ["kilted", "conda-roboplan"] }
-jazzy-conda-roboplan = { features = ["jazzy", "conda-roboplan"] }
+jazzy-conda-roboplan = { features = ["jazzy", "ros2", "conda-roboplan"] }
 
-###################
-## ROS 2 Rolling ##
-###################
-[feature.rolling]
-channels = ["https://prefix.dev/robostack-rolling"]
-
-[feature.rolling.dependencies]
+################################
+## Shared ROS 2 dependencies  ##
+################################
+# RoboStack publishes distro-agnostic `ros2-*` package names; the distro is
+# selected by the channel each distro feature adds. Kilted has not been
+# migrated yet, so it lists its `ros-kilted-*` packages separately below.
+[feature.ros2.dependencies]
 ros2-ros-base = "*"
 
 # RoboPlan and RoboPlan ROS dependencies
@@ -171,12 +176,17 @@ ros2-trajectory-msgs = "*"
 ros2-urdfdom = "*"
 ros2-visualization-msgs = "*"
 ros2-xacro = "*"
+ros2-yaml-cpp-vendor = "*"
 
+###################
+## ROS 2 Rolling ##
+###################
+[feature.rolling]
+channels = ["https://prefix.dev/robostack-rolling"]
+
+[feature.rolling.dependencies]
 # roboplan_core uses plain tinyxml2 (not the vendor package) on this distro
 tinyxml2 = "*"
-
-# Pinocchio from conda-forge, since RoboStack does not build it for win-64
-pinocchio = ">=4.1.0,<5"
 
 [feature.rolling.activation.env]
 ROS_DISTRO = "rolling"
@@ -188,33 +198,8 @@ ROS_DISTRO = "rolling"
 channels = ["https://prefix.dev/robostack-lyrical"]
 
 [feature.lyrical.dependencies]
-ros2-ros-base = "*"
-
-# RoboPlan and RoboPlan ROS dependencies
-ros2-builtin-interfaces = "*"
-ros2-console-bridge-vendor = "*"
-ros2-controller-manager = "*"
-ros2-geometry-msgs = "*"
-ros2-interactive-markers = "*"
-ros2-joint-state-broadcaster = "*"
-ros2-joint-trajectory-controller = "*"
-ros2-parallel-gripper-controller = "*"
-ros2-robot-state-publisher = "*"
-ros2-ros2controlcli = "*"
-ros2-rviz2 = "*"
-ros2-sensor-msgs = "*"
-ros2-tf2-eigen = "*"
-ros2-topic-tools = "*"
-ros2-trajectory-msgs = "*"
-ros2-urdfdom = "*"
-ros2-visualization-msgs = "*"
-ros2-xacro = "*"
-
 # roboplan_core uses plain tinyxml2 (not the vendor package) on this distro
 tinyxml2 = "*"
-
-# Pinocchio from conda-forge, since RoboStack does not build it for win-64
-pinocchio = ">=4.1.0,<5"
 
 [feature.lyrical.activation.env]
 ROS_DISTRO = "lyrical"
@@ -225,6 +210,8 @@ ROS_DISTRO = "lyrical"
 [feature.kilted]
 channels = ["https://prefix.dev/robostack-kilted"]
 
+# TODO: fold into the `ros2` feature once RoboStack renames kilted to `ros2-*`
+# or once kilted goes end-of-life, whichever comes first.
 [feature.kilted.dependencies]
 ros-kilted-ros-base = "*"
 
@@ -236,10 +223,10 @@ ros-kilted-geometry-msgs = "*"
 ros-kilted-interactive-markers = "*"
 ros-kilted-joint-state-broadcaster = "*"
 ros-kilted-joint-trajectory-controller = "*"
+ros-kilted-parallel-gripper-controller = "*"
 ros-kilted-robot-state-publisher = "*"
 ros-kilted-ros2controlcli = "*"
 ros-kilted-rviz2 = "*"
-ros-kilted-parallel-gripper-controller = "*"
 ros-kilted-sensor-msgs = "*"
 ros-kilted-tf2-eigen = "*"
 ros-kilted-tinyxml2-vendor = "*"
@@ -251,9 +238,6 @@ ros-kilted-visualization-msgs = "*"
 ros-kilted-xacro = "*"
 ros-kilted-yaml-cpp-vendor = "*"
 
-# Pinocchio from conda-forge, since RoboStack does not build it for win-64
-pinocchio = ">=4.1.0,<5"
-
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
 
@@ -264,33 +248,8 @@ ROS_DISTRO = "kilted"
 channels = ["https://prefix.dev/robostack-jazzy"]
 
 [feature.jazzy.dependencies]
-ros2-ros-base = "*"
-
-# RoboPlan and RoboPlan ROS dependencies
-ros2-builtin-interfaces = "*"
-ros2-console-bridge-vendor = "*"
-ros2-controller-manager = "*"
-ros2-geometry-msgs = "*"
-ros2-interactive-markers = "*"
-ros2-joint-state-broadcaster = "*"
-ros2-joint-trajectory-controller = "*"
-ros2-parallel-gripper-controller = "*"
-ros2-robot-state-publisher = "*"
-ros2-ros2controlcli = "*"
-ros2-rviz2 = "*"
-ros2-sensor-msgs = "*"
-ros2-tf2-eigen = "*"
 ros2-tinyxml2-vendor = "*"
 ros2-tl-expected = "*"
-ros2-topic-tools = "*"
-ros2-trajectory-msgs = "*"
-ros2-urdfdom = "*"
-ros2-visualization-msgs = "*"
-ros2-xacro = "*"
-ros2-yaml-cpp-vendor = "*"
-
-# Pinocchio from conda-forge, since RoboStack does not build it for win-64
-pinocchio = ">=4.1.0,<5"
 
 # RoboStack only builds mujoco_ros2_control for Linux
 [feature.jazzy.target.linux.dependencies]
@@ -299,9 +258,11 @@ ros2-mujoco-ros2-control = "*"
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
 
-# Adds conda-forge's prebuilt roboplan core on top of a ROS-distro
-# feature above, instead of cloning/building roboplan from source in the
-# same environment. Must be used with the conda feature above.
+#######################
+## Prebuilt RoboPlan ##
+#######################
+# Builds against a prebuilt roboplan core (conda-forge or RoboStack) instead of
+# cloning/building roboplan from source in the same environment.
 [feature.conda-roboplan.dependencies]
 roboplan-python = ">=0.7.0,<0.8.0"
 
@@ -309,6 +270,15 @@ roboplan-python = ">=0.7.0,<0.8.0"
 # built against!
 # TODO: drop once roboplan-feedstock exports this transitively.
 nanobind-abi = "==22"
+
+[feature.conda-roboplan.activation.env]
+ROBOPLAN_ROS_STABLE_ABI = "ON"
+
+[feature.conda-roboplan.tasks]
+setup = { cmd = """
+colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
+colcon mixin update default
+""" }
 
 [feature.robostack-roboplan.dependencies]
 ros2-roboplan = ">=0.7.0,<0.8.0"
@@ -319,15 +289,6 @@ nanobind-abi = "==22"
 # RoboStack only builds this for linux-64 on some distros
 [feature.robostack-roboplan.target.linux-64.dependencies]
 ros2-roboplan-ros-franka = "*"
-
-[feature.conda-roboplan.activation.env]
-ROBOPLAN_ROS_STABLE_ABI = "ON"
-
-[feature.conda-roboplan.tasks]
-setup = { cmd = """
-colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
-colcon mixin update default
-""" }
 
 [feature.robostack-roboplan.activation.env]
 ROBOPLAN_ROS_STABLE_ABI = "ON"
