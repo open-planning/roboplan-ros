@@ -138,22 +138,21 @@ CMAKE_PREFIX_PATH = '%CONDA_PREFIX%\Library;%CMAKE_PREFIX_PATH%'
 # conda-forge (features without channels inherit the workspace channels).
 rolling = { features = ["rolling", "ros2"] }
 lyrical = { features = ["lyrical", "ros2"] }
-kilted = { features = ["kilted"] }
+kilted = { features = ["kilted", "ros2"] }
 jazzy = { features = ["jazzy", "ros2"] }
 
 # Same as above, but building against prebuilt RoboPlan core from conda-forge
 # (or RoboStack, for distros that conda-forge's roboplan-python cannot serve).
 rolling-conda-roboplan = { features = ["rolling", "ros2", "conda-roboplan"] }
 lyrical-conda-roboplan = { features = ["lyrical", "ros2", "robostack-roboplan"] }
-kilted-conda-roboplan = { features = ["kilted", "conda-roboplan"] }
+kilted-conda-roboplan = { features = ["kilted", "ros2", "conda-roboplan"] }
 jazzy-conda-roboplan = { features = ["jazzy", "ros2", "conda-roboplan"] }
 
 ################################
 ## Shared ROS 2 dependencies  ##
 ################################
 # RoboStack publishes distro-agnostic `ros2-*` package names; the distro is
-# selected by the channel each distro feature adds. Kilted has not been
-# migrated yet, so it lists its `ros-kilted-*` packages separately below.
+# selected by the channel each distro feature adds.
 [feature.ros2.dependencies]
 ros2-ros-base = "*"
 
@@ -209,34 +208,12 @@ ROS_DISTRO = "lyrical"
 ##################
 [feature.kilted]
 channels = ["https://prefix.dev/robostack-kilted"]
+# TODO: add win-64 back once RoboStack finishes the kilted `ros2-*` builds there.
+platforms = ["linux-64", "linux-aarch64", "osx-arm64-macos-14-0"]
 
-# TODO: fold into the `ros2` feature once RoboStack renames kilted to `ros2-*`
-# or once kilted goes end-of-life, whichever comes first.
 [feature.kilted.dependencies]
-ros-kilted-ros-base = "*"
-
-# RoboPlan and RoboPlan ROS dependencies
-ros-kilted-builtin-interfaces = "*"
-ros-kilted-console-bridge-vendor = "*"
-ros-kilted-controller-manager = "*"
-ros-kilted-geometry-msgs = "*"
-ros-kilted-interactive-markers = "*"
-ros-kilted-joint-state-broadcaster = "*"
-ros-kilted-joint-trajectory-controller = "*"
-ros-kilted-parallel-gripper-controller = "*"
-ros-kilted-robot-state-publisher = "*"
-ros-kilted-ros2controlcli = "*"
-ros-kilted-rviz2 = "*"
-ros-kilted-sensor-msgs = "*"
-ros-kilted-tf2-eigen = "*"
-ros-kilted-tinyxml2-vendor = "*"
-ros-kilted-tl-expected = "*"
-ros-kilted-topic-tools = "*"
-ros-kilted-trajectory-msgs = "*"
-ros-kilted-urdfdom = "*"
-ros-kilted-visualization-msgs = "*"
-ros-kilted-xacro = "*"
-ros-kilted-yaml-cpp-vendor = "*"
+ros2-tinyxml2-vendor = "*"
+ros2-tl-expected = "*"
 
 [feature.kilted.activation.env]
 ROS_DISTRO = "kilted"
