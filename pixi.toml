@@ -135,10 +135,9 @@ lyrical = { features = ["lyrical", "ros2"] }
 kilted = { features = ["kilted", "ros2"] }
 jazzy = { features = ["jazzy", "ros2"] }
 
-# Same as above, but building against prebuilt RoboPlan core from conda-forge
-# (or RoboStack, for distros that conda-forge's roboplan-python cannot serve).
+# Same as above, but building against prebuilt RoboPlan core from conda-forge.
 rolling-conda-roboplan = { features = ["rolling", "ros2", "conda-roboplan"] }
-lyrical-conda-roboplan = { features = ["lyrical", "ros2", "robostack-roboplan"] }
+lyrical-conda-roboplan = { features = ["lyrical", "ros2", "conda-roboplan"] }
 kilted-conda-roboplan = { features = ["kilted", "ros2", "conda-roboplan"] }
 jazzy-conda-roboplan = { features = ["jazzy", "ros2", "conda-roboplan"] }
 
@@ -235,13 +234,12 @@ ROS_DISTRO = "jazzy"
 #######################
 ## Prebuilt RoboPlan ##
 #######################
-# Builds against a prebuilt roboplan core (conda-forge or RoboStack) instead of
+# Builds against a prebuilt roboplan core from conda-forge instead of
 # cloning/building roboplan from source in the same environment.
 [feature.conda-roboplan.dependencies]
 roboplan-python = ">=0.7.0,<0.8.0"
 
-# Must match the nanobind-abi generation roboplan-python (conda-forge) was
-# built against!
+# Must match the nanobind-abi generation roboplan-python was built against!
 # TODO: drop once roboplan-feedstock exports this transitively.
 nanobind-abi = "==22"
 
@@ -249,25 +247,6 @@ nanobind-abi = "==22"
 ROBOPLAN_ROS_STABLE_ABI = "ON"
 
 [feature.conda-roboplan.tasks]
-setup = { cmd = """
-colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
-colcon mixin update default
-""" }
-
-[feature.robostack-roboplan.dependencies]
-ros2-roboplan = ">=0.7.0,<0.8.0"
-
-# Same as above
-nanobind-abi = "==22"
-
-# RoboStack only builds this for linux-64 on some distros
-[feature.robostack-roboplan.target.linux-64.dependencies]
-ros2-roboplan-ros-franka = "*"
-
-[feature.robostack-roboplan.activation.env]
-ROBOPLAN_ROS_STABLE_ABI = "ON"
-
-[feature.robostack-roboplan.tasks]
 setup = { cmd = """
 colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml || true && \
 colcon mixin update default
