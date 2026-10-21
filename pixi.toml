@@ -63,22 +63,16 @@ sccache = ">=0.16.0,<0.17"
 # Common roboplan base deps
 python = ">=3.11,<3.15"
 gtest = ">=1.17.0,<2"
-tyro = ">=0.9.32,<0.10"
-matplotlib = ">=3.10.6,<4"
 filelock = ">=3.20.0,<4"
+matplotlib = ">=3.10.6,<4"
+nodeenv = ">=1.10.0, <2"
 numpy = ">=1.26.4,<3"
 nanobind = ">=2.12.0,<4"
-libtoppra  = ">=0.6.9,<0.7"
-proxsuite = ">=0.7.3,<0.8"
 nanoflann = ">=2.0.1,<3"
-# Pinocchio from conda-forge: RoboStack's ros2-pinocchio packages only wrap it,
-# and kilted has no win-64 build of that wrapper.
-pinocchio = ">=4.1.0,<5"
-
-viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
 plyfile = ">=1.1,<2"
 pycollada = ">=0.9.2, <0.10"
-nodeenv = ">=1.10.0, <2"
+tyro = ">=0.9.32,<0.10"
+viser = ">=1.0.29,<2.0"  # See https://github.com/viser-project/viser/issues/719
 
 # This fails with colcon test on newer pytest versions
 # due to failures loading ROS launch testing plugins.
@@ -165,11 +159,14 @@ ros2-interactive-markers = "*"
 ros2-joint-state-broadcaster = "*"
 ros2-joint-trajectory-controller = "*"
 ros2-parallel-gripper-controller = "*"
+ros2-pinocchio = "*"
+ros2-proxsuite = "*"
 ros2-robot-state-publisher = "*"
 ros2-ros2controlcli = "*"
 ros2-rviz2 = "*"
 ros2-sensor-msgs = "*"
 ros2-tf2-eigen = "*"
+ros2-toppra = "*"
 ros2-topic-tools = "*"
 ros2-trajectory-msgs = "*"
 ros2-urdfdom = "*"
