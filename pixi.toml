@@ -26,7 +26,7 @@ build = { cmd = ["colcon", "build", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=$
 build-symlink = { cmd = ["colcon", "build", "--symlink-install", "--cmake-args", "-DROBOPLAN_ROS_STABLE_ABI=$ROBOPLAN_ROS_STABLE_ABI"] }
 test = { cmd = ["colcon", "test"] }
 test-result = { cmd = ["colcon", "test-result", "--verbose"] }
-clean = { cmd = "rm -rf build install" }
+clean = { cmd = "rm -rf build install log" }
 
 # Use the MSVC-compatible clang driver: conda-forge packages are built with
 # MSVC and export MSVC-style flags that the GNU-style clang++ driver rejects.
