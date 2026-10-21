@@ -65,7 +65,7 @@ python = ">=3.11,<3.15"
 gtest = ">=1.17.0,<2"
 filelock = ">=3.20.0,<4"
 matplotlib = ">=3.10.6,<4"
-nodeenv = ">=1.10.0, <2"
+nodeenv = ">=1.10.0,<2"
 numpy = ">=1.26.4,<3"
 nanobind = ">=2.12.0,<4"
 nanoflann = ">=2.0.1,<3"
@@ -102,7 +102,7 @@ scripts = ["install/setup.sh"]
 
 [activation.env]
 # Build nanobind extensions with the stable Python ABI. Must be ON when using
-# prebuilt roboplan core from conda-forge/RoboStack (see the *-roboplan features).
+# prebuilt roboplan core from conda-forge/RoboStack (see the conda-roboplan feature).
 ROBOPLAN_ROS_STABLE_ABI = "OFF"
 
 [target.unix.activation.env]
