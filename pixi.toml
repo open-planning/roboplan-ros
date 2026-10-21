@@ -204,8 +204,6 @@ ROS_DISTRO = "lyrical"
 ##################
 [feature.kilted]
 channels = ["https://prefix.dev/robostack-kilted"]
-# TODO: add win-64 back once RoboStack finishes the kilted `ros2-*` builds there.
-platforms = ["linux-64", "linux-aarch64", "osx-arm64-macos-14-0"]
 
 [feature.kilted.dependencies]
 ros2-tinyxml2-vendor = "*"
