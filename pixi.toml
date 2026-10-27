@@ -12,6 +12,7 @@ platforms = [
     { platform = "osx-arm64", macos = "14.0" },
     "win-64",
 ]
+preview = ["pixi-build"]
 version = "0.7.0"
 
 [tasks]
@@ -148,30 +149,15 @@ jazzy-conda-roboplan = { features = ["jazzy", "ros2", "conda-roboplan"] }
 # selected by the channel each distro feature adds.
 [feature.ros2.dependencies]
 ros2-ros-base = "*"
-
-# RoboPlan and RoboPlan ROS dependencies
-ros2-builtin-interfaces = "*"
-ros2-console-bridge-vendor = "*"
-ros2-controller-manager = "*"
-ros2-geometry-msgs = "*"
-ros2-interactive-markers = "*"
-ros2-joint-state-broadcaster = "*"
-ros2-joint-trajectory-controller = "*"
-ros2-parallel-gripper-controller = "*"
-ros2-pinocchio = "*"
-ros2-proxsuite = "*"
-ros2-robot-state-publisher = "*"
 ros2-ros2controlcli = "*"
-ros2-rviz2 = "*"
-ros2-sensor-msgs = "*"
-ros2-tf2-eigen = "*"
-ros2-toppra = "*"
-ros2-topic-tools = "*"
-ros2-trajectory-msgs = "*"
-ros2-urdfdom = "*"
-ros2-visualization-msgs = "*"
-ros2-xacro = "*"
-ros2-yaml-cpp-vendor = "*"
+
+# Installs the dependencies declared in each package.xml.
+[feature.ros2.dev]
+ros2-roboplan-ros-cpp = { path = "roboplan_ros_cpp/package.xml" }
+ros2-roboplan-ros-py = { path = "roboplan_ros_py/package.xml" }
+ros2-roboplan-ros-visualization = { path = "roboplan_ros_visualization/package.xml" }
+ros2-roboplan-ros-examples = { path = "roboplan_ros_examples/roboplan_ros_examples/package.xml" }
+ros2-roboplan-ros-franka = { path = "roboplan_ros_examples/roboplan_ros_franka/package.xml" }
 
 ###################
 ## ROS 2 Rolling ##
