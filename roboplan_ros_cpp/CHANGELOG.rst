@@ -2,8 +2,8 @@
 Changelog for package roboplan_ros_cpp
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.0 (2026-10-31)
+------------------
 * Use the system tl-expected before the roboplan::tl_expected alias (`#85 <https://github.com/open-planning/roboplan-ros/issues/85>`_)
 * Contributors: Tobias Fischer
 
