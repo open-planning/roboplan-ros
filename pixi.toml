@@ -235,11 +235,7 @@ ROS_DISTRO = "jazzy"
 # Builds against a prebuilt roboplan core from conda-forge instead of
 # cloning/building roboplan from source in the same environment.
 [feature.conda-roboplan.dependencies]
-roboplan-python = ">=0.7.0,<0.9.0"
-
-# Must match the nanobind-abi generation roboplan-python was built against!
-# TODO: drop once roboplan-feedstock exports this transitively.
-nanobind-abi = "==22"
+roboplan-python = ">=0.8.0,<0.9.0"
 
 [feature.conda-roboplan.activation.env]
 ROBOPLAN_ROS_STABLE_ABI = "ON"
