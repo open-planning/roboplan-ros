@@ -173,6 +173,10 @@ ros2-visualization-msgs = "*"
 ros2-xacro = "*"
 ros2-yaml-cpp-vendor = "*"
 
+# RoboStack only builds mujoco_ros2_control for Linux
+[feature.ros2.target.linux.dependencies]
+ros2-mujoco-ros2-control = "*"
+
 ###################
 ## ROS 2 Rolling ##
 ###################
@@ -222,10 +226,6 @@ channels = ["https://prefix.dev/robostack-jazzy"]
 ros2-tinyxml2-vendor = "*"
 ros2-tl-expected = "*"
 
-# RoboStack only builds mujoco_ros2_control for Linux
-[feature.jazzy.target.linux.dependencies]
-ros2-mujoco-ros2-control = "*"
-
 [feature.jazzy.activation.env]
 ROS_DISTRO = "jazzy"
 
@@ -235,7 +235,7 @@ ROS_DISTRO = "jazzy"
 # Builds against a prebuilt roboplan core from conda-forge instead of
 # cloning/building roboplan from source in the same environment.
 [feature.conda-roboplan.dependencies]
-roboplan-python = ">=0.8.0,<0.9.0"
+roboplan-python = ">=0.7.0,<0.9.0"
 
 # Must match the nanobind-abi generation roboplan-python was built against!
 # TODO: drop once roboplan-feedstock exports this transitively.
