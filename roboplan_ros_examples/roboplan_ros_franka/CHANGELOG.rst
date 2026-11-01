@@ -2,6 +2,12 @@
 Changelog for package roboplan_ros_franka
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.0 (2026-10-31)
+------------------
+* Use RoboPlan functions to get paths to support conda-forge core installs (`#84 <https://github.com/open-planning/roboplan-ros/issues/84>`_)
+* Get URDF XML from robot description topic (`#79 <https://github.com/open-planning/roboplan-ros/issues/79>`_)
+* Contributors: Sebastian Castro
+
 0.7.0 (2026-09-19)
 ------------------
 * Update Scene Construction Post SRDF Changes (`#76 <https://github.com/open-planning/roboplan-ros/issues/76>`_)

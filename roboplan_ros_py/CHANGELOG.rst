@@ -2,6 +2,11 @@
 Changelog for package roboplan_ros_py
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.0 (2026-10-31)
+------------------
+* Remove lingering roboplan_simple_ik references outside tests (`#82 <https://github.com/open-planning/roboplan-ros/issues/82>`_)
+* Contributors: Sebastian Castro
+
 0.7.0 (2026-09-19)
 ------------------
 * Update Scene Construction Post SRDF Changes (`#76 <https://github.com/open-planning/roboplan-ros/issues/76>`_)

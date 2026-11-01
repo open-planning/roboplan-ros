@@ -2,6 +2,11 @@
 Changelog for package roboplan_ros_examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.0 (2026-10-31)
+------------------
+* Get URDF XML from robot description topic (`#79 <https://github.com/open-planning/roboplan-ros/issues/79>`_)
+* Contributors: Sebastian Castro
+
 0.7.0 (2026-09-19)
 ------------------
 * Fix rosdeps after roboplan_core package transition (`#73 <https://github.com/open-planning/roboplan-ros/issues/73>`_)
