@@ -89,7 +89,7 @@ RoboplanVisualizer::geometry_indices_for_group(const std::string& group_name) co
   if (!maybe_info) {
     throw std::runtime_error("RoboplanVisualizer: " + maybe_info.error());
   }
-  const auto& info = maybe_info.value();
+  const roboplan::JointGroupInfo& info = maybe_info.value();
   const auto& model = scene_->getModel();
 
   // A geometry object moves with the group when the joint it is attached to is one of the group's

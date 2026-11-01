@@ -28,7 +28,7 @@ buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointSt
     if (!joint_info) {
       return tl::make_unexpected("Failed to get joint info for: " + joint_name);
     }
-    const auto& info = joint_info.value();
+    const roboplan::JointInfo& info = joint_info.value();
 
     // TODO: This might not actually be worth failing for
     auto it = ros_map.find(joint_name);
@@ -66,7 +66,7 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
     if (!joint_info) {
       return tl::make_unexpected("Failed to get joint info: " + joint_name);
     }
-    const auto& info = joint_info.value();
+    const roboplan::JointInfo& info = joint_info.value();
 
     const auto joint_id = model.getJointId(joint_name);
     const auto q_idx = model.idx_qs.at(joint_id);
