@@ -67,7 +67,7 @@ TEST_F(RoboplanIkMarkerTest, MakeInteractiveMarkerDefaultFrame) {
 
   const auto joint_group_info = scene_->getJointGroupInfo(joint_group);
   ASSERT_TRUE(joint_group_info.has_value());
-  const auto q_indices = joint_group_info->q_indices;
+  const auto q_indices = joint_group_info->get().q_indices;
 
   // This 2-DOF arm needs a lot of iterating...
   roboplan::SimpleIkOptions ik_options;
