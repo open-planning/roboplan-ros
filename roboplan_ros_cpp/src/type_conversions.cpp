@@ -89,11 +89,17 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
 
 tl::expected<roboplan::JointConfiguration, std::string>
 fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::Scene& scene,
-               const JointStateConverterMap& conversion_map) {
+               const JointStateConverterMap& conversion_map,
+               const std::optional<Eigen::VectorXd>& q_reference) {
+  if (q_reference && static_cast<size_t>(q_reference->size()) != conversion_map.nq) {
+    return tl::make_unexpected("q_reference has " + std::to_string(q_reference->size()) +
+                               " positions, the scene has " + std::to_string(conversion_map.nq));
+  }
+
   roboplan::JointConfiguration config;
   config.joint_names = scene.getJointNames();
-  const auto current_positions = scene.getCurrentJointPositions();
-  config.positions = Eigen::VectorXd::Zero(current_positions.size());
+  // Joints that are not in the message keep their reference positions.
+  config.positions = q_reference ? *q_reference : scene.getCurrentJointPositions();
   config.velocities = Eigen::VectorXd::Zero(conversion_map.nv);
   config.accelerations = Eigen::VectorXd::Zero(conversion_map.nv);
 

@@ -79,6 +79,44 @@ def test_convert_joint_state():
     )
 
 
+def test_convert_partial_joint_state():
+    """Test that joints missing from the JointState keep their reference positions."""
+    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path))
+    scene.importSrdf(loadTextFile(srdf_path))
+    scene.setRngSeed(1234)
+    q_current = scene.randomPositions()
+    scene.setJointPositions(q_current)
+
+    # The message has the revolute joint only, not the continuous one.
+    joint_state = JointState()
+    joint_state.name = ["revolute_joint"]
+    joint_state.position = [0.3]
+    conversion_map = buildConversionMap(scene, joint_state)
+    continuous_idx = scene.getJointPositionIndices(["continuous_joint"])
+    revolute_idx = scene.getJointPositionIndices(["revolute_joint"])
+
+    # Without a reference, the missing joint keeps the scene's current position.
+    from_current = fromJointState(joint_state, scene, conversion_map)
+    assert np.allclose(
+        from_current.positions[continuous_idx], q_current[continuous_idx]
+    )
+    assert from_current.positions[revolute_idx[0]] == pytest.approx(0.3)
+
+    # With a reference, it keeps the reference's position instead.
+    q_reference = scene.randomPositions()
+    from_reference = fromJointState(joint_state, scene, conversion_map, q_reference)
+    assert np.allclose(
+        from_reference.positions[continuous_idx], q_reference[continuous_idx]
+    )
+    assert from_reference.positions[revolute_idx[0]] == pytest.approx(0.3)
+
+    # A reference of the wrong size is an error.
+    with pytest.raises(RuntimeError) as exc_info:
+        fromJointState(joint_state, scene, conversion_map, np.zeros(1))
+    expected_error = f"q_reference has 1 positions, the scene has {len(q_current)}"
+    assert str(exc_info.value) == expected_error
+
+
 def test_empty_conversions():
     roboplan_traj = JointTrajectory()
     ros_traj = toJointTrajectory(roboplan_traj)

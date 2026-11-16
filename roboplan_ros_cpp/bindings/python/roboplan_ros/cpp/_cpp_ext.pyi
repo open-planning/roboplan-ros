@@ -68,7 +68,7 @@ def toJointState(py_config: object, py_scene: object) -> object:
     Converts a roboplan::JointConfiguration to a ROS 2 sensor_msgs::msg::JointState message.
     """
 
-def fromJointState(py_joint_state: object, py_scene: object, conversion_map: JointStateConverterMap) -> "roboplan::JointConfiguration":
+def fromJointState(py_joint_state: object, py_scene: object, conversion_map: JointStateConverterMap, q_reference: Annotated[NDArray[numpy.float64], dict(shape=(None,), order='C')] | None = None) -> "roboplan::JointConfiguration":
     """
-    Converts a ROS 2 sensor_msgs::msg::JointState message to a roboplan::JointConfiguration.
+    Converts a ROS 2 sensor_msgs::msg::JointState message to a roboplan::JointConfiguration. Joints that are not in the message keep their positions from q_reference, or from the scene's current state if it is not given.
     """
