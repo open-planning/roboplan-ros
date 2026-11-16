@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <Eigen/Dense>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -80,13 +82,18 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
 
 /// @brief Convert the provided ROS 2 JointState message to an equivalent
 /// roboplan::JointConfiguration.
+/// @details Joints that are not in the message keep their positions from `q_reference`, or from
+/// the scene's current state if it is not given. This matters most for continuous and planar
+/// joints, whose positions are stored as cos and sin and would be invalid if zeroed.
 /// @param joint_state The ROS 2 JointState message to convert.
 /// @param scene The RoboPlan scene containing the model's joint information.
 /// @param joint_conversion_map A mapping of joint names to their indexes in the model.
+/// @param q_reference The full configuration supplying the joints that are not in the message.
 /// @return An equivalent roboplan::JointConfiguration, or an error.
 tl::expected<roboplan::JointConfiguration, std::string>
 fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::Scene& scene,
-               const JointStateConverterMap& joint_conversion_map);
+               const JointStateConverterMap& joint_conversion_map,
+               const std::optional<Eigen::VectorXd>& q_reference = std::nullopt);
 
 /// @brief Converts a roboplan::JointTrajectory object to a ROS 2 JointTrajectory message.
 /// @details This function will convert joint names and joint trajectory points. The caller

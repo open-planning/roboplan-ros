@@ -103,6 +103,44 @@ TEST_F(TypeConversionsTest, TestConvertJointState) {
   ASSERT_TRUE(joint_configuration.accelerations.isApprox(check_joint_configuration.accelerations));
 }
 
+TEST_F(TypeConversionsTest, TestConvertPartialJointState) {
+  auto scene = roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(urdf_path));
+  ASSERT_TRUE(scene.importSrdf(roboplan::loadTextFile(srdf_path)).has_value());
+  scene.setRngSeed(1234);
+  const Eigen::VectorXd q_current = scene.randomPositions();
+  scene.setJointPositions(q_current);
+
+  // The message has the revolute joint only, not the continuous one.
+  sensor_msgs::msg::JointState joint_state;
+  joint_state.name = {"revolute_joint"};
+  joint_state.position = {0.3};
+  const auto conversion_map_maybe = buildConversionMap(scene, joint_state);
+  ASSERT_TRUE(conversion_map_maybe.has_value());
+  const auto conversion_map = conversion_map_maybe.value();
+  const auto continuous_idx = scene.getJointPositionIndices({"continuous_joint"});
+  const auto revolute_idx = scene.getJointPositionIndices({"revolute_joint"});
+
+  // Without a reference, the missing joint keeps the scene's current position.
+  const auto from_current = fromJointState(joint_state, scene, conversion_map);
+  ASSERT_TRUE(from_current.has_value()) << from_current.error();
+  EXPECT_TRUE(from_current->positions(continuous_idx).isApprox(q_current(continuous_idx)));
+  EXPECT_DOUBLE_EQ(from_current->positions(revolute_idx(0)), 0.3);
+
+  // With a reference, it keeps the reference's position instead.
+  const Eigen::VectorXd q_reference = scene.randomPositions();
+  const auto from_reference = fromJointState(joint_state, scene, conversion_map, q_reference);
+  ASSERT_TRUE(from_reference.has_value()) << from_reference.error();
+  EXPECT_TRUE(from_reference->positions(continuous_idx).isApprox(q_reference(continuous_idx)));
+  EXPECT_DOUBLE_EQ(from_reference->positions(revolute_idx(0)), 0.3);
+
+  // A reference of the wrong size is an error.
+  const auto wrong_size =
+      fromJointState(joint_state, scene, conversion_map, Eigen::VectorXd::Zero(1));
+  ASSERT_FALSE(wrong_size.has_value());
+  const auto nq = std::to_string(scene.getModel().nq);
+  EXPECT_EQ(wrong_size.error(), "q_reference has 1 positions, the scene has " + nq);
+}
+
 TEST(ConversionTest, TestEmptyConversions) {
   roboplan::JointTrajectory roboplan_traj;
   const auto ros_traj = toJointTrajectory(roboplan_traj);

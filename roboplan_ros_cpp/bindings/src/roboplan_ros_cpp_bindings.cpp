@@ -1,5 +1,6 @@
 #include <nanobind/eigen/dense.h>
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/optional.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
@@ -112,11 +113,14 @@ NB_MODULE(_cpp_ext, m) {
   m.def(
       "fromJointState",
       [](nb::handle py_joint_state, nb::handle py_scene,
-         const JointStateConverterMap& conversion_map) {
+         const JointStateConverterMap& conversion_map,
+         const std::optional<Eigen::VectorXd>& q_reference) {
         auto joint_state = pyToCppMsg<sensor_msgs::msg::JointState>(py_joint_state);
         const auto& scene = nb::cast<roboplan::Scene&>(py_scene);
-        return handle_expected(fromJointState(joint_state, scene, conversion_map));
+        return handle_expected(fromJointState(joint_state, scene, conversion_map, q_reference));
       },
-      "py_joint_state"_a, "py_scene"_a, "conversion_map"_a,
-      "Converts a ROS 2 sensor_msgs::msg::JointState message to a roboplan::JointConfiguration.");
+      "py_joint_state"_a, "py_scene"_a, "conversion_map"_a, "q_reference"_a = nb::none(),
+      "Converts a ROS 2 sensor_msgs::msg::JointState message to a roboplan::JointConfiguration. "
+      "Joints that are not in the message keep their positions from q_reference, or from the "
+      "scene's current state if it is not given.");
 }
