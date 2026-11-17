@@ -162,8 +162,8 @@ fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
 /// overload without a MultiDOFJointTrajectory, and the MultiDOFJointTrajectory the planar and
 /// floating joints, converted as described in toMultiDOFJointTrajectory. A planar joint only uses
 /// the x and y translation and the rotation about z of its transforms. Either message may have no
-/// joints; otherwise both must have the same points at the same times. The joints of the result
-/// are in the order of the scene's model.
+/// joints; otherwise both must have the same points at the same times. The result has the joints
+/// of the JointTrajectory in their order, then those of the MultiDOFJointTrajectory in theirs.
 /// @param ros_trajectory The ROS 2 JointTrajectory message with the single DOF joints.
 /// @param multi_dof_trajectory The ROS 2 MultiDOFJointTrajectory with the planar and floating
 /// joints.

@@ -111,7 +111,8 @@ NB_MODULE(_cpp_ext, m) {
       "py_ros_traj"_a, "py_multi_dof_traj"_a, "py_scene"_a,
       "Converts a trajectory_msgs::msg::JointTrajectory with the single degree of freedom joints "
       "and a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints to "
-      "one roboplan::JointTrajectory, with the joints in the order of the scene's model.");
+      "one roboplan::JointTrajectory, with the joints of the JointTrajectory in their order, then "
+      "those of the MultiDOFJointTrajectory in theirs.");
 
   m.def(
       "toTransformStamped",

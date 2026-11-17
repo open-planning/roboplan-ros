@@ -1,6 +1,5 @@
 #include <roboplan_ros_cpp/type_conversions.hpp>
 
-#include <algorithm>
 #include <cmath>
 #include <numbers>
 #include <optional>
@@ -172,12 +171,12 @@ void fromTwist(TrajectoryJointKind kind, const geometry_msgs::msg::Twist& twist,
 }
 
 /// @brief Converts a ROS JointTrajectory and MultiDOFJointTrajectory pair to one RoboPlan
-/// trajectory. The joints are in the order of the model if scene_order is true, otherwise those
-/// of ros_trajectory come first in their order, then those of multi_dof_trajectory.
+/// trajectory. The joints of ros_trajectory come first in their order, then those of
+/// multi_dof_trajectory in theirs.
 tl::expected<roboplan::JointTrajectory, std::string>
 fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
-                    const roboplan::Scene& scene, bool scene_order) {
+                    const roboplan::Scene& scene) {
   const auto error = [](const std::string& message) {
     return tl::make_unexpected("Failed to convert the trajectory: " + message);
   };
@@ -214,12 +213,6 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     if (!seen.insert(source.joint.name).second) {
       return error("Joint '" + source.joint.name + "' appears twice");
     }
-  }
-  if (scene_order) {
-    const auto& model = scene.getModel();
-    std::stable_sort(sources.begin(), sources.end(), [&model](const auto& a, const auto& b) {
-      return model.getJointId(a.joint.name) < model.getJointId(b.joint.name);
-    });
   }
 
   // A message without joints only matters if the other has none either.
@@ -720,15 +713,15 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
 tl::expected<roboplan::JointTrajectory, std::string>
 fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const roboplan::Scene& scene) {
-  return fromRosTrajectories(ros_trajectory, trajectory_msgs::msg::MultiDOFJointTrajectory(), scene,
-                             false);
+  return fromRosTrajectories(ros_trajectory, trajectory_msgs::msg::MultiDOFJointTrajectory(),
+                             scene);
 }
 
 tl::expected<roboplan::JointTrajectory, std::string>
 fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
                     const roboplan::Scene& scene) {
-  return fromRosTrajectories(ros_trajectory, multi_dof_trajectory, scene, true);
+  return fromRosTrajectories(ros_trajectory, multi_dof_trajectory, scene);
 }
 
 geometry_msgs::msg::TransformStamped

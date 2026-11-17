@@ -44,7 +44,7 @@ def fromJointTrajectory(py_ros_traj: object, py_scene: "roboplan::Scene") -> "ro
 @overload
 def fromJointTrajectory(py_ros_traj: object, py_multi_dof_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
     """
-    Converts a trajectory_msgs::msg::JointTrajectory with the single degree of freedom joints and a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints to one roboplan::JointTrajectory, with the joints in the order of the scene's model.
+    Converts a trajectory_msgs::msg::JointTrajectory with the single degree of freedom joints and a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints to one roboplan::JointTrajectory, with the joints of the JointTrajectory in their order, then those of the MultiDOFJointTrajectory in theirs.
     """
 
 def toTransformStamped(cartesian_config: "roboplan::CartesianConfiguration") -> object:

@@ -322,16 +322,28 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectory) {
   EXPECT_DOUBLE_EQ(drone_acceleration.linear.x, 2.0);
   EXPECT_DOUBLE_EQ(drone_acceleration.angular.z, 12.0);
 
-  // Converting both messages back gives the original trajectory.
+  // Converting both messages back gives the original trajectory, with the joints of the
+  // JointTrajectory first: the wheel, then the base and the drone.
   const auto new_roboplan_traj =
       fromJointTrajectory(ros_traj.value(), multi_dof_traj.value(), scene);
   ASSERT_TRUE(new_roboplan_traj.has_value()) << new_roboplan_traj.error();
-  EXPECT_EQ(new_roboplan_traj->joint_names, joint_names);
+  EXPECT_EQ(new_roboplan_traj->joint_names,
+            (std::vector<std::string>{"wheel_joint", "base_joint", "drone_joint"}));
   EXPECT_EQ(new_roboplan_traj->times, roboplan_traj.times);
+  // Moves the wheel's values, after the base's base_size ones, to the front.
+  const auto wheel_first = [](const Eigen::VectorXd& x, int base_size, int wheel_size) {
+    Eigen::VectorXd y(x.size());
+    y << x.segment(base_size, wheel_size), x.head(base_size),
+        x.tail(x.size() - base_size - wheel_size);
+    return y;
+  };
   for (size_t i = 0; i < roboplan_traj.positions.size(); ++i) {
-    EXPECT_TRUE(new_roboplan_traj->positions[i].isApprox(roboplan_traj.positions[i]));
-    EXPECT_TRUE(new_roboplan_traj->velocities[i].isApprox(roboplan_traj.velocities[i]));
-    EXPECT_TRUE(new_roboplan_traj->accelerations[i].isApprox(roboplan_traj.accelerations[i]));
+    EXPECT_TRUE(
+        new_roboplan_traj->positions[i].isApprox(wheel_first(roboplan_traj.positions[i], 4, 2)));
+    EXPECT_TRUE(
+        new_roboplan_traj->velocities[i].isApprox(wheel_first(roboplan_traj.velocities[i], 3, 1)));
+    EXPECT_TRUE(new_roboplan_traj->accelerations[i].isApprox(
+        wheel_first(roboplan_traj.accelerations[i], 3, 1)));
   }
 
   // A trajectory without planar or floating joints gives an empty MultiDOFJointTrajectory.

@@ -235,14 +235,16 @@ def test_convert_multi_dof_joint_trajectory():
         0.3,
     ]
 
+    # The joints of the JointTrajectory come first: the wheel, then base and drone.
     new_roboplan_traj = fromJointTrajectory(ros_traj, multi_dof_traj, scene)
-    assert new_roboplan_traj.joint_names == roboplan_traj.joint_names
+    assert new_roboplan_traj.joint_names == ["wheel_joint", "base_joint", "drone_joint"]
     for i in range(len(roboplan_traj.positions)):
+        q, v = roboplan_traj.positions[i], roboplan_traj.velocities[i]
         assert new_roboplan_traj.positions[i] == pytest.approx(
-            roboplan_traj.positions[i]
+            np.concatenate([q[4:6], q[0:4], q[6:]])
         )
         assert new_roboplan_traj.velocities[i] == pytest.approx(
-            roboplan_traj.velocities[i]
+            np.concatenate([v[3:4], v[0:3], v[4:]])
         )
 
 
