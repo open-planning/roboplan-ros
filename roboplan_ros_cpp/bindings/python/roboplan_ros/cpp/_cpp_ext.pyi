@@ -1,6 +1,6 @@
 """RoboPlan ROS nanobind wrappers for core C++ ROS tools."""
 
-from typing import Annotated
+from typing import Annotated, overload
 
 import numpy
 from numpy.typing import NDArray
@@ -12,19 +12,39 @@ def se3ToPose(transform: Annotated[NDArray[numpy.float64], dict(shape=(4, 4), or
 def poseToSE3(py_pose: object) -> Annotated[NDArray[numpy.float64], dict(shape=(4, 4), order='F')]:
     """Converts the provided geometry_msgs::msg::Pose to an SE3 Matrix."""
 
-def toJointTrajectory(py_roboplan_traj: object, py_scene: object | None = None) -> object:
+@overload
+def toJointTrajectory(py_roboplan_traj: object) -> object:
     """
-    Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. With a scene, the [cos, sin] positions of continuous joints become angles, unwrapped along the trajectory, and mimic, planar and floating joints are left out; without one, positions are copied as they are.
+    Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. Positions are copied as they are, which is only correct without continuous joints; use the overload that takes a scene otherwise.
     """
 
-def toMultiDOFJointTrajectory(py_roboplan_traj: object, py_scene: object) -> object:
+@overload
+def toJointTrajectory(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> object:
+    """
+    Converts the single degree of freedom joints of a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. Continuous joints become angles, unwrapped along the trajectory. Mimic joints are left out, and so are planar and floating joints: use toMultiDOFJointTrajectory for them.
+    """
+
+def toMultiDOFJointTrajectory(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> object:
     """
     Converts the planar and floating joints of a roboplan::JointTrajectory to a trajectory_msgs::msg::MultiDOFJointTrajectory, with twists in each joint's own frame.
     """
 
-def fromJointTrajectory(py_ros_traj: object, py_scene: object | None = None, py_multi_dof_traj: object | None = None) -> object:
+@overload
+def fromJointTrajectory(py_ros_traj: object) -> "roboplan::JointTrajectory":
     """
-    Converts a trajectory_msgs::msg::JointTrajectory, and optionally a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints, to a roboplan::JointTrajectory. With a scene, the angles of continuous joints become [cos, sin] positions and the values of mimic joints are ignored; without one, positions are copied as they are.
+    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Positions are copied as they are, which is only correct without continuous joints; use the overload that takes a scene otherwise.
+    """
+
+@overload
+def fromJointTrajectory(py_ros_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
+    """
+    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous joints become [cos, sin] positions, and the values of mimic joints are ignored. Planar and floating joints are an error: use the overload that also takes a MultiDOFJointTrajectory.
+    """
+
+@overload
+def fromJointTrajectory(py_ros_traj: object, py_multi_dof_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
+    """
+    Converts a trajectory_msgs::msg::JointTrajectory with the single degree of freedom joints and a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints to one roboplan::JointTrajectory, with the joints in the order of the scene's model.
     """
 
 def toTransformStamped(cartesian_config: "roboplan::CartesianConfiguration") -> object:

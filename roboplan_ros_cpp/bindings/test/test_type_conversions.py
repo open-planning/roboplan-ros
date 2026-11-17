@@ -235,7 +235,7 @@ def test_convert_multi_dof_joint_trajectory():
         0.3,
     ]
 
-    new_roboplan_traj = fromJointTrajectory(ros_traj, scene, multi_dof_traj)
+    new_roboplan_traj = fromJointTrajectory(ros_traj, multi_dof_traj, scene)
     assert new_roboplan_traj.joint_names == roboplan_traj.joint_names
     for i in range(len(roboplan_traj.positions)):
         assert new_roboplan_traj.positions[i] == pytest.approx(

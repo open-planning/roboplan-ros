@@ -37,29 +37,40 @@ NB_MODULE(_cpp_ext, m) {
       },
       "py_pose"_a, "Converts the provided geometry_msgs::msg::Pose to an SE3 Matrix.");
 
+  // The trajectory conversions are overloaded as in C++, each overload with its own docstring.
+  const auto joint_trajectory_class = [] {
+    return nb::module_::import_("trajectory_msgs.msg").attr("JointTrajectory");
+  };
+
   m.def(
       "toJointTrajectory",
-      [](nb::handle py_roboplan_traj, nb::handle py_scene) {
-        auto cpp_roboplan_traj = nb::cast<roboplan::JointTrajectory>(py_roboplan_traj);
-        auto ros_traj = py_scene.is_none()
-                            ? toJointTrajectory(cpp_roboplan_traj)
-                            : handle_expected(toJointTrajectory(
-                                  cpp_roboplan_traj, nb::cast<roboplan::Scene&>(py_scene)));
-        return cppToPyMsg(ros_traj,
-                          nb::module_::import_("trajectory_msgs.msg").attr("JointTrajectory"));
+      [=](nb::handle py_roboplan_traj) {
+        auto ros_traj = toJointTrajectory(nb::cast<roboplan::JointTrajectory>(py_roboplan_traj));
+        return cppToPyMsg(ros_traj, joint_trajectory_class());
       },
-      "py_roboplan_traj"_a, "py_scene"_a = nb::none(),
-      "Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. With a "
-      "scene, the [cos, sin] positions of continuous joints become angles, unwrapped along the "
-      "trajectory, and mimic, planar and floating joints are left out; without one, positions are "
-      "copied as they are.");
+      "py_roboplan_traj"_a,
+      "Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. Positions "
+      "are copied as they are, which is only correct without continuous joints; use the overload "
+      "that takes a scene otherwise.");
+
+  m.def(
+      "toJointTrajectory",
+      [=](nb::handle py_roboplan_traj, const roboplan::Scene& py_scene) {
+        auto ros_traj = handle_expected(
+            toJointTrajectory(nb::cast<roboplan::JointTrajectory>(py_roboplan_traj), py_scene));
+        return cppToPyMsg(ros_traj, joint_trajectory_class());
+      },
+      "py_roboplan_traj"_a, "py_scene"_a,
+      "Converts the single degree of freedom joints of a roboplan::JointTrajectory to a "
+      "trajectory_msgs::msg::JointTrajectory. Continuous joints become angles, unwrapped along the "
+      "trajectory. Mimic joints are left out, and so are planar and floating joints: use "
+      "toMultiDOFJointTrajectory for them.");
 
   m.def(
       "toMultiDOFJointTrajectory",
-      [](nb::handle py_roboplan_traj, nb::handle py_scene) {
-        auto cpp_roboplan_traj = nb::cast<roboplan::JointTrajectory>(py_roboplan_traj);
-        auto ros_traj = handle_expected(
-            toMultiDOFJointTrajectory(cpp_roboplan_traj, nb::cast<roboplan::Scene&>(py_scene)));
+      [](nb::handle py_roboplan_traj, const roboplan::Scene& py_scene) {
+        auto ros_traj = handle_expected(toMultiDOFJointTrajectory(
+            nb::cast<roboplan::JointTrajectory>(py_roboplan_traj), py_scene));
         return cppToPyMsg(
             ros_traj, nb::module_::import_("trajectory_msgs.msg").attr("MultiDOFJointTrajectory"));
       },
@@ -69,28 +80,38 @@ NB_MODULE(_cpp_ext, m) {
 
   m.def(
       "fromJointTrajectory",
-      [](nb::handle py_ros_traj, nb::handle py_scene, nb::handle py_multi_dof_traj) {
+      [](nb::handle py_ros_traj) {
         auto ros_traj = pyToCppMsg<trajectory_msgs::msg::JointTrajectory>(py_ros_traj);
-        if (py_scene.is_none()) {
-          if (!py_multi_dof_traj.is_none()) {
-            throw nb::value_error("Converting a MultiDOFJointTrajectory requires a scene");
-          }
-          return nb::cast(fromJointTrajectory(ros_traj));
-        }
-        const auto& scene = nb::cast<roboplan::Scene&>(py_scene);
-        if (py_multi_dof_traj.is_none()) {
-          return nb::cast(handle_expected(fromJointTrajectory(ros_traj, scene)));
-        }
+        return fromJointTrajectory(ros_traj);
+      },
+      "py_ros_traj"_a,
+      "Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Positions "
+      "are copied as they are, which is only correct without continuous joints; use the overload "
+      "that takes a scene otherwise.");
+
+  m.def(
+      "fromJointTrajectory",
+      [](nb::handle py_ros_traj, const roboplan::Scene& py_scene) {
+        auto ros_traj = pyToCppMsg<trajectory_msgs::msg::JointTrajectory>(py_ros_traj);
+        return handle_expected(fromJointTrajectory(ros_traj, py_scene));
+      },
+      "py_ros_traj"_a, "py_scene"_a,
+      "Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous "
+      "joints become [cos, sin] positions, and the values of mimic joints are ignored. Planar and "
+      "floating joints are an error: use the overload that also takes a MultiDOFJointTrajectory.");
+
+  m.def(
+      "fromJointTrajectory",
+      [](nb::handle py_ros_traj, nb::handle py_multi_dof_traj, const roboplan::Scene& py_scene) {
+        auto ros_traj = pyToCppMsg<trajectory_msgs::msg::JointTrajectory>(py_ros_traj);
         auto multi_dof_traj =
             pyToCppMsg<trajectory_msgs::msg::MultiDOFJointTrajectory>(py_multi_dof_traj);
-        return nb::cast(handle_expected(fromJointTrajectory(ros_traj, multi_dof_traj, scene)));
+        return handle_expected(fromJointTrajectory(ros_traj, multi_dof_traj, py_scene));
       },
-      "py_ros_traj"_a, "py_scene"_a = nb::none(), "py_multi_dof_traj"_a = nb::none(),
-      "Converts a trajectory_msgs::msg::JointTrajectory, and optionally a "
-      "trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints, to a "
-      "roboplan::JointTrajectory. With a scene, the angles of continuous joints become [cos, sin] "
-      "positions and the values of mimic joints are ignored; without one, positions are copied as "
-      "they are.");
+      "py_ros_traj"_a, "py_multi_dof_traj"_a, "py_scene"_a,
+      "Converts a trajectory_msgs::msg::JointTrajectory with the single degree of freedom joints "
+      "and a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints to "
+      "one roboplan::JointTrajectory, with the joints in the order of the scene's model.");
 
   m.def(
       "toTransformStamped",
