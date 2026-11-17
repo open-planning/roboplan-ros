@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<robot name="mobile_robot">
+  <link name="world"/>
+  <link name="base"/>
+  <link name="wheel"/>
+  <link name="drone"/>
+  <joint name="base_joint" type="planar">
+    <parent link="world"/>
+    <child link="base"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <joint name="wheel_joint" type="continuous">
+    <parent link="base"/>
+    <child link="wheel"/>
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+  <joint name="drone_joint" type="floating">
+    <parent link="world"/>
+    <child link="drone"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+</robot>

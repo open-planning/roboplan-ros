@@ -22,6 +22,7 @@ from ._cpp_ext import (  # noqa: F401
     se3ToPose,
     toJointState,
     toJointTrajectory,
+    toMultiDOFJointTrajectory,
     toTransformStamped,
 )
 
@@ -36,5 +37,6 @@ __all__ = [
     "se3ToPose",
     "toJointState",
     "toJointTrajectory",
+    "toMultiDOFJointTrajectory",
     "toTransformStamped",
 ]

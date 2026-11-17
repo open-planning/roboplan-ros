@@ -1,4 +1,7 @@
 #include <filesystem>
+#include <numbers>
+
+#include <Eigen/Geometry>
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/version.h>
@@ -26,10 +29,12 @@ protected:
 
     urdf_path = resources_dir / "test_robot.urdf";
     srdf_path = resources_dir / "test_robot.srdf";
+    mobile_urdf_path = resources_dir / "test_mobile_robot.urdf";
   }
 
   std::filesystem::path urdf_path;
   std::filesystem::path srdf_path;
+  std::filesystem::path mobile_urdf_path;
 };
 
 TEST_F(TypeConversionsTest, TestJointStateMapping) {
@@ -139,6 +144,264 @@ TEST_F(TypeConversionsTest, TestConvertPartialJointState) {
   ASSERT_FALSE(wrong_size.has_value());
   const auto nq = std::to_string(scene.getModel().nq);
   EXPECT_EQ(wrong_size.error(), "q_reference has 1 positions, the scene has " + nq);
+}
+
+TEST_F(TypeConversionsTest, TestConvertJointTrajectoryWithContinuousJoint) {
+  const auto scene = roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(urdf_path));
+
+  // RoboPlan stores the continuous joint as [cos(theta), sin(theta)], ROS as theta.
+  const auto make_q = [](double theta, double revolute) {
+    return (Eigen::VectorXd(3) << std::cos(theta), std::sin(theta), revolute).finished();
+  };
+  const auto make_v = [](double a, double b) { return (Eigen::VectorXd(2) << a, b).finished(); };
+  roboplan::JointTrajectory roboplan_traj;
+  roboplan_traj.joint_names = {"continuous_joint", "revolute_joint"};
+  roboplan_traj.times = {0.0, 1.0};
+  roboplan_traj.positions = {make_q(0.5, 0.1), make_q(-2.0, 0.2)};
+  roboplan_traj.velocities = {make_v(0.0, 0.0), make_v(1.0, -1.0)};
+  roboplan_traj.accelerations = {make_v(0.0, 0.0), make_v(2.0, -2.0)};
+
+  const auto ros_traj = toJointTrajectory(roboplan_traj, scene);
+  ASSERT_TRUE(ros_traj.has_value()) << ros_traj.error();
+  ASSERT_EQ(ros_traj->joint_names, roboplan_traj.joint_names);
+  ASSERT_EQ(ros_traj->points.size(), 2u);
+  ASSERT_EQ(ros_traj->points[1].positions.size(), 2u);
+  EXPECT_DOUBLE_EQ(ros_traj->points[1].positions[0], -2.0);
+  EXPECT_DOUBLE_EQ(ros_traj->points[1].positions[1], 0.2);
+  EXPECT_EQ(ros_traj->points[1].velocities, (std::vector<double>{1.0, -1.0}));
+
+  // Converting it back gives the original trajectory.
+  const auto new_roboplan_traj = fromJointTrajectory(ros_traj.value(), scene);
+  ASSERT_TRUE(new_roboplan_traj.has_value()) << new_roboplan_traj.error();
+  EXPECT_EQ(new_roboplan_traj->joint_names, roboplan_traj.joint_names);
+  EXPECT_EQ(new_roboplan_traj->times, roboplan_traj.times);
+  for (size_t i = 0; i < roboplan_traj.positions.size(); ++i) {
+    EXPECT_TRUE(new_roboplan_traj->positions[i].isApprox(roboplan_traj.positions[i]));
+    EXPECT_TRUE(new_roboplan_traj->velocities[i].isApprox(roboplan_traj.velocities[i]));
+    EXPECT_TRUE(new_roboplan_traj->accelerations[i].isApprox(roboplan_traj.accelerations[i]));
+  }
+}
+
+TEST_F(TypeConversionsTest, TestConvertJointTrajectoryWithMimicJoint) {
+  const auto scene = roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(urdf_path));
+
+  // A RoboPlan trajectory names the mimic joint, but has no values for it.
+  roboplan::JointTrajectory roboplan_traj;
+  roboplan_traj.joint_names = {"revolute_joint", "mimic_joint"};
+  roboplan_traj.times = {0.0};
+  roboplan_traj.positions = {Eigen::VectorXd::Constant(1, 0.3)};
+  const auto ros_traj = toJointTrajectory(roboplan_traj, scene);
+  ASSERT_TRUE(ros_traj.has_value()) << ros_traj.error();
+  EXPECT_EQ(ros_traj->joint_names, std::vector<std::string>{"revolute_joint"});
+  EXPECT_EQ(ros_traj->points[0].positions, std::vector<double>{0.3});
+
+  // From ROS, the mimic joint's value is ignored.
+  trajectory_msgs::msg::JointTrajectory msg;
+  msg.joint_names = {"revolute_joint", "mimic_joint"};
+  msg.points.resize(1);
+  msg.points[0].positions = {0.3, 99.0};
+  const auto from_ros = fromJointTrajectory(msg, scene);
+  ASSERT_TRUE(from_ros.has_value()) << from_ros.error();
+  EXPECT_EQ(from_ros->joint_names, msg.joint_names);
+  EXPECT_TRUE(from_ros->positions[0].isApprox(Eigen::VectorXd::Constant(1, 0.3)));
+  EXPECT_EQ(from_ros->velocities[0].size(), 0);
+}
+
+TEST_F(TypeConversionsTest, TestConvertJointTrajectoryErrors) {
+  const auto scene = roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(urdf_path));
+
+  trajectory_msgs::msg::JointTrajectory msg;
+  msg.joint_names = {"continuous_joint", "revolute_joint"};
+  msg.points.resize(1);
+  msg.points[0].positions = {0.5};
+  const auto wrong_size = fromJointTrajectory(msg, scene);
+  ASSERT_FALSE(wrong_size.has_value());
+  EXPECT_EQ(wrong_size.error(),
+            "Failed to convert the trajectory: Point 0 has 1 positions, expected 2");
+
+  msg.joint_names = {"continuous_joint", "no_such_joint"};
+  msg.points[0].positions = {0.5, 0.1};
+  EXPECT_FALSE(fromJointTrajectory(msg, scene).has_value());
+
+  // RoboPlan has two positions for the continuous joint.
+  roboplan::JointTrajectory roboplan_traj;
+  roboplan_traj.joint_names = {"continuous_joint"};
+  roboplan_traj.times = {0.0};
+  roboplan_traj.positions = {Eigen::VectorXd::Constant(1, 0.5)};
+  const auto collapsed = toJointTrajectory(roboplan_traj, scene);
+  ASSERT_FALSE(collapsed.has_value());
+  EXPECT_EQ(collapsed.error(),
+            "Failed to convert the trajectory: Point 0 has 1 positions, expected 2");
+}
+
+TEST_F(TypeConversionsTest, TestJointTrajectoryUnwrapsContinuousJoints) {
+  const auto scene = roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(urdf_path));
+
+  // The continuous joint crosses +-pi between the first two points.
+  const auto make_q = [](double theta) {
+    return (Eigen::VectorXd(2) << std::cos(theta), std::sin(theta)).finished();
+  };
+  roboplan::JointTrajectory roboplan_traj;
+  roboplan_traj.joint_names = {"continuous_joint"};
+  roboplan_traj.times = {0.0, 1.0, 2.0};
+  roboplan_traj.positions = {make_q(3.0), make_q(-3.0), make_q(-2.5)};
+
+  // In ROS the angle keeps going past pi instead of jumping to -pi.
+  const auto ros_traj = toJointTrajectory(roboplan_traj, scene);
+  ASSERT_TRUE(ros_traj.has_value()) << ros_traj.error();
+  const double two_pi = 2.0 * std::numbers::pi;
+  EXPECT_NEAR(ros_traj->points[0].positions[0], 3.0, 1e-12);
+  EXPECT_NEAR(ros_traj->points[1].positions[0], two_pi - 3.0, 1e-12);
+  EXPECT_NEAR(ros_traj->points[2].positions[0], two_pi - 2.5, 1e-12);
+
+  const auto new_roboplan_traj = fromJointTrajectory(ros_traj.value(), scene);
+  ASSERT_TRUE(new_roboplan_traj.has_value()) << new_roboplan_traj.error();
+  for (size_t i = 0; i < roboplan_traj.positions.size(); ++i) {
+    EXPECT_TRUE(new_roboplan_traj->positions[i].isApprox(roboplan_traj.positions[i]));
+  }
+}
+
+TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectory) {
+  const auto scene =
+      roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(mobile_urdf_path));
+  const std::vector<std::string> joint_names = {"base_joint", "wheel_joint", "drone_joint"};
+  ASSERT_EQ(scene.getJointNames(), joint_names);
+
+  // Planar [x, y, cos, sin], continuous [cos, sin], floating [x, y, z, qx, qy, qz, qw]. The base
+  // turns from 3 to -3 rad, across +-pi.
+  const auto make_q = [](double base_theta, double drone_z) {
+    const Eigen::Quaterniond drone_rotation(Eigen::AngleAxisd(0.4, Eigen::Vector3d::UnitX()));
+    Eigen::VectorXd q(13);
+    q << 1.0, 2.0, std::cos(base_theta), std::sin(base_theta), std::cos(0.5), std::sin(0.5), 0.1,
+        0.2, drone_z, drone_rotation.x(), drone_rotation.y(), drone_rotation.z(),
+        drone_rotation.w();
+    return q;
+  };
+  Eigen::VectorXd v(10);
+  v << 0.1, 0.2, 0.3, 0.4, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
+  roboplan::JointTrajectory roboplan_traj;
+  roboplan_traj.joint_names = joint_names;
+  roboplan_traj.times = {0.0, 1.0};
+  roboplan_traj.positions = {make_q(3.0, 1.0), make_q(-3.0, 1.5)};
+  roboplan_traj.velocities = {v, v};
+  roboplan_traj.accelerations = {2.0 * v, 2.0 * v};
+
+  // The JointTrajectory only has the continuous joint.
+  const auto ros_traj = toJointTrajectory(roboplan_traj, scene);
+  ASSERT_TRUE(ros_traj.has_value()) << ros_traj.error();
+  EXPECT_EQ(ros_traj->joint_names, std::vector<std::string>{"wheel_joint"});
+  EXPECT_NEAR(ros_traj->points[0].positions[0], 0.5, 1e-12);
+  EXPECT_EQ(ros_traj->points[0].velocities, std::vector<double>{0.4});
+
+  // The MultiDOFJointTrajectory has the planar and floating joints.
+  const auto multi_dof_traj = toMultiDOFJointTrajectory(roboplan_traj, scene);
+  ASSERT_TRUE(multi_dof_traj.has_value()) << multi_dof_traj.error();
+  EXPECT_EQ(multi_dof_traj->joint_names, (std::vector<std::string>{"base_joint", "drone_joint"}));
+  ASSERT_EQ(multi_dof_traj->points.size(), 2u);
+  const auto& base = multi_dof_traj->points[0].transforms[0];
+  EXPECT_DOUBLE_EQ(base.translation.x, 1.0);
+  EXPECT_DOUBLE_EQ(base.translation.y, 2.0);
+  EXPECT_NEAR(base.rotation.z, std::sin(1.5), 1e-12);
+  EXPECT_NEAR(base.rotation.w, std::cos(1.5), 1e-12);
+  const auto& drone = multi_dof_traj->points[1].transforms[1];
+  EXPECT_DOUBLE_EQ(drone.translation.z, 1.5);
+  EXPECT_NEAR(drone.rotation.x, std::sin(0.2), 1e-12);
+
+  // At -3 rad the base's quaternion keeps the sign of the previous point: it is the rotation by
+  // 2 pi - 3, so interpolating does not turn the base the long way round.
+  const auto& turned_base = multi_dof_traj->points[1].transforms[0];
+  EXPECT_NEAR(turned_base.rotation.z, std::sin((2.0 * std::numbers::pi - 3.0) / 2.0), 1e-12);
+  EXPECT_NEAR(turned_base.rotation.w, std::cos((2.0 * std::numbers::pi - 3.0) / 2.0), 1e-12);
+
+  // Twists are in the joint's frame, as in RoboPlan.
+  const auto& base_twist = multi_dof_traj->points[0].velocities[0];
+  EXPECT_DOUBLE_EQ(base_twist.linear.x, 0.1);
+  EXPECT_DOUBLE_EQ(base_twist.linear.y, 0.2);
+  EXPECT_DOUBLE_EQ(base_twist.angular.z, 0.3);
+  const auto& drone_acceleration = multi_dof_traj->points[0].accelerations[1];
+  EXPECT_DOUBLE_EQ(drone_acceleration.linear.x, 2.0);
+  EXPECT_DOUBLE_EQ(drone_acceleration.angular.z, 12.0);
+
+  // Converting both messages back gives the original trajectory.
+  const auto new_roboplan_traj =
+      fromJointTrajectory(ros_traj.value(), multi_dof_traj.value(), scene);
+  ASSERT_TRUE(new_roboplan_traj.has_value()) << new_roboplan_traj.error();
+  EXPECT_EQ(new_roboplan_traj->joint_names, joint_names);
+  EXPECT_EQ(new_roboplan_traj->times, roboplan_traj.times);
+  for (size_t i = 0; i < roboplan_traj.positions.size(); ++i) {
+    EXPECT_TRUE(new_roboplan_traj->positions[i].isApprox(roboplan_traj.positions[i]));
+    EXPECT_TRUE(new_roboplan_traj->velocities[i].isApprox(roboplan_traj.velocities[i]));
+    EXPECT_TRUE(new_roboplan_traj->accelerations[i].isApprox(roboplan_traj.accelerations[i]));
+  }
+
+  // A trajectory without planar or floating joints gives an empty MultiDOFJointTrajectory.
+  roboplan::JointTrajectory wheel_traj;
+  wheel_traj.joint_names = {"wheel_joint"};
+  wheel_traj.times = {0.0};
+  wheel_traj.positions = {(Eigen::VectorXd(2) << 1.0, 0.0).finished()};
+  const auto empty_multi_dof_traj = toMultiDOFJointTrajectory(wheel_traj, scene);
+  ASSERT_TRUE(empty_multi_dof_traj.has_value()) << empty_multi_dof_traj.error();
+  EXPECT_TRUE(empty_multi_dof_traj->joint_names.empty());
+  EXPECT_TRUE(empty_multi_dof_traj->points.empty());
+}
+
+TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectoryErrors) {
+  const auto scene =
+      roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(mobile_urdf_path));
+  const auto prefix = std::string("Failed to convert the trajectory: ");
+
+  trajectory_msgs::msg::JointTrajectory joint_msg;
+  joint_msg.joint_names = {"wheel_joint"};
+  joint_msg.points.resize(2);
+  joint_msg.points[0].positions = {0.5};
+  joint_msg.points[1].positions = {0.6};
+  joint_msg.points[1].time_from_start.sec = 1;
+
+  trajectory_msgs::msg::MultiDOFJointTrajectory multi_dof_msg;
+  multi_dof_msg.joint_names = {"base_joint"};
+  multi_dof_msg.points.resize(2);
+  for (auto& point : multi_dof_msg.points) {
+    point.transforms.resize(1);
+  }
+  multi_dof_msg.points[1].time_from_start.sec = 1;
+  ASSERT_TRUE(fromJointTrajectory(joint_msg, multi_dof_msg, scene).has_value());
+
+  // A planar joint cannot be in a JointTrajectory, nor a continuous one in a
+  // MultiDOFJointTrajectory.
+  auto wrong_joint_msg = joint_msg;
+  wrong_joint_msg.joint_names = {"base_joint"};
+  EXPECT_EQ(fromJointTrajectory(wrong_joint_msg, scene).error(),
+            prefix + "Joint 'base_joint' has several degrees of freedom: a JointTrajectory cannot "
+                     "represent it, use a MultiDOFJointTrajectory");
+  auto wrong_multi_dof_msg = multi_dof_msg;
+  wrong_multi_dof_msg.joint_names = {"wheel_joint"};
+  EXPECT_EQ(fromJointTrajectory(joint_msg, wrong_multi_dof_msg, scene).error(),
+            prefix + "Joint 'wheel_joint' has a single degree of freedom: it belongs in the "
+                     "JointTrajectory");
+
+  // Both messages must have the same points.
+  auto short_msg = multi_dof_msg;
+  short_msg.points.pop_back();
+  EXPECT_EQ(fromJointTrajectory(joint_msg, short_msg, scene).error(),
+            prefix + "The JointTrajectory has 2 points, the MultiDOFJointTrajectory 1");
+  auto late_msg = multi_dof_msg;
+  late_msg.points[1].time_from_start.sec = 2;
+  EXPECT_EQ(
+      fromJointTrajectory(joint_msg, late_msg, scene).error(),
+      prefix +
+          "Point 1 has different times in the JointTrajectory and the MultiDOFJointTrajectory");
+
+  // Velocities are given for all the joints or for none.
+  auto moving_msg = multi_dof_msg;
+  moving_msg.points[0].velocities.resize(1);
+  EXPECT_EQ(fromJointTrajectory(joint_msg, moving_msg, scene).error(),
+            prefix + "Point 0 has velocities for some joints only");
+
+  // A quaternion must not be zero.
+  auto zero_msg = multi_dof_msg;
+  zero_msg.points[0].transforms[0].rotation.w = 0.0;
+  EXPECT_EQ(fromJointTrajectory(joint_msg, zero_msg, scene).error(),
+            prefix + "Point 0 has a zero quaternion for joint 'base_joint'");
 }
 
 TEST(ConversionTest, TestEmptyConversions) {

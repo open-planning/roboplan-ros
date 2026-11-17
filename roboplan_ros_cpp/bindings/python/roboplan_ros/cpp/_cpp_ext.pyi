@@ -12,14 +12,19 @@ def se3ToPose(transform: Annotated[NDArray[numpy.float64], dict(shape=(4, 4), or
 def poseToSE3(py_pose: object) -> Annotated[NDArray[numpy.float64], dict(shape=(4, 4), order='F')]:
     """Converts the provided geometry_msgs::msg::Pose to an SE3 Matrix."""
 
-def toJointTrajectory(py_roboplan_traj: object) -> object:
+def toJointTrajectory(py_roboplan_traj: object, py_scene: object | None = None) -> object:
     """
-    Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory.
+    Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. With a scene, the [cos, sin] positions of continuous joints become angles, unwrapped along the trajectory, and mimic, planar and floating joints are left out; without one, positions are copied as they are.
     """
 
-def fromJointTrajectory(py_ros_traj: object) -> object:
+def toMultiDOFJointTrajectory(py_roboplan_traj: object, py_scene: object) -> object:
     """
-    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory.
+    Converts the planar and floating joints of a roboplan::JointTrajectory to a trajectory_msgs::msg::MultiDOFJointTrajectory, with twists in each joint's own frame.
+    """
+
+def fromJointTrajectory(py_ros_traj: object, py_scene: object | None = None, py_multi_dof_traj: object | None = None) -> object:
+    """
+    Converts a trajectory_msgs::msg::JointTrajectory, and optionally a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints, to a roboplan::JointTrajectory. With a scene, the angles of continuous joints become [cos, sin] positions and the values of mimic joints are ignored; without one, positions are copied as they are.
     """
 
 def toTransformStamped(cartesian_config: "roboplan::CartesianConfiguration") -> object:

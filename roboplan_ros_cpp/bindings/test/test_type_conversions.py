@@ -17,6 +17,7 @@ from roboplan_ros.cpp import (
     toJointState,
     fromJointState,
     toJointTrajectory,
+    toMultiDOFJointTrajectory,
     fromJointTrajectory,
     se3ToPose,
     poseToSE3,
@@ -28,6 +29,7 @@ from roboplan_ros.cpp import (
 resource_path = get_package_share_path("roboplan_ros_cpp") / "test" / "resources"
 urdf_path = resource_path / "test_robot.urdf"
 srdf_path = resource_path / "test_robot.srdf"
+mobile_urdf_path = resource_path / "test_mobile_robot.urdf"
 
 
 def test_joint_state_mapping():
@@ -160,6 +162,87 @@ def test_convert_to_joint_trajectory():
     for i in range(len(roboplan_traj.accelerations)):
         assert new_roboplan_traj.accelerations[i] == pytest.approx(
             roboplan_traj.accelerations[i]
+        )
+
+
+def test_convert_joint_trajectory_with_continuous_joint():
+    """Test that a scene converts the positions of continuous joints."""
+    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path))
+
+    # RoboPlan stores the continuous joint as [cos(theta), sin(theta)], ROS as theta.
+    roboplan_traj = JointTrajectory()
+    roboplan_traj.joint_names = ["continuous_joint", "revolute_joint"]
+    roboplan_traj.times = [0.0, 1.0]
+    roboplan_traj.positions = [
+        np.array([np.cos(0.5), np.sin(0.5), 0.1]),
+        np.array([np.cos(-2.0), np.sin(-2.0), 0.2]),
+    ]
+    roboplan_traj.velocities = [np.array([0.0, 0.0]), np.array([1.0, -1.0])]
+    roboplan_traj.accelerations = [np.array([0.0, 0.0]), np.array([2.0, -2.0])]
+
+    ros_traj = toJointTrajectory(roboplan_traj, scene)
+    assert ros_traj.joint_names == roboplan_traj.joint_names
+    assert list(ros_traj.points[1].positions) == pytest.approx([-2.0, 0.2])
+
+    new_roboplan_traj = fromJointTrajectory(ros_traj, scene)
+    for i in range(len(roboplan_traj.positions)):
+        assert new_roboplan_traj.positions[i] == pytest.approx(
+            roboplan_traj.positions[i]
+        )
+
+    # Without a scene, positions are copied as they are.
+    assert len(toJointTrajectory(roboplan_traj).points[1].positions) == 3
+
+    # A wrong number of positions is an error.
+    ros_traj.points[0].positions = [0.5]
+    with pytest.raises(RuntimeError) as exc_info:
+        fromJointTrajectory(ros_traj, scene)
+    expected_error = (
+        "Failed to convert the trajectory: Point 0 has 1 positions, expected 2"
+    )
+    assert str(exc_info.value) == expected_error
+
+
+def test_convert_multi_dof_joint_trajectory():
+    """Test that planar and floating joints go in a MultiDOFJointTrajectory."""
+    scene = Scene("test_scene", loadUrdfSceneDescription(mobile_urdf_path))
+
+    # Planar [x, y, cos, sin], continuous [cos, sin],
+    # floating [x, y, z, qx, qy, qz, qw].
+    def make_q(base_theta):
+        return np.array(
+            [1.0, 2.0, np.cos(base_theta), np.sin(base_theta)]
+            + [np.cos(0.5), np.sin(0.5)]
+            + [0.1, 0.2, 1.0, 0.0, 0.0, 0.0, 1.0]
+        )
+
+    velocities = np.array([0.1, 0.2, 0.3, 0.4, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    roboplan_traj = JointTrajectory()
+    roboplan_traj.joint_names = ["base_joint", "wheel_joint", "drone_joint"]
+    roboplan_traj.times = [0.0, 1.0]
+    roboplan_traj.positions = [make_q(3.0), make_q(-3.0)]
+    roboplan_traj.velocities = [velocities, velocities]
+
+    ros_traj = toJointTrajectory(roboplan_traj, scene)
+    assert ros_traj.joint_names == ["wheel_joint"]
+
+    multi_dof_traj = toMultiDOFJointTrajectory(roboplan_traj, scene)
+    assert multi_dof_traj.joint_names == ["base_joint", "drone_joint"]
+    base_twist = multi_dof_traj.points[0].velocities[0]
+    assert [base_twist.linear.x, base_twist.linear.y, base_twist.angular.z] == [
+        0.1,
+        0.2,
+        0.3,
+    ]
+
+    new_roboplan_traj = fromJointTrajectory(ros_traj, scene, multi_dof_traj)
+    assert new_roboplan_traj.joint_names == roboplan_traj.joint_names
+    for i in range(len(roboplan_traj.positions)):
+        assert new_roboplan_traj.positions[i] == pytest.approx(
+            roboplan_traj.positions[i]
+        )
+        assert new_roboplan_traj.velocities[i] == pytest.approx(
+            roboplan_traj.velocities[i]
         )
 
 
