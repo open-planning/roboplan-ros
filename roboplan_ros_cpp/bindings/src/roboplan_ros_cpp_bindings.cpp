@@ -37,28 +37,13 @@ NB_MODULE(_cpp_ext, m) {
       },
       "py_pose"_a, "Converts the provided geometry_msgs::msg::Pose to an SE3 Matrix.");
 
-  // The trajectory conversions are overloaded as in C++, each overload with its own docstring.
-  const auto joint_trajectory_class = [] {
-    return nb::module_::import_("trajectory_msgs.msg").attr("JointTrajectory");
-  };
-
   m.def(
       "toJointTrajectory",
-      [=](nb::handle py_roboplan_traj) {
-        auto ros_traj = toJointTrajectory(nb::cast<roboplan::JointTrajectory>(py_roboplan_traj));
-        return cppToPyMsg(ros_traj, joint_trajectory_class());
-      },
-      "py_roboplan_traj"_a,
-      "Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. Positions "
-      "are copied as they are, which is only correct without continuous joints; use the overload "
-      "that takes a scene otherwise.");
-
-  m.def(
-      "toJointTrajectory",
-      [=](nb::handle py_roboplan_traj, const roboplan::Scene& py_scene) {
+      [](nb::handle py_roboplan_traj, const roboplan::Scene& py_scene) {
         auto ros_traj = handle_expected(
             toJointTrajectory(nb::cast<roboplan::JointTrajectory>(py_roboplan_traj), py_scene));
-        return cppToPyMsg(ros_traj, joint_trajectory_class());
+        return cppToPyMsg(ros_traj,
+                          nb::module_::import_("trajectory_msgs.msg").attr("JointTrajectory"));
       },
       "py_roboplan_traj"_a, "py_scene"_a,
       "Converts the single degree of freedom joints of a roboplan::JointTrajectory to a "
@@ -78,17 +63,7 @@ NB_MODULE(_cpp_ext, m) {
       "Converts the planar and floating joints of a roboplan::JointTrajectory to a "
       "trajectory_msgs::msg::MultiDOFJointTrajectory, with twists in each joint's own frame.");
 
-  m.def(
-      "fromJointTrajectory",
-      [](nb::handle py_ros_traj) {
-        auto ros_traj = pyToCppMsg<trajectory_msgs::msg::JointTrajectory>(py_ros_traj);
-        return fromJointTrajectory(ros_traj);
-      },
-      "py_ros_traj"_a,
-      "Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Positions "
-      "are copied as they are, which is only correct without continuous joints; use the overload "
-      "that takes a scene otherwise.");
-
+  // fromJointTrajectory is overloaded as in C++, each overload with its own docstring.
   m.def(
       "fromJointTrajectory",
       [](nb::handle py_ros_traj, const roboplan::Scene& py_scene) {

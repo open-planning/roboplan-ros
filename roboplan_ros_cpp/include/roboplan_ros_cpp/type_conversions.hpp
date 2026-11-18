@@ -96,23 +96,15 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
                const JointStateConverterMap& joint_conversion_map,
                const std::optional<Eigen::VectorXd>& q_reference = std::nullopt);
 
-/// @brief Converts a roboplan::JointTrajectory object to a ROS 2 JointTrajectory message.
-/// @details This function will convert joint names and joint trajectory points. The caller
-/// is responsible for any additional configuration that is required in the message.
-/// Positions are copied as they are, which is only correct without continuous joints; use the
-/// overload that takes a scene otherwise.
-/// @param roboplan_trajectory The roboplan JointTrajectory to convert
-/// @return An equivalent ROS 2 JointTrajectory message.
-trajectory_msgs::msg::JointTrajectory
-toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory);
-
 /// @brief Converts the single degree of freedom joints of a roboplan::JointTrajectory to a ROS 2
 /// JointTrajectory message, using the scene to convert the positions of continuous joints.
-/// @details A continuous joint's [cos(theta), sin(theta)] positions become theta, unwrapped along
-/// the trajectory: consecutive points never differ by more than pi, so interpolating between them
-/// does not turn the joint the long way round. Mimic joints are left out of the message, since
-/// they have no positions of their own. Planar and floating joints are left out too: use
-/// toMultiDOFJointTrajectory for them.
+/// @details This function will convert joint names and joint trajectory points. The caller
+/// is responsible for any additional configuration that is required in the message. A continuous
+/// joint's [cos(theta), sin(theta)] positions become theta, unwrapped along the trajectory:
+/// consecutive points never differ by more than pi, so interpolating between them does not turn the
+/// joint the long way round. Mimic joints are left out of the message, since they have no positions
+/// of their own. Planar and floating joints are left out too: use toMultiDOFJointTrajectory for
+/// them.
 /// @param roboplan_trajectory The roboplan JointTrajectory to convert.
 /// @param scene The RoboPlan scene containing the model's joint information.
 /// @return An equivalent ROS 2 JointTrajectory message, or an error.
@@ -133,15 +125,6 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
 tl::expected<trajectory_msgs::msg::MultiDOFJointTrajectory, std::string>
 toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
                           const roboplan::Scene& scene);
-
-/// @brief Convert the provided ROS 2 JointTrajectory message to an equivalent
-/// roboplan::JointTrajectory.
-/// @details Positions are copied as they are, which is only correct without continuous joints;
-/// use the overload that takes a scene otherwise.
-/// @param ros_trajectory The ROS 2 JointTrajectory message to convert.
-/// @return An equivalent roboplan::JointTrajectory.
-roboplan::JointTrajectory
-fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory);
 
 /// @brief Convert the provided ROS 2 JointTrajectory message to an equivalent
 /// roboplan::JointTrajectory, using the scene to convert the positions of continuous joints.

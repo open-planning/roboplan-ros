@@ -120,29 +120,31 @@ def test_convert_partial_joint_state():
 
 
 def test_empty_conversions():
+    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path))
     roboplan_traj = JointTrajectory()
-    ros_traj = toJointTrajectory(roboplan_traj)
+    ros_traj = toJointTrajectory(roboplan_traj, scene)
     assert len(ros_traj.joint_names) == 0
 
-    orig_roboplan_traj = fromJointTrajectory(ros_traj)
+    orig_roboplan_traj = fromJointTrajectory(ros_traj, scene)
     assert len(orig_roboplan_traj.joint_names) == 0
 
 
 def test_convert_to_joint_trajectory():
-    # Create a roboplan trajectory with two joints and two points, convert it to/from
-    # ROS and ensure we get the same data back.
+    # Create a roboplan trajectory with a revolute joint and two points, convert it
+    # to/from ROS and ensure we get the same data back.
+    scene = Scene("test_scene", loadUrdfSceneDescription(urdf_path))
     roboplan_traj = JointTrajectory()
-    roboplan_traj.joint_names = ["joint1", "joint2"]
+    roboplan_traj.joint_names = ["revolute_joint"]
     roboplan_traj.times = [0.0, 1.0]
-    roboplan_traj.positions = [np.array([0.0, 0.0]), np.array([1.0, -1.0])]
-    roboplan_traj.velocities = [np.array([0.0, 0.0]), np.array([2.0, -2.0])]
-    roboplan_traj.accelerations = [np.array([0.0, 0.0]), np.array([3.0, -3.0])]
+    roboplan_traj.positions = [np.array([0.0]), np.array([1.0])]
+    roboplan_traj.velocities = [np.array([0.0]), np.array([2.0])]
+    roboplan_traj.accelerations = [np.array([0.0]), np.array([3.0])]
 
-    ros_traj = toJointTrajectory(roboplan_traj)
+    ros_traj = toJointTrajectory(roboplan_traj, scene)
     assert ros_traj.joint_names == roboplan_traj.joint_names
     assert len(ros_traj.points) == 2
 
-    new_roboplan_traj = fromJointTrajectory(ros_traj)
+    new_roboplan_traj = fromJointTrajectory(ros_traj, scene)
     assert new_roboplan_traj.joint_names == roboplan_traj.joint_names
     assert new_roboplan_traj.times == roboplan_traj.times
 
@@ -189,9 +191,6 @@ def test_convert_joint_trajectory_with_continuous_joint():
         assert new_roboplan_traj.positions[i] == pytest.approx(
             roboplan_traj.positions[i]
         )
-
-    # Without a scene, positions are copied as they are.
-    assert len(toJointTrajectory(roboplan_traj).points[1].positions) == 3
 
     # A wrong number of positions is an error.
     ros_traj.points[0].positions = [0.5]
