@@ -39,28 +39,16 @@ trajectoryDofs(const roboplan::Scene& scene, const std::vector<std::string>& joi
   return std::make_pair(nq, nv);
 }
 
-/// @brief The number of values a point has for one of its fields, and how many it should have.
-struct PointField {
-  std::string what;
-  size_t size;
-  size_t expected;
-
-  /// @brief Whether the point may also have no values for the field.
-  bool optional;
-};
-
-/// @brief Checks that each field of a point has the expected size, or is empty if it is optional.
-tl::expected<void, std::string> checkPointSizes(size_t point_index,
-                                                const std::vector<PointField>& fields) {
-  for (const auto& field : fields) {
-    if (field.size != field.expected && !(field.optional && field.size == 0)) {
-      return tl::make_unexpected("Failed to convert the trajectory: Point " +
-                                 std::to_string(point_index) + " has " +
-                                 std::to_string(field.size) + " " + field.what + ", expected " +
-                                 std::to_string(field.expected));
-    }
+/// @brief Checks that point i has the expected number of values for a field, or none if the field
+/// is optional.
+tl::expected<void, std::string> checkPointSize(size_t i, const std::string& what, size_t size,
+                                               size_t expected, bool optional) {
+  if (size == expected || (optional && size == 0)) {
+    return {};
   }
-  return {};
+  return tl::make_unexpected("Failed to convert the trajectory: Point " + std::to_string(i) +
+                             " has " + std::to_string(size) + " " + what + ", expected " +
+                             std::to_string(expected));
 }
 
 /// @brief Checks that the joints of a RoboPlan trajectory are in the scene, and that its points
@@ -74,21 +62,24 @@ tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTra
   const auto [nq, nv] = dofs.value();
   for (size_t i = 0; i < trajectory.times.size(); ++i) {
     // Values are only checked if the trajectory has them for this point.
-    std::vector<PointField> fields;
     if (i < trajectory.positions.size()) {
-      fields.push_back(
-          {"positions", static_cast<size_t>(trajectory.positions[i].size()), nq, false});
+      if (auto ok = checkPointSize(i, "positions", trajectory.positions[i].size(), nq, false);
+          !ok) {
+        return ok;
+      }
     }
     if (i < trajectory.velocities.size()) {
-      fields.push_back(
-          {"velocities", static_cast<size_t>(trajectory.velocities[i].size()), nv, true});
+      if (auto ok = checkPointSize(i, "velocities", trajectory.velocities[i].size(), nv, true);
+          !ok) {
+        return ok;
+      }
     }
     if (i < trajectory.accelerations.size()) {
-      fields.push_back(
-          {"accelerations", static_cast<size_t>(trajectory.accelerations[i].size()), nv, true});
-    }
-    if (auto ok = checkPointSizes(i, fields); !ok) {
-      return ok;
+      if (auto ok =
+              checkPointSize(i, "accelerations", trajectory.accelerations[i].size(), nv, true);
+          !ok) {
+        return ok;
+      }
     }
   }
   return {};
@@ -211,21 +202,28 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
       return error("Point " + std::to_string(i) +
                    " has different times in the JointTrajectory and the MultiDOFJointTrajectory");
     }
-    std::vector<PointField> fields;
     if (point) {
-      fields.push_back({"positions", point->positions.size(), num_single, false});
-      fields.push_back({"velocities", point->velocities.size(), num_single, true});
-      fields.push_back({"accelerations", point->accelerations.size(), num_single, true});
+      for (const auto& ok :
+           {checkPointSize(i, "positions", point->positions.size(), num_single, false),
+            checkPointSize(i, "velocities", point->velocities.size(), num_single, true),
+            checkPointSize(i, "accelerations", point->accelerations.size(), num_single, true)}) {
+        if (!ok) {
+          return tl::make_unexpected(ok.error());
+        }
+      }
     }
     if (multi_dof_point) {
-      fields.push_back({"transforms", multi_dof_point->transforms.size(), num_multi_dof, false});
-      fields.push_back(
-          {"velocity twists", multi_dof_point->velocities.size(), num_multi_dof, true});
-      fields.push_back(
-          {"acceleration twists", multi_dof_point->accelerations.size(), num_multi_dof, true});
-    }
-    if (auto ok = checkPointSizes(i, fields); !ok) {
-      return tl::make_unexpected(ok.error());
+      for (const auto& ok :
+           {checkPointSize(i, "transforms", multi_dof_point->transforms.size(), num_multi_dof,
+                           false),
+            checkPointSize(i, "velocity twists", multi_dof_point->velocities.size(), num_multi_dof,
+                           true),
+            checkPointSize(i, "acceleration twists", multi_dof_point->accelerations.size(),
+                           num_multi_dof, true)}) {
+        if (!ok) {
+          return tl::make_unexpected(ok.error());
+        }
+      }
     }
 
     // Velocities and accelerations must be given for all the joints or for none.
