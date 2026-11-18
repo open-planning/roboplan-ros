@@ -12,30 +12,10 @@ namespace roboplan_ros_cpp {
 
 namespace {
 
-/// @brief How a trajectory joint is represented in RoboPlan and in ROS.
-enum class TrajectoryJointKind {
-  /// @brief A revolute or prismatic joint: one value in both.
-  SINGLE,
-  /// @brief [cos(theta), sin(theta)] in RoboPlan, theta in a JointTrajectory.
-  CONTINUOUS,
-  /// @brief No values of its own in RoboPlan, which derives them from the joint it mimics.
-  MIMIC,
-  /// @brief [x, y, cos(theta), sin(theta)] in RoboPlan, a transform in a MultiDOFJointTrajectory.
-  PLANAR,
-  /// @brief [x, y, z, qx, qy, qz, qw] in RoboPlan, a transform in a MultiDOFJointTrajectory.
-  FLOATING,
-};
-
 /// @brief A joint of a trajectory, with where its values are in RoboPlan.
 struct TrajectoryJoint {
   std::string name;
-  TrajectoryJointKind kind;
-
-  /// @brief Number of positions in RoboPlan.
-  size_t nq;
-
-  /// @brief Number of velocities (and accelerations) in RoboPlan.
-  size_t nv;
+  roboplan::JointInfo info;
 
   /// @brief Index of the joint's first position in RoboPlan, set by layOutJoints.
   size_t q_start = 0;
@@ -44,18 +24,25 @@ struct TrajectoryJoint {
   /// layOutJoints.
   size_t v_start = 0;
 
+  /// @brief Whether the joint is a mimic joint, which has no values of its own in RoboPlan: they
+  /// are derived from the joint it mimics.
+  bool isMimic() const { return info.mimic_info.has_value(); }
+
   /// @brief Whether the joint goes in a JointTrajectory.
   bool isSingleDof() const {
-    return kind == TrajectoryJointKind::SINGLE || kind == TrajectoryJointKind::CONTINUOUS;
+    return !isMimic() && (info.type == roboplan::JointType::REVOLUTE ||
+                          info.type == roboplan::JointType::PRISMATIC ||
+                          info.type == roboplan::JointType::CONTINUOUS);
   }
 
   /// @brief Whether the joint goes in a MultiDOFJointTrajectory.
   bool isMultiDof() const {
-    return kind == TrajectoryJointKind::PLANAR || kind == TrajectoryJointKind::FLOATING;
+    return !isMimic() &&
+           (info.type == roboplan::JointType::PLANAR || info.type == roboplan::JointType::FLOATING);
   }
 };
 
-/// @brief Looks up how each joint of a trajectory is represented.
+/// @brief Looks up the JointInfo of each joint of a trajectory.
 /// @return The joints in the order of joint_names, or an error if one is unknown.
 tl::expected<std::vector<TrajectoryJoint>, std::string>
 trajectoryJoints(const roboplan::Scene& scene, const std::vector<std::string>& joint_names) {
@@ -66,27 +53,7 @@ trajectoryJoints(const roboplan::Scene& scene, const std::vector<std::string>& j
     if (!joint_info) {
       return tl::make_unexpected(joint_info.error());
     }
-    if (joint_info->mimic_info) {
-      joints.push_back({joint_name, TrajectoryJointKind::MIMIC, 0, 0});
-      continue;
-    }
-    switch (joint_info->type) {
-    case roboplan::JointType::REVOLUTE:
-    case roboplan::JointType::PRISMATIC:
-      joints.push_back({joint_name, TrajectoryJointKind::SINGLE, 1, 1});
-      break;
-    case roboplan::JointType::CONTINUOUS:
-      joints.push_back({joint_name, TrajectoryJointKind::CONTINUOUS, 2, 1});
-      break;
-    case roboplan::JointType::PLANAR:
-      joints.push_back({joint_name, TrajectoryJointKind::PLANAR, 4, 3});
-      break;
-    case roboplan::JointType::FLOATING:
-      joints.push_back({joint_name, TrajectoryJointKind::FLOATING, 7, 6});
-      break;
-    default:
-      return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
-    }
+    joints.push_back({joint_name, joint_info.value()});
   }
   return joints;
 }
@@ -98,15 +65,17 @@ struct TrajectorySize {
 };
 
 /// @brief Places the joints one after the other in RoboPlan's positions and velocities, setting
-/// their q_start and v_start.
+/// their q_start and v_start. Mimic joints take no room.
 /// @return The total number of positions and velocities.
 TrajectorySize layOutJoints(std::vector<TrajectoryJoint>& joints) {
   TrajectorySize size;
   for (auto& joint : joints) {
     joint.q_start = size.nq;
     joint.v_start = size.nv;
-    size.nq += joint.nq;
-    size.nv += joint.nv;
+    if (!joint.isMimic()) {
+      size.nq += joint.info.num_position_dofs;
+      size.nv += joint.info.num_velocity_dofs;
+    }
   }
   return size;
 }
@@ -183,10 +152,10 @@ double unwrapAngle(double angle, const std::optional<double>& previous) {
 
 /// @brief Converts the RoboPlan velocities (or accelerations) of a planar or floating joint to a
 /// twist, both in the joint's own frame.
-geometry_msgs::msg::Twist toTwist(TrajectoryJointKind kind, const Eigen::VectorXd& values,
+geometry_msgs::msg::Twist toTwist(roboplan::JointType type, const Eigen::VectorXd& values,
                                   size_t v_idx) {
   geometry_msgs::msg::Twist twist;
-  if (kind == TrajectoryJointKind::PLANAR) {
+  if (type == roboplan::JointType::PLANAR) {
     twist.linear.x = values(v_idx);
     twist.linear.y = values(v_idx + 1);
     twist.angular.z = values(v_idx + 2);
@@ -202,9 +171,9 @@ geometry_msgs::msg::Twist toTwist(TrajectoryJointKind kind, const Eigen::VectorX
 }
 
 /// @brief Inverse of toTwist: writes a twist's values for a planar or floating joint.
-void fromTwist(TrajectoryJointKind kind, const geometry_msgs::msg::Twist& twist,
+void fromTwist(roboplan::JointType type, const geometry_msgs::msg::Twist& twist,
                Eigen::VectorXd& values, size_t v_idx) {
-  if (kind == TrajectoryJointKind::PLANAR) {
+  if (type == roboplan::JointType::PLANAR) {
     values.segment<3>(v_idx) << twist.linear.x, twist.linear.y, twist.angular.z;
   } else {
     values.segment<6>(v_idx) << twist.linear.x, twist.linear.y, twist.linear.z, twist.angular.x,
@@ -331,13 +300,15 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
       const auto j = message_indices[k];
       const auto q_idx = joint.q_start;
       const auto v_idx = joint.v_start;
-      switch (joint.kind) {
-      case TrajectoryJointKind::MIMIC:
+      if (joint.isMimic()) {
         // Mimic joints have no values of their own: RoboPlan derives them.
-        break;
-      case TrajectoryJointKind::SINGLE:
-      case TrajectoryJointKind::CONTINUOUS:
-        if (joint.kind == TrajectoryJointKind::CONTINUOUS) {
+        continue;
+      }
+      switch (joint.info.type) {
+      case roboplan::JointType::REVOLUTE:
+      case roboplan::JointType::PRISMATIC:
+      case roboplan::JointType::CONTINUOUS:
+        if (joint.info.type == roboplan::JointType::CONTINUOUS) {
           positions(q_idx) = std::cos(point->positions[j]);
           positions(q_idx + 1) = std::sin(point->positions[j]);
         } else {
@@ -350,8 +321,8 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
           accelerations(v_idx) = point->accelerations[j];
         }
         break;
-      case TrajectoryJointKind::PLANAR:
-      case TrajectoryJointKind::FLOATING: {
+      case roboplan::JointType::PLANAR:
+      case roboplan::JointType::FLOATING: {
         const auto& transform = multi_dof_point->transforms[j];
         Eigen::Quaterniond rotation;
         tf2::fromMsg(transform.rotation, rotation);
@@ -360,7 +331,7 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                        joint.name + "'");
         }
         rotation.normalize();
-        if (joint.kind == TrajectoryJointKind::PLANAR) {
+        if (joint.info.type == roboplan::JointType::PLANAR) {
           // Only the rotation about z: the direction of the x axis in the xy plane.
           const Eigen::Matrix3d matrix = rotation.toRotationMatrix();
           const double norm = std::hypot(matrix(0, 0), matrix(1, 0));
@@ -375,13 +346,15 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
               transform.translation.z, rotation.x(), rotation.y(), rotation.z(), rotation.w();
         }
         if (velocities.size() > 0) {
-          fromTwist(joint.kind, multi_dof_point->velocities[j], velocities, v_idx);
+          fromTwist(joint.info.type, multi_dof_point->velocities[j], velocities, v_idx);
         }
         if (accelerations.size() > 0) {
-          fromTwist(joint.kind, multi_dof_point->accelerations[j], accelerations, v_idx);
+          fromTwist(joint.info.type, multi_dof_point->accelerations[j], accelerations, v_idx);
         }
         break;
       }
+      default:
+        return error("Joint '" + joint.name + "' has an unknown type");
       }
     }
     joint_traj.times.push_back(
@@ -625,7 +598,7 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
       const auto q_idx = joint.q_start;
       const auto v_idx = joint.v_start;
       if (joint.isSingleDof()) {
-        if (positions && joint.kind == TrajectoryJointKind::CONTINUOUS) {
+        if (positions && joint.info.type == roboplan::JointType::CONTINUOUS) {
           const auto angle = unwrapAngle(std::atan2((*positions)(q_idx + 1), (*positions)(q_idx)),
                                          previous_angles[j]);
           previous_angles[j] = angle;
@@ -680,7 +653,7 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
           const auto& q = *positions;
           geometry_msgs::msg::Transform transform;
           Eigen::Quaterniond rotation;
-          if (joint.kind == TrajectoryJointKind::PLANAR) {
+          if (joint.info.type == roboplan::JointType::PLANAR) {
             transform.translation.x = q(q_idx);
             transform.translation.y = q(q_idx + 1);
             const auto angle = std::atan2(q(q_idx + 3), q(q_idx + 2));
@@ -701,10 +674,10 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
           point.transforms.push_back(transform);
         }
         if (velocities) {
-          point.velocities.push_back(toTwist(joint.kind, *velocities, v_idx));
+          point.velocities.push_back(toTwist(joint.info.type, *velocities, v_idx));
         }
         if (accelerations) {
-          point.accelerations.push_back(toTwist(joint.kind, *accelerations, v_idx));
+          point.accelerations.push_back(toTwist(joint.info.type, *accelerations, v_idx));
         }
       }
     }
