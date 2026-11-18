@@ -12,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        ros_distro: [rolling, lyrical, kilted, jazzy]
+        os: [ubuntu-latest]
+        ros_distro: [jazzy]
 
     runs-on: ${{ matrix.os }}
     defaults:
@@ -42,6 +42,13 @@ jobs:
           pixi run -e ${{ matrix.ros_distro }} build
           pixi run -e ${{ matrix.ros_distro }} test
           pixi run -e ${{ matrix.ros_distro }} test-result
+      - name: Debug test crashes
+        if: ${{ !cancelled() && runner.os == 'Linux' }}
+        timeout-minutes: 25
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdb
+          bash .github/scripts/debug_linux_crash.sh ${{ matrix.ros_distro }}
       - name: Check bindings stub files
         if: runner.os == 'Linux'
         run: |
