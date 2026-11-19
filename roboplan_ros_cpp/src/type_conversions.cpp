@@ -504,8 +504,8 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
   const auto& positions = roboplan_trajectory.positions;
   const auto& velocities = roboplan_trajectory.velocities;
   const auto& accelerations = roboplan_trajectory.accelerations;
-  RosTrajectories ros;
-  auto& [joint_traj, multi_dof_traj] = ros;
+  RosTrajectories ros_trajectories;
+  auto& [joint_traj, multi_dof_traj] = ros_trajectories;
   joint_traj.points.resize(roboplan_trajectory.times.size());
   multi_dof_traj.points.resize(roboplan_trajectory.times.size());
   for (size_t i = 0; i < roboplan_trajectory.times.size(); ++i) {
@@ -628,7 +628,7 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
   if (multi_dof_traj.joint_names.empty()) {
     multi_dof_traj.points.clear();
   }
-  return ros;
+  return ros_trajectories;
 }
 
 }  // namespace
@@ -636,21 +636,21 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
 tl::expected<trajectory_msgs::msg::JointTrajectory, std::string>
 toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene) {
-  auto ros = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/false);
-  if (!ros) {
-    return tl::make_unexpected("Failed to convert the trajectory: " + ros.error());
+  auto ros_trajectories = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/false);
+  if (!ros_trajectories) {
+    return tl::make_unexpected("Failed to convert the trajectory: " + ros_trajectories.error());
   }
-  return std::move(ros->first);
+  return std::move(ros_trajectories->first);
 }
 
 tl::expected<RosTrajectories, std::string>
 toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene) {
-  auto ros = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/true);
-  if (!ros) {
-    return tl::make_unexpected("Failed to convert the trajectory: " + ros.error());
+  auto ros_trajectories = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/true);
+  if (!ros_trajectories) {
+    return tl::make_unexpected("Failed to convert the trajectory: " + ros_trajectories.error());
   }
-  return ros;
+  return ros_trajectories;
 }
 
 tl::expected<roboplan::JointTrajectory, std::string>
