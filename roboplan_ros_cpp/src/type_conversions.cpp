@@ -31,9 +31,8 @@ tl::expected<void, std::string> checkPointSize(size_t i, const std::string& what
   if (size == expected || (optional && size == 0)) {
     return {};
   }
-  return tl::make_unexpected("Failed to convert the trajectory: Point " + std::to_string(i) +
-                             " has " + std::to_string(size) + " " + what + ", expected " +
-                             std::to_string(expected));
+  return tl::make_unexpected("Point " + std::to_string(i) + " has " + std::to_string(size) + " " +
+                             what + ", expected " + std::to_string(expected));
 }
 
 /// @brief Checks the joints and the point sizes of a RoboPlan trajectory.
@@ -45,7 +44,7 @@ tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTra
   for (const auto& joint_name : trajectory.joint_names) {
     const auto joint_info = scene.getJointInfo(joint_name);
     if (!joint_info) {
-      return tl::make_unexpected("Failed to convert the trajectory: " + joint_info.error());
+      return tl::make_unexpected(joint_info.error());
     }
     if (!joint_info->mimic_info) {
       nq += joint_info->num_position_dofs;
@@ -56,9 +55,8 @@ tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTra
   const auto check_field = [&](const std::string& what, const std::vector<Eigen::VectorXd>& values,
                                size_t expected) -> tl::expected<void, std::string> {
     if (!values.empty() && values.size() != trajectory.times.size()) {
-      return tl::make_unexpected("Failed to convert the trajectory: It has " +
-                                 std::to_string(trajectory.times.size()) + " times but " +
-                                 std::to_string(values.size()) + " " + what +
+      return tl::make_unexpected("It has " + std::to_string(trajectory.times.size()) +
+                                 " times but " + std::to_string(values.size()) + " " + what +
                                  ", expected one per time or none");
     }
     for (size_t i = 0; i < values.size(); ++i) {
@@ -121,10 +119,6 @@ tl::expected<roboplan::JointTrajectory, std::string>
 fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                 const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
                 const roboplan::Scene& scene) {
-  const auto error = [](const std::string& message) {
-    return tl::make_unexpected("Failed to convert the trajectory: " + message);
-  };
-
   // Records a joint whose message was checked, and counts its RoboPlan positions and velocities.
   roboplan::JointTrajectory joint_traj;
   size_t nq = 0;
@@ -134,7 +128,7 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
       [&](const std::string& joint_name,
           const roboplan::JointInfo& joint_info) -> tl::expected<void, std::string> {
     if (!seen.insert(joint_name).second) {
-      return error("Joint '" + joint_name + "' appears twice");
+      return tl::make_unexpected("Joint '" + joint_name + "' appears twice");
     }
     if (!joint_info.mimic_info) {
       nq += joint_info.num_position_dofs;
@@ -146,12 +140,13 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
   for (const auto& joint_name : ros_trajectory.joint_names) {
     const auto joint_info = scene.getJointInfo(joint_name);
     if (!joint_info) {
-      return error(joint_info.error());
+      return tl::make_unexpected(joint_info.error());
     }
     if (isMultiDof(*joint_info)) {
-      return error("Joint '" + joint_name +
-                   "' has several degrees of freedom: a JointTrajectory cannot represent it, "
-                   "use fromRosTrajectories");
+      return tl::make_unexpected(
+          "Joint '" + joint_name +
+          "' has several degrees of freedom: a JointTrajectory cannot represent it, "
+          "use fromRosTrajectories");
     }
     if (auto ok = add_joint(joint_name, *joint_info); !ok) {
       return tl::make_unexpected(ok.error());
@@ -160,11 +155,12 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
   for (const auto& joint_name : multi_dof_trajectory.joint_names) {
     const auto joint_info = scene.getJointInfo(joint_name);
     if (!joint_info) {
-      return error(joint_info.error());
+      return tl::make_unexpected(joint_info.error());
     }
     if (!isMultiDof(*joint_info)) {
-      return error("Joint '" + joint_name +
-                   "' has a single degree of freedom: it belongs in the JointTrajectory");
+      return tl::make_unexpected(
+          "Joint '" + joint_name +
+          "' has a single degree of freedom: it belongs in the JointTrajectory");
     }
     if (auto ok = add_joint(joint_name, *joint_info); !ok) {
       return tl::make_unexpected(ok.error());
@@ -177,9 +173,9 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
   const auto num_points =
       use_single ? ros_trajectory.points.size() : multi_dof_trajectory.points.size();
   if (use_single && use_multi_dof && multi_dof_trajectory.points.size() != num_points) {
-    return error("The JointTrajectory has " + std::to_string(num_points) +
-                 " points, the MultiDOFJointTrajectory " +
-                 std::to_string(multi_dof_trajectory.points.size()));
+    return tl::make_unexpected("The JointTrajectory has " + std::to_string(num_points) +
+                               " points, the MultiDOFJointTrajectory " +
+                               std::to_string(multi_dof_trajectory.points.size()));
   }
 
   const auto num_single = ros_trajectory.joint_names.size();
@@ -194,8 +190,9 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     const auto* point = use_single ? &ros_trajectory.points[i] : nullptr;
     const auto* multi_dof_point = use_multi_dof ? &multi_dof_trajectory.points[i] : nullptr;
     if (point && multi_dof_point && point->time_from_start != multi_dof_point->time_from_start) {
-      return error("Point " + std::to_string(i) +
-                   " has different times in the JointTrajectory and the MultiDOFJointTrajectory");
+      return tl::make_unexpected(
+          "Point " + std::to_string(i) +
+          " has different times in the JointTrajectory and the MultiDOFJointTrajectory");
     }
     if (point) {
       for (const auto& ok :
@@ -225,7 +222,8 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     const auto all_or_none = [&](bool single_has, bool multi_dof_has,
                                  const std::string& what) -> tl::expected<bool, std::string> {
       if (point && multi_dof_point && single_has != multi_dof_has) {
-        return error("Point " + std::to_string(i) + " has " + what + " for some joints only");
+        return tl::make_unexpected("Point " + std::to_string(i) + " has " + what +
+                                   " for some joints only");
       }
       return point ? single_has : multi_dof_has;
     };
@@ -290,15 +288,15 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
         const auto& transform = multi_dof_point->transforms[j];
         const auto rotation = normalizedRotation(transform.rotation);
         if (!rotation) {
-          return error("Point " + std::to_string(i) + " has a zero quaternion for joint '" +
-                       joint_name + "'");
+          return tl::make_unexpected("Point " + std::to_string(i) +
+                                     " has a zero quaternion for joint '" + joint_name + "'");
         }
         // Keep only the rotation about z.
         const Eigen::Matrix3d matrix = rotation->toRotationMatrix();
         const double norm = std::hypot(matrix(0, 0), matrix(1, 0));
         if (norm < kMinPlanarAxisNorm) {
-          return error("Point " + std::to_string(i) + " has no rotation about z for joint '" +
-                       joint_name + "'");
+          return tl::make_unexpected("Point " + std::to_string(i) +
+                                     " has no rotation about z for joint '" + joint_name + "'");
         }
         positions.segment<4>(q_idx) << transform.translation.x, transform.translation.y,
             matrix(0, 0) / norm, matrix(1, 0) / norm;
@@ -316,8 +314,8 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
         const auto& transform = multi_dof_point->transforms[j];
         const auto rotation = normalizedRotation(transform.rotation);
         if (!rotation) {
-          return error("Point " + std::to_string(i) + " has a zero quaternion for joint '" +
-                       joint_name + "'");
+          return tl::make_unexpected("Point " + std::to_string(i) +
+                                     " has a zero quaternion for joint '" + joint_name + "'");
         }
         positions.segment<7>(q_idx) << transform.translation.x, transform.translation.y,
             transform.translation.z, rotation->x(), rotation->y(), rotation->z(), rotation->w();
@@ -333,7 +331,7 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
         break;
       }
       default:
-        return error("Joint '" + joint_name + "' has an unknown type");
+        return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
       }
     }
     q_idx += joint_info.num_position_dofs;
@@ -518,7 +516,7 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
       continue;
     }
     if (isMultiDof(joint_info) && !allow_multi_dof) {
-      return tl::make_unexpected("Failed to convert the trajectory: Joint '" + joint_name +
+      return tl::make_unexpected("Joint '" + joint_name +
                                  "' has several degrees of freedom: a JointTrajectory cannot "
                                  "represent it, use toRosTrajectories");
     }
@@ -612,8 +610,7 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
       break;
     }
     default:
-      return tl::make_unexpected("Failed to convert the trajectory: Joint '" + joint_name +
-                                 "' has an unknown type");
+      return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
     }
     q_idx += joint_info.num_position_dofs;
     v_idx += joint_info.num_velocity_dofs;
@@ -636,7 +633,7 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene) {
   auto ros = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/false);
   if (!ros) {
-    return tl::make_unexpected(ros.error());
+    return tl::make_unexpected("Failed to convert the trajectory: " + ros.error());
   }
   return std::move(ros->first);
 }
@@ -644,20 +641,33 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
 tl::expected<RosTrajectories, std::string>
 toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene) {
-  return toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/true);
+  auto ros = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/true);
+  if (!ros) {
+    return tl::make_unexpected("Failed to convert the trajectory: " + ros.error());
+  }
+  return ros;
 }
 
 tl::expected<roboplan::JointTrajectory, std::string>
 fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const roboplan::Scene& scene) {
-  return fromRosMessages(ros_trajectory, trajectory_msgs::msg::MultiDOFJointTrajectory(), scene);
+  auto joint_traj =
+      fromRosMessages(ros_trajectory, trajectory_msgs::msg::MultiDOFJointTrajectory(), scene);
+  if (!joint_traj) {
+    return tl::make_unexpected("Failed to convert the trajectory: " + joint_traj.error());
+  }
+  return joint_traj;
 }
 
 tl::expected<roboplan::JointTrajectory, std::string>
 fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
                     const roboplan::Scene& scene) {
-  return fromRosMessages(ros_trajectory, multi_dof_trajectory, scene);
+  auto joint_traj = fromRosMessages(ros_trajectory, multi_dof_trajectory, scene);
+  if (!joint_traj) {
+    return tl::make_unexpected("Failed to convert the trajectory: " + joint_traj.error());
+  }
+  return joint_traj;
 }
 
 geometry_msgs::msg::TransformStamped
