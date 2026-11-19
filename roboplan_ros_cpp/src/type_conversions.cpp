@@ -169,12 +169,14 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     }
   }
 
-  // A message without joints only matters if the other has none either.
-  const bool use_multi_dof = !multi_dof_trajectory.joint_names.empty();
-  const bool use_single = !ros_trajectory.joint_names.empty() || !use_multi_dof;
-  const auto num_points =
-      use_single ? ros_trajectory.points.size() : multi_dof_trajectory.points.size();
-  if (use_single && use_multi_dof && multi_dof_trajectory.points.size() != num_points) {
+  // A message without joints is ignored; without joints at all, the trajectory has no points.
+  const bool has_single_dof_joints = !ros_trajectory.joint_names.empty();
+  const bool has_multi_dof_joints = !multi_dof_trajectory.joint_names.empty();
+  const auto num_points = has_single_dof_joints  ? ros_trajectory.points.size()
+                          : has_multi_dof_joints ? multi_dof_trajectory.points.size()
+                                                 : 0;
+  if (has_single_dof_joints && has_multi_dof_joints &&
+      multi_dof_trajectory.points.size() != num_points) {
     return tl::make_unexpected("The JointTrajectory has " + std::to_string(num_points) +
                                " points, the MultiDOFJointTrajectory " +
                                std::to_string(multi_dof_trajectory.points.size()));
@@ -189,8 +191,8 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
   joint_traj.accelerations.reserve(num_points);
 
   for (size_t i = 0; i < num_points; ++i) {
-    const auto* point = use_single ? &ros_trajectory.points[i] : nullptr;
-    const auto* multi_dof_point = use_multi_dof ? &multi_dof_trajectory.points[i] : nullptr;
+    const auto* point = has_single_dof_joints ? &ros_trajectory.points[i] : nullptr;
+    const auto* multi_dof_point = has_multi_dof_joints ? &multi_dof_trajectory.points[i] : nullptr;
     if (point && multi_dof_point && point->time_from_start != multi_dof_point->time_from_start) {
       return tl::make_unexpected(
           "Point " + std::to_string(i) +
@@ -260,8 +262,9 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
       return {};
     }
     for (size_t i = 0; i < num_points; ++i) {
-      const auto* point = use_single ? &ros_trajectory.points[i] : nullptr;
-      const auto* multi_dof_point = use_multi_dof ? &multi_dof_trajectory.points[i] : nullptr;
+      const auto* point = has_single_dof_joints ? &ros_trajectory.points[i] : nullptr;
+      const auto* multi_dof_point =
+          has_multi_dof_joints ? &multi_dof_trajectory.points[i] : nullptr;
       auto& positions = joint_traj.positions[i];
       auto& velocities = joint_traj.velocities[i];
       auto& accelerations = joint_traj.accelerations[i];
