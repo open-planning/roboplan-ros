@@ -24,7 +24,7 @@ def toRosTrajectories(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> 
 
 def fromJointTrajectory(py_ros_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
     """
-    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous joints become [cos, sin] positions, and the values of mimic joints are ignored. Planar and floating joints are an error: use fromRosTrajectories for them.
+    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous joints become [cos, sin] positions, and mimic joints are left out. Planar and floating joints are an error: use fromRosTrajectories for them.
     """
 
 def fromRosTrajectories(py_ros_traj: object, py_multi_dof_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":

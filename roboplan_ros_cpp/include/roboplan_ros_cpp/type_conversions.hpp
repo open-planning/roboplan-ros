@@ -125,7 +125,7 @@ toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene);
 
 /// @brief Converts a ROS 2 JointTrajectory message to a roboplan::JointTrajectory.
-/// @details The values of mimic joints are ignored. Planar and floating joints are an error: use
+/// @details Mimic joints are left out. Planar and floating joints are an error: use
 /// fromRosTrajectories for them.
 /// @param ros_trajectory The ROS 2 JointTrajectory message to convert.
 /// @param scene The RoboPlan scene containing the model's joint information.

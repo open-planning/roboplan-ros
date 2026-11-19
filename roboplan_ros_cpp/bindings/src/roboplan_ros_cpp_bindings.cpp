@@ -73,7 +73,7 @@ NB_MODULE(_cpp_ext, m) {
       },
       "py_ros_traj"_a, "py_scene"_a,
       "Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous "
-      "joints become [cos, sin] positions, and the values of mimic joints are ignored. Planar and "
+      "joints become [cos, sin] positions, and mimic joints are left out. Planar and "
       "floating joints are an error: use fromRosTrajectories for them.");
 
   m.def(

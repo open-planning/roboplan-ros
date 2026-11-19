@@ -130,10 +130,12 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     if (!seen.insert(joint_name).second) {
       return tl::make_unexpected("Joint '" + joint_name + "' appears twice");
     }
-    if (!joint_info.mimic_info) {
-      nq += joint_info.num_position_dofs;
-      nv += joint_info.num_velocity_dofs;
+    if (joint_info.mimic_info) {
+      // Mimic joints are left out: RoboPlan derives them from the joints they mimic.
+      return {};
     }
+    nq += joint_info.num_position_dofs;
+    nv += joint_info.num_velocity_dofs;
     joint_traj.joint_names.push_back(joint_name);
     return {};
   };

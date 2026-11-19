@@ -195,14 +195,14 @@ TEST_F(TypeConversionsTest, TestConvertJointTrajectoryWithMimicJoint) {
   EXPECT_EQ(ros_traj->joint_names, std::vector<std::string>{"revolute_joint"});
   EXPECT_EQ(ros_traj->points[0].positions, std::vector<double>{0.3});
 
-  // From ROS, the mimic joint's value is ignored.
+  // From ROS, the mimic joint is left out too.
   trajectory_msgs::msg::JointTrajectory msg;
   msg.joint_names = {"revolute_joint", "mimic_joint"};
   msg.points.resize(1);
   msg.points[0].positions = {0.3, 99.0};
   const auto from_ros = fromJointTrajectory(msg, scene);
   ASSERT_TRUE(from_ros.has_value()) << from_ros.error();
-  EXPECT_EQ(from_ros->joint_names, msg.joint_names);
+  EXPECT_EQ(from_ros->joint_names, std::vector<std::string>{"revolute_joint"});
   EXPECT_TRUE(from_ros->positions[0].isApprox(Eigen::VectorXd::Constant(1, 0.3)));
   EXPECT_EQ(from_ros->velocities[0].size(), 0);
 }
