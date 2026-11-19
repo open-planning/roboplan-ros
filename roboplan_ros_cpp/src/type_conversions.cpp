@@ -13,10 +13,9 @@ namespace roboplan_ros_cpp {
 
 namespace {
 
-/// @brief Whether a joint goes in a MultiDOFJointTrajectory.
+/// @brief Whether a joint has several degrees of freedom: planar and floating joints.
 bool isMultiDof(const roboplan::JointInfo& info) {
-  return !info.mimic_info &&
-         (info.type == roboplan::JointType::PLANAR || info.type == roboplan::JointType::FLOATING);
+  return info.type == roboplan::JointType::PLANAR || info.type == roboplan::JointType::FLOATING;
 }
 
 /// @brief The numbers of positions and velocities some joints take in RoboPlan (none for mimic
