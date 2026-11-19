@@ -13,6 +13,13 @@ namespace roboplan_ros_cpp {
 
 namespace {
 
+/// @brief Below this norm, a quaternion is taken to be zero, which is no rotation.
+constexpr double kMinQuaternionNorm = 1e-9;
+
+/// @brief Below this norm, the x axis of a planar joint's rotation is taken to have no component
+/// in the xy plane, so the rotation has no angle about z.
+constexpr double kMinPlanarAxisNorm = 1e-9;
+
 /// @brief Whether a joint has several degrees of freedom: planar and floating joints.
 bool isMultiDof(const roboplan::JointInfo& info) {
   return info.type == roboplan::JointType::PLANAR || info.type == roboplan::JointType::FLOATING;
@@ -96,7 +103,7 @@ geometry_msgs::msg::Twist planarTwist(const Eigen::VectorXd& values, size_t v_id
 std::optional<Eigen::Quaterniond> normalizedRotation(const geometry_msgs::msg::Quaternion& msg) {
   Eigen::Quaterniond rotation;
   tf2::fromMsg(msg, rotation);
-  if (rotation.norm() < 1e-9) {
+  if (rotation.norm() < kMinQuaternionNorm) {
     return std::nullopt;
   }
   return rotation.normalized();
@@ -279,7 +286,7 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
           // Keep only the rotation about z.
           const Eigen::Matrix3d matrix = rotation->toRotationMatrix();
           const double norm = std::hypot(matrix(0, 0), matrix(1, 0));
-          if (norm < 1e-9) {
+          if (norm < kMinPlanarAxisNorm) {
             return error("Point " + std::to_string(i) + " has no rotation about z for joint '" +
                          names[j] + "'");
           }
