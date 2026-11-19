@@ -18,25 +18,6 @@ bool isMultiDof(const roboplan::JointInfo& info) {
   return info.type == roboplan::JointType::PLANAR || info.type == roboplan::JointType::FLOATING;
 }
 
-/// @brief The numbers of positions and velocities some joints take in RoboPlan (none for mimic
-/// joints).
-tl::expected<std::pair<size_t, size_t>, std::string>
-trajectoryDofs(const roboplan::Scene& scene, const std::vector<std::string>& joint_names) {
-  size_t nq = 0;
-  size_t nv = 0;
-  for (const auto& joint_name : joint_names) {
-    const auto joint_info = scene.getJointInfo(joint_name);
-    if (!joint_info) {
-      return tl::make_unexpected("Failed to convert the trajectory: " + joint_info.error());
-    }
-    if (!joint_info->mimic_info) {
-      nq += joint_info->num_position_dofs;
-      nv += joint_info->num_velocity_dofs;
-    }
-  }
-  return std::make_pair(nq, nv);
-}
-
 /// @brief Checks that point i has `expected` values for a field, or none if it is optional.
 tl::expected<void, std::string> checkPointSize(size_t i, const std::string& what, size_t size,
                                                size_t expected, bool optional) {
@@ -51,11 +32,19 @@ tl::expected<void, std::string> checkPointSize(size_t i, const std::string& what
 /// @brief Checks the joints and the point sizes of a RoboPlan trajectory.
 tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTrajectory& trajectory,
                                                         const roboplan::Scene& scene) {
-  const auto dofs = trajectoryDofs(scene, trajectory.joint_names);
-  if (!dofs) {
-    return tl::make_unexpected(dofs.error());
+  // The numbers of positions and velocities of the joints; mimic joints have none.
+  size_t nq = 0;
+  size_t nv = 0;
+  for (const auto& joint_name : trajectory.joint_names) {
+    const auto joint_info = scene.getJointInfo(joint_name);
+    if (!joint_info) {
+      return tl::make_unexpected("Failed to convert the trajectory: " + joint_info.error());
+    }
+    if (!joint_info->mimic_info) {
+      nq += joint_info->num_position_dofs;
+      nv += joint_info->num_velocity_dofs;
+    }
   }
-  const auto [nq, nv] = dofs.value();
   for (size_t i = 0; i < trajectory.times.size(); ++i) {
     if (i < trajectory.positions.size()) {
       if (auto ok = checkPointSize(i, "positions", trajectory.positions[i].size(), nq, false);
