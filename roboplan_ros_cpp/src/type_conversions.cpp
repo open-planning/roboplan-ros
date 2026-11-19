@@ -22,6 +22,9 @@ constexpr double kMinQuaternionNorm = 1e-9;
 /// in the xy plane, so the rotation has no angle about z.
 constexpr double kMinPlanarAxisNorm = 1e-9;
 
+/// @brief The start of the errors of the trajectory conversions.
+const std::string kConversionFailed = "Failed to convert the trajectory: ";
+
 /// @brief Whether a joint has several degrees of freedom: planar and floating joints.
 bool isMultiDof(const roboplan::JointInfo& info) {
   return info.type == JointType::PLANAR || info.type == JointType::FLOATING;
@@ -54,27 +57,40 @@ tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTra
     }
   }
   // Positions, velocities and accelerations each have no values, or one per time.
-  const auto check_field = [&](const std::string& what, const std::vector<Eigen::VectorXd>& values,
-                               size_t expected) -> tl::expected<void, std::string> {
-    if (!values.empty() && values.size() != trajectory.times.size()) {
-      return tl::make_unexpected("It has " + std::to_string(trajectory.times.size()) +
-                                 " times but " + std::to_string(values.size()) + " " + what +
-                                 ", expected one per time or none");
-    }
-    for (size_t i = 0; i < values.size(); ++i) {
-      if (auto ok = checkPointSize(i, what, values[i].size(), expected, false); !ok) {
-        return ok;
-      }
-    }
-    return {};
-  };
-  if (auto ok = check_field("positions", trajectory.positions, nq); !ok) {
-    return ok;
+  const auto num_times = trajectory.times.size();
+  if (!trajectory.positions.empty() && trajectory.positions.size() != num_times) {
+    return tl::make_unexpected("It has " + std::to_string(num_times) + " times but " +
+                               std::to_string(trajectory.positions.size()) +
+                               " positions, expected one per time or none");
   }
-  if (auto ok = check_field("velocities", trajectory.velocities, nv); !ok) {
-    return ok;
+  if (!trajectory.velocities.empty() && trajectory.velocities.size() != num_times) {
+    return tl::make_unexpected("It has " + std::to_string(num_times) + " times but " +
+                               std::to_string(trajectory.velocities.size()) +
+                               " velocities, expected one per time or none");
   }
-  return check_field("accelerations", trajectory.accelerations, nv);
+  if (!trajectory.accelerations.empty() && trajectory.accelerations.size() != num_times) {
+    return tl::make_unexpected("It has " + std::to_string(num_times) + " times but " +
+                               std::to_string(trajectory.accelerations.size()) +
+                               " accelerations, expected one per time or none");
+  }
+  for (size_t i = 0; i < trajectory.positions.size(); ++i) {
+    if (auto ok = checkPointSize(i, "positions", trajectory.positions[i].size(), nq, false); !ok) {
+      return ok;
+    }
+  }
+  for (size_t i = 0; i < trajectory.velocities.size(); ++i) {
+    if (auto ok = checkPointSize(i, "velocities", trajectory.velocities[i].size(), nv, false);
+        !ok) {
+      return ok;
+    }
+  }
+  for (size_t i = 0; i < trajectory.accelerations.size(); ++i) {
+    if (auto ok = checkPointSize(i, "accelerations", trajectory.accelerations[i].size(), nv, false);
+        !ok) {
+      return ok;
+    }
+  }
+  return {};
 }
 
 /// @brief Returns angle plus the multiple of 2 pi that brings it closest to previous, if any.
@@ -116,31 +132,29 @@ geometry_msgs::msg::Quaternion continuousQuaternion(Eigen::Quaterniond rotation,
   return tf2::toMsg(rotation);
 }
 
-/// @brief The shared implementation of fromJointTrajectory and fromRosTrajectories.
-tl::expected<roboplan::JointTrajectory, std::string>
-fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
-                const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
-                const roboplan::Scene& scene) {
-  // Records a joint whose message was checked, and counts its RoboPlan positions and velocities.
-  roboplan::JointTrajectory joint_traj;
+/// @brief Appends the joints of a JointTrajectory to trajectory, after the joints it already has.
+/// Planar and floating joints are an error. If trajectory has no times yet, they are the
+/// message's. A message without joints adds nothing.
+tl::expected<void, std::string>
+appendJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
+                      const roboplan::Scene& scene, roboplan::JointTrajectory& trajectory) {
+  if (ros_trajectory.joint_names.empty()) {
+    return {};
+  }
+
+  // Check the joints, and count the RoboPlan positions and velocities of these and of the joints
+  // already in trajectory, whose values come first.
+  size_t q_start = 0;
+  size_t v_start = 0;
+  std::unordered_set<std::string> seen;
+  for (const auto& joint_name : trajectory.joint_names) {
+    const auto joint_info = scene.getJointInfo(joint_name).value();
+    q_start += joint_info.num_position_dofs;
+    v_start += joint_info.num_velocity_dofs;
+    seen.insert(joint_name);
+  }
   size_t nq = 0;
   size_t nv = 0;
-  std::unordered_set<std::string> seen;
-  const auto add_joint =
-      [&](const std::string& joint_name,
-          const roboplan::JointInfo& joint_info) -> tl::expected<void, std::string> {
-    if (!seen.insert(joint_name).second) {
-      return tl::make_unexpected("Joint '" + joint_name + "' appears twice");
-    }
-    if (joint_info.mimic_info) {
-      // Mimic joints are left out: RoboPlan derives them from the joints they mimic.
-      return {};
-    }
-    nq += joint_info.num_position_dofs;
-    nv += joint_info.num_velocity_dofs;
-    joint_traj.joint_names.push_back(joint_name);
-    return {};
-  };
   for (const auto& joint_name : ros_trajectory.joint_names) {
     const auto joint_info = scene.getJointInfo(joint_name);
     if (!joint_info) {
@@ -152,11 +166,119 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
           "' has several degrees of freedom: a JointTrajectory cannot represent it, "
           "use fromRosTrajectories");
     }
-    if (auto ok = add_joint(joint_name, *joint_info); !ok) {
-      return tl::make_unexpected(ok.error());
+    if (!seen.insert(joint_name).second) {
+      return tl::make_unexpected("Joint '" + joint_name + "' appears twice");
+    }
+    if (!joint_info->mimic_info) {
+      nq += joint_info->num_position_dofs;
+      nv += joint_info->num_velocity_dofs;
     }
   }
-  for (const auto& joint_name : multi_dof_trajectory.joint_names) {
+
+  const auto num_joints = ros_trajectory.joint_names.size();
+  const auto num_points = ros_trajectory.points.size();
+  for (size_t i = 0; i < num_points; ++i) {
+    const auto& point = ros_trajectory.points[i];
+    for (const auto& ok :
+         {checkPointSize(i, "positions", point.positions.size(), num_joints, false),
+          checkPointSize(i, "velocities", point.velocities.size(), num_joints, true),
+          checkPointSize(i, "accelerations", point.accelerations.size(), num_joints, true)}) {
+      if (!ok) {
+        return tl::make_unexpected(ok.error());
+      }
+    }
+  }
+
+  // Make room for the values.
+  if (trajectory.times.empty()) {
+    for (const auto& point : ros_trajectory.points) {
+      trajectory.times.push_back(fromDuration(point.time_from_start));
+    }
+    trajectory.positions.resize(num_points);
+    trajectory.velocities.resize(num_points);
+    trajectory.accelerations.resize(num_points);
+  }
+  for (size_t i = 0; i < num_points; ++i) {
+    const auto& point = ros_trajectory.points[i];
+    trajectory.positions[i].conservativeResize(q_start + nq);
+    if (!point.velocities.empty()) {
+      trajectory.velocities[i].conservativeResize(v_start + nv);
+    }
+    if (!point.accelerations.empty()) {
+      trajectory.accelerations[i].conservativeResize(v_start + nv);
+    }
+  }
+
+  size_t q_idx = q_start;
+  size_t v_idx = v_start;
+  for (size_t j = 0; j < num_joints; ++j) {
+    const auto& joint_name = ros_trajectory.joint_names[j];
+    const auto joint_info = scene.getJointInfo(joint_name).value();
+    if (joint_info.mimic_info) {
+      // Mimic joints are left out: RoboPlan derives them from the joints they mimic.
+      continue;
+    }
+    trajectory.joint_names.push_back(joint_name);
+    for (size_t i = 0; i < num_points; ++i) {
+      const auto& point = ros_trajectory.points[i];
+      auto& positions = trajectory.positions[i];
+      auto& velocities = trajectory.velocities[i];
+      auto& accelerations = trajectory.accelerations[i];
+      switch (joint_info.type) {
+      case JointType::REVOLUTE:
+      case JointType::PRISMATIC:
+        positions(q_idx) = point.positions[j];
+        if (!point.velocities.empty()) {
+          velocities(v_idx) = point.velocities[j];
+        }
+        if (!point.accelerations.empty()) {
+          accelerations(v_idx) = point.accelerations[j];
+        }
+        break;
+      case JointType::CONTINUOUS:
+        positions(q_idx) = std::cos(point.positions[j]);
+        positions(q_idx + 1) = std::sin(point.positions[j]);
+        if (!point.velocities.empty()) {
+          velocities(v_idx) = point.velocities[j];
+        }
+        if (!point.accelerations.empty()) {
+          accelerations(v_idx) = point.accelerations[j];
+        }
+        break;
+      default:
+        return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
+      }
+    }
+    q_idx += joint_info.num_position_dofs;
+    v_idx += joint_info.num_velocity_dofs;
+  }
+  return {};
+}
+
+/// @brief Appends the joints of a MultiDOFJointTrajectory to trajectory, after the joints it
+/// already has. Joints other than planar and floating ones are an error. If trajectory has no
+/// times yet, they are the message's. A message without joints adds nothing.
+tl::expected<void, std::string>
+appendMultiDOFJointTrajectory(const trajectory_msgs::msg::MultiDOFJointTrajectory& ros_trajectory,
+                              const roboplan::Scene& scene, roboplan::JointTrajectory& trajectory) {
+  if (ros_trajectory.joint_names.empty()) {
+    return {};
+  }
+
+  // Check the joints, and count the RoboPlan positions and velocities of these and of the joints
+  // already in trajectory, whose values come first.
+  size_t q_start = 0;
+  size_t v_start = 0;
+  std::unordered_set<std::string> seen;
+  for (const auto& joint_name : trajectory.joint_names) {
+    const auto joint_info = scene.getJointInfo(joint_name).value();
+    q_start += joint_info.num_position_dofs;
+    v_start += joint_info.num_velocity_dofs;
+    seen.insert(joint_name);
+  }
+  size_t nq = 0;
+  size_t nv = 0;
+  for (const auto& joint_name : ros_trajectory.joint_names) {
     const auto joint_info = scene.getJointInfo(joint_name);
     if (!joint_info) {
       return tl::make_unexpected(joint_info.error());
@@ -166,135 +288,66 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
           "Joint '" + joint_name +
           "' has a single degree of freedom: it belongs in the JointTrajectory");
     }
-    if (auto ok = add_joint(joint_name, *joint_info); !ok) {
-      return tl::make_unexpected(ok.error());
+    if (!seen.insert(joint_name).second) {
+      return tl::make_unexpected("Joint '" + joint_name + "' appears twice");
     }
+    nq += joint_info->num_position_dofs;
+    nv += joint_info->num_velocity_dofs;
   }
 
-  // A message without joints is ignored; without joints at all, the trajectory has no points.
-  const bool has_single_dof_joints = !ros_trajectory.joint_names.empty();
-  const bool has_multi_dof_joints = !multi_dof_trajectory.joint_names.empty();
-  const auto num_points = has_single_dof_joints  ? ros_trajectory.points.size()
-                          : has_multi_dof_joints ? multi_dof_trajectory.points.size()
-                                                 : 0;
-  if (has_single_dof_joints && has_multi_dof_joints &&
-      multi_dof_trajectory.points.size() != num_points) {
-    return tl::make_unexpected("The JointTrajectory has " + std::to_string(num_points) +
-                               " points, the MultiDOFJointTrajectory " +
-                               std::to_string(multi_dof_trajectory.points.size()));
-  }
-
-  const auto num_single_dof_joints = ros_trajectory.joint_names.size();
-  const auto num_multi_dof_joints = multi_dof_trajectory.joint_names.size();
-
-  joint_traj.times.reserve(num_points);
-  joint_traj.positions.reserve(num_points);
-  joint_traj.velocities.reserve(num_points);
-  joint_traj.accelerations.reserve(num_points);
-
+  const auto num_joints = ros_trajectory.joint_names.size();
+  const auto num_points = ros_trajectory.points.size();
   for (size_t i = 0; i < num_points; ++i) {
-    // Both messages must have the same time, and velocities and accelerations for all the joints
-    // or for none.
-    std::optional<builtin_interfaces::msg::Duration> time;
-    std::optional<bool> has_velocities;
-    std::optional<bool> has_accelerations;
-    if (has_single_dof_joints) {
-      const auto& point = ros_trajectory.points[i];
-      for (const auto& ok :
-           {checkPointSize(i, "positions", point.positions.size(), num_single_dof_joints, false),
-            checkPointSize(i, "velocities", point.velocities.size(), num_single_dof_joints, true),
-            checkPointSize(i, "accelerations", point.accelerations.size(), num_single_dof_joints,
-                           true)}) {
-        if (!ok) {
-          return tl::make_unexpected(ok.error());
-        }
+    const auto& point = ros_trajectory.points[i];
+    for (const auto& ok :
+         {checkPointSize(i, "transforms", point.transforms.size(), num_joints, false),
+          checkPointSize(i, "velocity twists", point.velocities.size(), num_joints, true),
+          checkPointSize(i, "acceleration twists", point.accelerations.size(), num_joints, true)}) {
+      if (!ok) {
+        return tl::make_unexpected(ok.error());
       }
-      time = point.time_from_start;
-      has_velocities = !point.velocities.empty();
-      has_accelerations = !point.accelerations.empty();
     }
-    if (has_multi_dof_joints) {
-      const auto& point = multi_dof_trajectory.points[i];
-      if (time && *time != point.time_from_start) {
-        return tl::make_unexpected(
-            "Point " + std::to_string(i) +
-            " has different times in the JointTrajectory and the MultiDOFJointTrajectory");
-      }
-      for (const auto& ok :
-           {checkPointSize(i, "transforms", point.transforms.size(), num_multi_dof_joints, false),
-            checkPointSize(i, "velocity twists", point.velocities.size(), num_multi_dof_joints,
-                           true),
-            checkPointSize(i, "acceleration twists", point.accelerations.size(),
-                           num_multi_dof_joints, true)}) {
-        if (!ok) {
-          return tl::make_unexpected(ok.error());
-        }
-      }
-      if (has_velocities && *has_velocities == point.velocities.empty()) {
-        return tl::make_unexpected("Point " + std::to_string(i) +
-                                   " has velocities for some joints only");
-      }
-      if (has_accelerations && *has_accelerations == point.accelerations.empty()) {
-        return tl::make_unexpected("Point " + std::to_string(i) +
-                                   " has accelerations for some joints only");
-      }
-      time = point.time_from_start;
-      has_velocities = !point.velocities.empty();
-      has_accelerations = !point.accelerations.empty();
-    }
-    joint_traj.times.push_back(fromDuration(*time));
-    joint_traj.positions.emplace_back(nq);
-    joint_traj.velocities.emplace_back(*has_velocities ? nv : 0);
-    joint_traj.accelerations.emplace_back(*has_accelerations ? nv : 0);
   }
 
-  // Fills in the values of joint j of its message, after those of the previous joints.
-  size_t q_idx = 0;
-  size_t v_idx = 0;
-  const auto fill_joint = [&](const std::string& joint_name,
-                              size_t j) -> tl::expected<void, std::string> {
-    const auto joint_info = scene.getJointInfo(joint_name).value();
-    if (joint_info.mimic_info) {
-      // Mimic joints have no values of their own.
-      return {};
+  // Make room for the values.
+  if (trajectory.times.empty()) {
+    for (const auto& point : ros_trajectory.points) {
+      trajectory.times.push_back(fromDuration(point.time_from_start));
     }
+    trajectory.positions.resize(num_points);
+    trajectory.velocities.resize(num_points);
+    trajectory.accelerations.resize(num_points);
+  }
+  for (size_t i = 0; i < num_points; ++i) {
+    const auto& point = ros_trajectory.points[i];
+    trajectory.positions[i].conservativeResize(q_start + nq);
+    if (!point.velocities.empty()) {
+      trajectory.velocities[i].conservativeResize(v_start + nv);
+    }
+    if (!point.accelerations.empty()) {
+      trajectory.accelerations[i].conservativeResize(v_start + nv);
+    }
+  }
+
+  size_t q_idx = q_start;
+  size_t v_idx = v_start;
+  for (size_t j = 0; j < num_joints; ++j) {
+    const auto& joint_name = ros_trajectory.joint_names[j];
+    const auto joint_info = scene.getJointInfo(joint_name).value();
+    trajectory.joint_names.push_back(joint_name);
     for (size_t i = 0; i < num_points; ++i) {
-      auto& positions = joint_traj.positions[i];
-      auto& velocities = joint_traj.velocities[i];
-      auto& accelerations = joint_traj.accelerations[i];
+      const auto& point = ros_trajectory.points[i];
+      const auto& transform = point.transforms[j];
+      auto& positions = trajectory.positions[i];
+      auto& velocities = trajectory.velocities[i];
+      auto& accelerations = trajectory.accelerations[i];
+      const auto rotation = normalizedRotation(transform.rotation);
+      if (!rotation) {
+        return tl::make_unexpected("Point " + std::to_string(i) +
+                                   " has a zero quaternion for joint '" + joint_name + "'");
+      }
       switch (joint_info.type) {
-      case JointType::REVOLUTE:
-      case JointType::PRISMATIC: {
-        const auto& point = ros_trajectory.points[i];
-        positions(q_idx) = point.positions[j];
-        if (velocities.size() > 0) {
-          velocities(v_idx) = point.velocities[j];
-        }
-        if (accelerations.size() > 0) {
-          accelerations(v_idx) = point.accelerations[j];
-        }
-        break;
-      }
-      case JointType::CONTINUOUS: {
-        const auto& point = ros_trajectory.points[i];
-        positions(q_idx) = std::cos(point.positions[j]);
-        positions(q_idx + 1) = std::sin(point.positions[j]);
-        if (velocities.size() > 0) {
-          velocities(v_idx) = point.velocities[j];
-        }
-        if (accelerations.size() > 0) {
-          accelerations(v_idx) = point.accelerations[j];
-        }
-        break;
-      }
       case JointType::PLANAR: {
-        const auto& point = multi_dof_trajectory.points[i];
-        const auto& transform = point.transforms[j];
-        const auto rotation = normalizedRotation(transform.rotation);
-        if (!rotation) {
-          return tl::make_unexpected("Point " + std::to_string(i) +
-                                     " has a zero quaternion for joint '" + joint_name + "'");
-        }
         // Keep only the rotation about z.
         const Eigen::Matrix3d matrix = rotation->toRotationMatrix();
         const double norm = std::hypot(matrix(0, 0), matrix(1, 0));
@@ -304,32 +357,25 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
         }
         positions.segment<4>(q_idx) << transform.translation.x, transform.translation.y,
             matrix(0, 0) / norm, matrix(1, 0) / norm;
-        if (velocities.size() > 0) {
+        if (!point.velocities.empty()) {
           const auto& twist = point.velocities[j];
           velocities.segment<3>(v_idx) << twist.linear.x, twist.linear.y, twist.angular.z;
         }
-        if (accelerations.size() > 0) {
+        if (!point.accelerations.empty()) {
           const auto& twist = point.accelerations[j];
           accelerations.segment<3>(v_idx) << twist.linear.x, twist.linear.y, twist.angular.z;
         }
         break;
       }
       case JointType::FLOATING: {
-        const auto& point = multi_dof_trajectory.points[i];
-        const auto& transform = point.transforms[j];
-        const auto rotation = normalizedRotation(transform.rotation);
-        if (!rotation) {
-          return tl::make_unexpected("Point " + std::to_string(i) +
-                                     " has a zero quaternion for joint '" + joint_name + "'");
-        }
         positions.segment<7>(q_idx) << transform.translation.x, transform.translation.y,
             transform.translation.z, rotation->x(), rotation->y(), rotation->z(), rotation->w();
         Eigen::Matrix<double, 6, 1> twist;
-        if (velocities.size() > 0) {
+        if (!point.velocities.empty()) {
           tf2::fromMsg(point.velocities[j], twist);
           velocities.segment<6>(v_idx) = twist;
         }
-        if (accelerations.size() > 0) {
+        if (!point.accelerations.empty()) {
           tf2::fromMsg(point.accelerations[j], twist);
           accelerations.segment<6>(v_idx) = twist;
         }
@@ -341,19 +387,174 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     }
     q_idx += joint_info.num_position_dofs;
     v_idx += joint_info.num_velocity_dofs;
-    return {};
-  };
-  for (size_t j = 0; j < ros_trajectory.joint_names.size(); ++j) {
-    if (auto ok = fill_joint(ros_trajectory.joint_names[j], j); !ok) {
-      return tl::make_unexpected(ok.error());
-    }
   }
-  for (size_t j = 0; j < multi_dof_trajectory.joint_names.size(); ++j) {
-    if (auto ok = fill_joint(multi_dof_trajectory.joint_names[j], j); !ok) {
-      return tl::make_unexpected(ok.error());
-    }
+  return {};
+}
+
+/// @brief The single degree of freedom joints of a RoboPlan trajectory, checked by
+/// checkRoboPlanTrajectory, as a JointTrajectory. Its other joints are skipped.
+tl::expected<trajectory_msgs::msg::JointTrajectory, std::string>
+toJointTrajectoryMessage(const roboplan::JointTrajectory& trajectory,
+                         const roboplan::Scene& scene) {
+  const auto& positions = trajectory.positions;
+  const auto& velocities = trajectory.velocities;
+  const auto& accelerations = trajectory.accelerations;
+  trajectory_msgs::msg::JointTrajectory ros_trajectory;
+  ros_trajectory.points.resize(trajectory.times.size());
+  for (size_t i = 0; i < trajectory.times.size(); ++i) {
+    ros_trajectory.points[i].time_from_start = toDuration(trajectory.times[i]);
   }
-  return joint_traj;
+
+  // The values of a point, or no values if the trajectory has none of that kind.
+  const Eigen::VectorXd no_values;
+  size_t q_idx = 0;
+  size_t v_idx = 0;
+  for (const auto& joint_name : trajectory.joint_names) {
+    const auto joint_info = scene.getJointInfo(joint_name).value();
+    if (joint_info.mimic_info) {
+      continue;
+    }
+    if (isMultiDof(joint_info)) {
+      q_idx += joint_info.num_position_dofs;
+      v_idx += joint_info.num_velocity_dofs;
+      continue;
+    }
+    ros_trajectory.joint_names.push_back(joint_name);
+    // The previous point's angle, to unwrap continuous joints.
+    std::optional<double> previous_angle;
+    for (size_t i = 0; i < trajectory.times.size(); ++i) {
+      const auto& q = positions.empty() ? no_values : positions[i];
+      const auto& v = velocities.empty() ? no_values : velocities[i];
+      const auto& a = accelerations.empty() ? no_values : accelerations[i];
+      auto& point = ros_trajectory.points[i];
+      switch (joint_info.type) {
+      case JointType::REVOLUTE:
+      case JointType::PRISMATIC:
+        if (!positions.empty()) {
+          point.positions.push_back(q(q_idx));
+        }
+        if (!velocities.empty()) {
+          point.velocities.push_back(v(v_idx));
+        }
+        if (!accelerations.empty()) {
+          point.accelerations.push_back(a(v_idx));
+        }
+        break;
+      case JointType::CONTINUOUS:
+        if (!positions.empty()) {
+          const auto angle = unwrapAngle(std::atan2(q(q_idx + 1), q(q_idx)), previous_angle);
+          previous_angle = angle;
+          point.positions.push_back(angle);
+        }
+        if (!velocities.empty()) {
+          point.velocities.push_back(v(v_idx));
+        }
+        if (!accelerations.empty()) {
+          point.accelerations.push_back(a(v_idx));
+        }
+        break;
+      default:
+        return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
+      }
+    }
+    q_idx += joint_info.num_position_dofs;
+    v_idx += joint_info.num_velocity_dofs;
+  }
+
+  // A message without joints has no points either.
+  if (ros_trajectory.joint_names.empty()) {
+    ros_trajectory.points.clear();
+  }
+  return ros_trajectory;
+}
+
+/// @brief The planar and floating joints of a RoboPlan trajectory, checked by
+/// checkRoboPlanTrajectory, as a MultiDOFJointTrajectory. Its other joints are skipped.
+tl::expected<trajectory_msgs::msg::MultiDOFJointTrajectory, std::string>
+toMultiDOFJointTrajectoryMessage(const roboplan::JointTrajectory& trajectory,
+                                 const roboplan::Scene& scene) {
+  const auto& positions = trajectory.positions;
+  const auto& velocities = trajectory.velocities;
+  const auto& accelerations = trajectory.accelerations;
+  trajectory_msgs::msg::MultiDOFJointTrajectory ros_trajectory;
+  ros_trajectory.points.resize(trajectory.times.size());
+  for (size_t i = 0; i < trajectory.times.size(); ++i) {
+    ros_trajectory.points[i].time_from_start = toDuration(trajectory.times[i]);
+  }
+
+  // The values of a point, or no values if the trajectory has none of that kind.
+  const Eigen::VectorXd no_values;
+  size_t q_idx = 0;
+  size_t v_idx = 0;
+  for (const auto& joint_name : trajectory.joint_names) {
+    const auto joint_info = scene.getJointInfo(joint_name).value();
+    if (joint_info.mimic_info) {
+      continue;
+    }
+    if (!isMultiDof(joint_info)) {
+      q_idx += joint_info.num_position_dofs;
+      v_idx += joint_info.num_velocity_dofs;
+      continue;
+    }
+    ros_trajectory.joint_names.push_back(joint_name);
+    // The previous point's rotation, to keep the quaternion's sign.
+    std::optional<Eigen::Quaterniond> previous_rotation;
+    for (size_t i = 0; i < trajectory.times.size(); ++i) {
+      const auto& q = positions.empty() ? no_values : positions[i];
+      const auto& v = velocities.empty() ? no_values : velocities[i];
+      const auto& a = accelerations.empty() ? no_values : accelerations[i];
+      auto& point = ros_trajectory.points[i];
+      switch (joint_info.type) {
+      case JointType::PLANAR:
+        if (!positions.empty()) {
+          geometry_msgs::msg::Transform transform;
+          transform.translation.x = q(q_idx);
+          transform.translation.y = q(q_idx + 1);
+          const auto angle = std::atan2(q(q_idx + 3), q(q_idx + 2));
+          transform.rotation = continuousQuaternion(
+              Eigen::Quaterniond(Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ())),
+              previous_rotation);
+          point.transforms.push_back(transform);
+        }
+        if (!velocities.empty()) {
+          point.velocities.push_back(planarTwist(v, v_idx));
+        }
+        if (!accelerations.empty()) {
+          point.accelerations.push_back(planarTwist(a, v_idx));
+        }
+        break;
+      case JointType::FLOATING:
+        if (!positions.empty()) {
+          geometry_msgs::msg::Transform transform;
+          transform.translation.x = q(q_idx);
+          transform.translation.y = q(q_idx + 1);
+          transform.translation.z = q(q_idx + 2);
+          transform.rotation = continuousQuaternion(
+              Eigen::Quaterniond(q(q_idx + 6), q(q_idx + 3), q(q_idx + 4), q(q_idx + 5)),
+              previous_rotation);
+          point.transforms.push_back(transform);
+        }
+        if (!velocities.empty()) {
+          point.velocities.push_back(tf2::toMsg(Eigen::Matrix<double, 6, 1>(v.segment<6>(v_idx))));
+        }
+        if (!accelerations.empty()) {
+          point.accelerations.push_back(
+              tf2::toMsg(Eigen::Matrix<double, 6, 1>(a.segment<6>(v_idx))));
+        }
+        break;
+      default:
+        return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
+      }
+    }
+    q_idx += joint_info.num_position_dofs;
+    v_idx += joint_info.num_velocity_dofs;
+  }
+
+  // A message without joints has no points either.
+  if (ros_trajectory.joint_names.empty()) {
+    ros_trajectory.points.clear();
+  }
+  return ros_trajectory;
 }
 
 }  // namespace
@@ -490,186 +691,96 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
   return config;
 }
 
-namespace {
-
-/// @brief The shared implementation of toJointTrajectory and toRosTrajectories. If
-/// allow_multi_dof is false, as for toJointTrajectory, planar and floating joints are an error.
-tl::expected<RosTrajectories, std::string>
-toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const roboplan::Scene& scene,
-              bool allow_multi_dof) {
-  if (auto ok = checkRoboPlanTrajectory(roboplan_trajectory, scene); !ok) {
-    return tl::make_unexpected(ok.error());
-  }
-  // checkRoboPlanTrajectory made sure each of these has no values, or one per time.
-  const auto& positions = roboplan_trajectory.positions;
-  const auto& velocities = roboplan_trajectory.velocities;
-  const auto& accelerations = roboplan_trajectory.accelerations;
-  RosTrajectories ros_trajectories;
-  auto& [joint_traj, multi_dof_traj] = ros_trajectories;
-  joint_traj.points.resize(roboplan_trajectory.times.size());
-  multi_dof_traj.points.resize(roboplan_trajectory.times.size());
-  for (size_t i = 0; i < roboplan_trajectory.times.size(); ++i) {
-    joint_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
-    multi_dof_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
-  }
-
-  // The values of a point, or no values if the trajectory has none of that kind.
-  const Eigen::VectorXd no_values;
-  size_t q_idx = 0;
-  size_t v_idx = 0;
-  for (const auto& joint_name : roboplan_trajectory.joint_names) {
-    const auto joint_info = scene.getJointInfo(joint_name).value();
-    if (joint_info.mimic_info) {
-      continue;
-    }
-    if (isMultiDof(joint_info) && !allow_multi_dof) {
-      return tl::make_unexpected("Joint '" + joint_name +
-                                 "' has several degrees of freedom: a JointTrajectory cannot "
-                                 "represent it, use toRosTrajectories");
-    }
-    if (isMultiDof(joint_info)) {
-      multi_dof_traj.joint_names.push_back(joint_name);
-    } else {
-      joint_traj.joint_names.push_back(joint_name);
-    }
-    // The previous point's values, to unwrap angles and keep quaternion signs.
-    std::optional<double> previous_angle;
-    std::optional<Eigen::Quaterniond> previous_rotation;
-    for (size_t i = 0; i < roboplan_trajectory.times.size(); ++i) {
-      const auto& q = positions.empty() ? no_values : positions[i];
-      const auto& v = velocities.empty() ? no_values : velocities[i];
-      const auto& a = accelerations.empty() ? no_values : accelerations[i];
-      switch (joint_info.type) {
-      case JointType::REVOLUTE:
-      case JointType::PRISMATIC: {
-        auto& point = joint_traj.points[i];
-        if (!positions.empty()) {
-          point.positions.push_back(q(q_idx));
-        }
-        if (!velocities.empty()) {
-          point.velocities.push_back(v(v_idx));
-        }
-        if (!accelerations.empty()) {
-          point.accelerations.push_back(a(v_idx));
-        }
-        break;
-      }
-      case JointType::CONTINUOUS: {
-        auto& point = joint_traj.points[i];
-        if (!positions.empty()) {
-          const auto angle = unwrapAngle(std::atan2(q(q_idx + 1), q(q_idx)), previous_angle);
-          previous_angle = angle;
-          point.positions.push_back(angle);
-        }
-        if (!velocities.empty()) {
-          point.velocities.push_back(v(v_idx));
-        }
-        if (!accelerations.empty()) {
-          point.accelerations.push_back(a(v_idx));
-        }
-        break;
-      }
-      case JointType::PLANAR: {
-        auto& point = multi_dof_traj.points[i];
-        if (!positions.empty()) {
-          geometry_msgs::msg::Transform transform;
-          transform.translation.x = q(q_idx);
-          transform.translation.y = q(q_idx + 1);
-          const auto angle = std::atan2(q(q_idx + 3), q(q_idx + 2));
-          transform.rotation = continuousQuaternion(
-              Eigen::Quaterniond(Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ())),
-              previous_rotation);
-          point.transforms.push_back(transform);
-        }
-        if (!velocities.empty()) {
-          point.velocities.push_back(planarTwist(v, v_idx));
-        }
-        if (!accelerations.empty()) {
-          point.accelerations.push_back(planarTwist(a, v_idx));
-        }
-        break;
-      }
-      case JointType::FLOATING: {
-        auto& point = multi_dof_traj.points[i];
-        if (!positions.empty()) {
-          geometry_msgs::msg::Transform transform;
-          transform.translation.x = q(q_idx);
-          transform.translation.y = q(q_idx + 1);
-          transform.translation.z = q(q_idx + 2);
-          transform.rotation = continuousQuaternion(
-              Eigen::Quaterniond(q(q_idx + 6), q(q_idx + 3), q(q_idx + 4), q(q_idx + 5)),
-              previous_rotation);
-          point.transforms.push_back(transform);
-        }
-        if (!velocities.empty()) {
-          point.velocities.push_back(tf2::toMsg(Eigen::Matrix<double, 6, 1>(v.segment<6>(v_idx))));
-        }
-        if (!accelerations.empty()) {
-          point.accelerations.push_back(
-              tf2::toMsg(Eigen::Matrix<double, 6, 1>(a.segment<6>(v_idx))));
-        }
-        break;
-      }
-      default:
-        return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
-      }
-    }
-    q_idx += joint_info.num_position_dofs;
-    v_idx += joint_info.num_velocity_dofs;
-  }
-
-  // A message without joints has no points either.
-  if (joint_traj.joint_names.empty()) {
-    joint_traj.points.clear();
-  }
-  if (multi_dof_traj.joint_names.empty()) {
-    multi_dof_traj.points.clear();
-  }
-  return ros_trajectories;
-}
-
-}  // namespace
-
 tl::expected<trajectory_msgs::msg::JointTrajectory, std::string>
 toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene) {
-  auto ros_trajectories = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/false);
-  if (!ros_trajectories) {
-    return tl::make_unexpected("Failed to convert the trajectory: " + ros_trajectories.error());
+  if (auto ok = checkRoboPlanTrajectory(roboplan_trajectory, scene); !ok) {
+    return tl::make_unexpected(kConversionFailed + ok.error());
   }
-  return std::move(ros_trajectories->first);
+  for (const auto& joint_name : roboplan_trajectory.joint_names) {
+    if (isMultiDof(scene.getJointInfo(joint_name).value())) {
+      return tl::make_unexpected(kConversionFailed + "Joint '" + joint_name +
+                                 "' has several degrees of freedom: a JointTrajectory cannot "
+                                 "represent it, use toRosTrajectories");
+    }
+  }
+  auto ros_trajectory = toJointTrajectoryMessage(roboplan_trajectory, scene);
+  if (!ros_trajectory) {
+    return tl::make_unexpected(kConversionFailed + ros_trajectory.error());
+  }
+  return ros_trajectory;
 }
 
 tl::expected<RosTrajectories, std::string>
 toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene) {
-  auto ros_trajectories = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/true);
-  if (!ros_trajectories) {
-    return tl::make_unexpected("Failed to convert the trajectory: " + ros_trajectories.error());
+  if (auto ok = checkRoboPlanTrajectory(roboplan_trajectory, scene); !ok) {
+    return tl::make_unexpected(kConversionFailed + ok.error());
   }
-  return ros_trajectories;
+  auto ros_trajectory = toJointTrajectoryMessage(roboplan_trajectory, scene);
+  if (!ros_trajectory) {
+    return tl::make_unexpected(kConversionFailed + ros_trajectory.error());
+  }
+  auto multi_dof_trajectory = toMultiDOFJointTrajectoryMessage(roboplan_trajectory, scene);
+  if (!multi_dof_trajectory) {
+    return tl::make_unexpected(kConversionFailed + multi_dof_trajectory.error());
+  }
+  return RosTrajectories{std::move(*ros_trajectory), std::move(*multi_dof_trajectory)};
 }
 
 tl::expected<roboplan::JointTrajectory, std::string>
 fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const roboplan::Scene& scene) {
-  auto joint_traj =
-      fromRosMessages(ros_trajectory, trajectory_msgs::msg::MultiDOFJointTrajectory(), scene);
-  if (!joint_traj) {
-    return tl::make_unexpected("Failed to convert the trajectory: " + joint_traj.error());
+  roboplan::JointTrajectory trajectory;
+  if (auto ok = appendJointTrajectory(ros_trajectory, scene, trajectory); !ok) {
+    return tl::make_unexpected(kConversionFailed + ok.error());
   }
-  return joint_traj;
+  return trajectory;
 }
 
 tl::expected<roboplan::JointTrajectory, std::string>
 fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
                     const roboplan::Scene& scene) {
-  auto joint_traj = fromRosMessages(ros_trajectory, multi_dof_trajectory, scene);
-  if (!joint_traj) {
-    return tl::make_unexpected("Failed to convert the trajectory: " + joint_traj.error());
+  // When both messages have joints, they must have the same points at the same times, and
+  // velocities and accelerations for all the joints or for none.
+  const bool has_single_dof_joints = !ros_trajectory.joint_names.empty();
+  const bool has_multi_dof_joints = !multi_dof_trajectory.joint_names.empty();
+  if (has_single_dof_joints && has_multi_dof_joints) {
+    const auto num_points = ros_trajectory.points.size();
+    if (multi_dof_trajectory.points.size() != num_points) {
+      return tl::make_unexpected(kConversionFailed + "The JointTrajectory has " +
+                                 std::to_string(num_points) +
+                                 " points, the MultiDOFJointTrajectory " +
+                                 std::to_string(multi_dof_trajectory.points.size()));
+    }
+    for (size_t i = 0; i < num_points; ++i) {
+      const auto& point = ros_trajectory.points[i];
+      const auto& multi_dof_point = multi_dof_trajectory.points[i];
+      if (point.time_from_start != multi_dof_point.time_from_start) {
+        return tl::make_unexpected(
+            kConversionFailed + "Point " + std::to_string(i) +
+            " has different times in the JointTrajectory and the MultiDOFJointTrajectory");
+      }
+      if (point.velocities.empty() != multi_dof_point.velocities.empty()) {
+        return tl::make_unexpected(kConversionFailed + "Point " + std::to_string(i) +
+                                   " has velocities for some joints only");
+      }
+      if (point.accelerations.empty() != multi_dof_point.accelerations.empty()) {
+        return tl::make_unexpected(kConversionFailed + "Point " + std::to_string(i) +
+                                   " has accelerations for some joints only");
+      }
+    }
   }
-  return joint_traj;
+
+  roboplan::JointTrajectory trajectory;
+  if (auto ok = appendJointTrajectory(ros_trajectory, scene, trajectory); !ok) {
+    return tl::make_unexpected(kConversionFailed + ok.error());
+  }
+  if (auto ok = appendMultiDOFJointTrajectory(multi_dof_trajectory, scene, trajectory); !ok) {
+    return tl::make_unexpected(kConversionFailed + ok.error());
+  }
+  return trajectory;
 }
 
 geometry_msgs::msg::TransformStamped
