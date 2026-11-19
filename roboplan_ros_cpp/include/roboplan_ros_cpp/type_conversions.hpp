@@ -97,14 +97,9 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
                const std::optional<Eigen::VectorXd>& q_reference = std::nullopt);
 
 /// @brief Converts the single degree of freedom joints of a roboplan::JointTrajectory to a ROS 2
-/// JointTrajectory message, using the scene to convert the positions of continuous joints.
-/// @details This function will convert joint names and joint trajectory points. The caller
-/// is responsible for any additional configuration that is required in the message. A continuous
-/// joint's [cos(theta), sin(theta)] positions become theta, unwrapped along the trajectory:
-/// consecutive points never differ by more than pi, so interpolating between them does not turn the
-/// joint the long way round. Mimic joints are left out of the message, since they have no positions
-/// of their own. Planar and floating joints are left out too: use toMultiDOFJointTrajectory for
-/// them.
+/// JointTrajectory message.
+/// @details Continuous joints become angles, unwrapped along the trajectory. Mimic joints are left
+/// out, and so are planar and floating joints: use toMultiDOFJointTrajectory for them.
 /// @param roboplan_trajectory The roboplan JointTrajectory to convert.
 /// @param scene The RoboPlan scene containing the model's joint information.
 /// @return An equivalent ROS 2 JointTrajectory message, or an error.
@@ -114,11 +109,8 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
 
 /// @brief Converts the planar and floating joints of a roboplan::JointTrajectory to a ROS 2
 /// MultiDOFJointTrajectory message.
-/// @details Each point has one transform per joint, the pose of the joint's child frame in its
-/// parent frame. Velocities and accelerations are twists in the joint's own (child) frame, as in
-/// RoboPlan: a planar joint's (vx, vy, omega) are linear.x, linear.y and angular.z. A planar
-/// joint's quaternion is a rotation about z. Quaternions keep the same sign from one point to the
-/// next. The message is empty if the trajectory has no planar or floating joints.
+/// @details One transform per joint and point. Velocities and accelerations are twists in the
+/// joint's own frame, as in RoboPlan. The message is empty without planar or floating joints.
 /// @param roboplan_trajectory The roboplan JointTrajectory to convert.
 /// @param scene The RoboPlan scene containing the model's joint information.
 /// @return An equivalent ROS 2 MultiDOFJointTrajectory message, or an error.
@@ -126,12 +118,9 @@ tl::expected<trajectory_msgs::msg::MultiDOFJointTrajectory, std::string>
 toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
                           const roboplan::Scene& scene);
 
-/// @brief Convert the provided ROS 2 JointTrajectory message to an equivalent
-/// roboplan::JointTrajectory, using the scene to convert the positions of continuous joints.
-/// @details A continuous joint's theta becomes [cos(theta), sin(theta)]. Mimic joints keep their
-/// names, but their values are ignored: RoboPlan derives them from the joints they mimic. Planar
-/// and floating joints cannot be represented in a JointTrajectory and are an error: use the
-/// overload that also takes a MultiDOFJointTrajectory.
+/// @brief Converts a ROS 2 JointTrajectory message to a roboplan::JointTrajectory.
+/// @details The values of mimic joints are ignored. Planar and floating joints are an error: use
+/// the overload that also takes a MultiDOFJointTrajectory.
 /// @param ros_trajectory The ROS 2 JointTrajectory message to convert.
 /// @param scene The RoboPlan scene containing the model's joint information.
 /// @return An equivalent roboplan::JointTrajectory, or an error.
@@ -141,12 +130,9 @@ fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
 
 /// @brief Converts a ROS 2 JointTrajectory and MultiDOFJointTrajectory pair, as made by
 /// toJointTrajectory and toMultiDOFJointTrajectory, to one roboplan::JointTrajectory.
-/// @details The JointTrajectory holds the single degree of freedom joints, converted as in the
-/// overload without a MultiDOFJointTrajectory, and the MultiDOFJointTrajectory the planar and
-/// floating joints, converted as described in toMultiDOFJointTrajectory. A planar joint only uses
-/// the x and y translation and the rotation about z of its transforms. Either message may have no
-/// joints; otherwise both must have the same points at the same times. The result has the joints
-/// of the JointTrajectory in their order, then those of the MultiDOFJointTrajectory in theirs.
+/// @details Either message may have no joints; otherwise both must have the same points at the
+/// same times. The joints of the JointTrajectory come first, then those of the
+/// MultiDOFJointTrajectory, each in their message's order.
 /// @param ros_trajectory The ROS 2 JointTrajectory message with the single DOF joints.
 /// @param multi_dof_trajectory The ROS 2 MultiDOFJointTrajectory with the planar and floating
 /// joints.

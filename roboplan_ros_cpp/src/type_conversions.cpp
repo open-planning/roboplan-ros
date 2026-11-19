@@ -13,15 +13,14 @@ namespace roboplan_ros_cpp {
 
 namespace {
 
-/// @brief Whether a joint goes in a MultiDOFJointTrajectory: planar and floating joints, not mimic
-/// joints.
+/// @brief Whether a joint goes in a MultiDOFJointTrajectory.
 bool isMultiDof(const roboplan::JointInfo& info) {
   return !info.mimic_info &&
          (info.type == roboplan::JointType::PLANAR || info.type == roboplan::JointType::FLOATING);
 }
 
-/// @brief The number of positions and velocities (or accelerations) that some joints take in a
-/// RoboPlan trajectory. Mimic joints take none.
+/// @brief The numbers of positions and velocities some joints take in RoboPlan (none for mimic
+/// joints).
 tl::expected<std::pair<size_t, size_t>, std::string>
 trajectoryDofs(const roboplan::Scene& scene, const std::vector<std::string>& joint_names) {
   size_t nq = 0;
@@ -39,8 +38,7 @@ trajectoryDofs(const roboplan::Scene& scene, const std::vector<std::string>& joi
   return std::make_pair(nq, nv);
 }
 
-/// @brief Checks that point i has the expected number of values for a field, or none if the field
-/// is optional.
+/// @brief Checks that point i has `expected` values for a field, or none if it is optional.
 tl::expected<void, std::string> checkPointSize(size_t i, const std::string& what, size_t size,
                                                size_t expected, bool optional) {
   if (size == expected || (optional && size == 0)) {
@@ -51,8 +49,7 @@ tl::expected<void, std::string> checkPointSize(size_t i, const std::string& what
                              std::to_string(expected));
 }
 
-/// @brief Checks that the joints of a RoboPlan trajectory are in the scene, and that its points
-/// have the right number of values.
+/// @brief Checks the joints and the point sizes of a RoboPlan trajectory.
 tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTrajectory& trajectory,
                                                         const roboplan::Scene& scene) {
   const auto dofs = trajectoryDofs(scene, trajectory.joint_names);
@@ -61,7 +58,6 @@ tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTra
   }
   const auto [nq, nv] = dofs.value();
   for (size_t i = 0; i < trajectory.times.size(); ++i) {
-    // Values are only checked if the trajectory has them for this point.
     if (i < trajectory.positions.size()) {
       if (auto ok = checkPointSize(i, "positions", trajectory.positions[i].size(), nq, false);
           !ok) {
@@ -85,7 +81,7 @@ tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTra
   return {};
 }
 
-/// @brief Returns point i's values, or nullptr if the trajectory has none for it.
+/// @brief Point i's values, or nullptr if it has none.
 const Eigen::VectorXd* pointValues(const std::vector<Eigen::VectorXd>& values, size_t i) {
   return i < values.size() && values[i].size() > 0 ? &values[i] : nullptr;
 }
@@ -99,8 +95,7 @@ double unwrapAngle(double angle, const std::optional<double>& previous) {
   return angle + kTwoPi * std::round((*previous - angle) / kTwoPi);
 }
 
-/// @brief Converts a planar joint's RoboPlan (vx, vy, omega) velocities (or accelerations) to a
-/// twist, both in the joint's own frame.
+/// @brief A planar joint's (vx, vy, omega) as a twist.
 geometry_msgs::msg::Twist planarTwist(const Eigen::VectorXd& values, size_t v_idx) {
   geometry_msgs::msg::Twist twist;
   twist.linear.x = values(v_idx);
@@ -119,10 +114,8 @@ std::optional<Eigen::Quaterniond> normalizedRotation(const geometry_msgs::msg::Q
   return rotation.normalized();
 }
 
-/// @brief Returns rotation as a ROS quaternion with the sign closest to previous, if any, and
-/// stores it in previous.
-/// @details q and -q are the same rotation: keeping the sign closest to the previous point makes
-/// interpolating between consecutive points take the short way.
+/// @brief rotation as a ROS quaternion, with the sign closest to previous so that interpolating
+/// between points takes the short way. Stores it in previous.
 geometry_msgs::msg::Quaternion continuousQuaternion(Eigen::Quaterniond rotation,
                                                     std::optional<Eigen::Quaterniond>& previous) {
   if (previous && previous->dot(rotation) < 0.0) {
@@ -132,9 +125,7 @@ geometry_msgs::msg::Quaternion continuousQuaternion(Eigen::Quaterniond rotation,
   return tf2::toMsg(rotation);
 }
 
-/// @brief Converts a ROS JointTrajectory and MultiDOFJointTrajectory pair to one RoboPlan
-/// trajectory. The joints of ros_trajectory come first in their order, then those of
-/// multi_dof_trajectory in theirs.
+/// @brief Implements both fromJointTrajectory overloads.
 tl::expected<roboplan::JointTrajectory, std::string>
 fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
@@ -143,8 +134,7 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     return tl::make_unexpected("Failed to convert the trajectory: " + message);
   };
 
-  // Check that each joint is in the right message and appears once, and count the positions and
-  // velocities of the RoboPlan trajectory.
+  // Check each joint's message and count the RoboPlan positions and velocities.
   roboplan::JointTrajectory joint_traj;
   size_t nq = 0;
   size_t nv = 0;
@@ -254,16 +244,14 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     joint_traj.accelerations.emplace_back(*has_accelerations ? nv : 0);
   }
 
-  // Fill in the values one joint at a time, each one after the previous in RoboPlan.
   size_t q_idx = 0;
   size_t v_idx = 0;
   for (const bool multi_dof : {false, true}) {
     const auto& names = multi_dof ? multi_dof_trajectory.joint_names : ros_trajectory.joint_names;
     for (size_t j = 0; j < names.size(); ++j) {
-      // The joints were checked above.
       const auto joint_info = scene.getJointInfo(names[j]).value();
       if (joint_info.mimic_info) {
-        // Mimic joints have no values of their own: RoboPlan derives them.
+        // Mimic joints have no values of their own.
         continue;
       }
       for (size_t i = 0; i < num_points; ++i) {
@@ -300,7 +288,7 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
             return error("Point " + std::to_string(i) + " has a zero quaternion for joint '" +
                          names[j] + "'");
           }
-          // Only the rotation about z: the direction of the x axis in the xy plane.
+          // Keep only the rotation about z.
           const Eigen::Matrix3d matrix = rotation->toRotationMatrix();
           const double norm = std::hypot(matrix(0, 0), matrix(1, 0));
           if (norm < 1e-9) {
@@ -309,7 +297,6 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
           }
           positions.segment<4>(q_idx) << transform.translation.x, transform.translation.y,
               matrix(0, 0) / norm, matrix(1, 0) / norm;
-          // RoboPlan's (vx, vy, omega) are a twist's linear x and y and its angular z.
           if (velocities.size() > 0) {
             const auto& twist = multi_dof_point->velocities[j];
             velocities.segment<3>(v_idx) << twist.linear.x, twist.linear.y, twist.angular.z;
@@ -329,7 +316,6 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
           }
           positions.segment<7>(q_idx) << transform.translation.x, transform.translation.y,
               transform.translation.z, rotation->x(), rotation->y(), rotation->z(), rotation->w();
-          // RoboPlan's 6 velocities are a twist's linear then angular components.
           Eigen::Matrix<double, 6, 1> twist;
           if (velocities.size() > 0) {
             tf2::fromMsg(multi_dof_point->velocities[j], twist);
@@ -498,12 +484,9 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
     ros_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
   }
 
-  // One joint at a time, each one after the previous in RoboPlan. Mimic joints have no values of
-  // their own, planar and floating joints go in a MultiDOFJointTrajectory.
   size_t q_idx = 0;
   size_t v_idx = 0;
   for (const auto& joint_name : roboplan_trajectory.joint_names) {
-    // The joints were checked by checkRoboPlanTrajectory.
     const auto joint_info = scene.getJointInfo(joint_name).value();
     if (joint_info.mimic_info) {
       continue;
@@ -547,7 +530,7 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
     }
     case roboplan::JointType::PLANAR:
     case roboplan::JointType::FLOATING:
-      // These go in the MultiDOFJointTrajectory.
+      // Converted by toMultiDOFJointTrajectory.
       break;
     default:
       return tl::make_unexpected("Failed to convert the trajectory: Joint '" + joint_name +
@@ -571,12 +554,9 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
     ros_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
   }
 
-  // One joint at a time, each one after the previous in RoboPlan. Only planar and floating joints
-  // go in a MultiDOFJointTrajectory.
   size_t q_idx = 0;
   size_t v_idx = 0;
   for (const auto& joint_name : roboplan_trajectory.joint_names) {
-    // The joints were checked by checkRoboPlanTrajectory.
     const auto joint_info = scene.getJointInfo(joint_name).value();
     if (joint_info.mimic_info) {
       continue;
@@ -585,7 +565,7 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
     case roboplan::JointType::REVOLUTE:
     case roboplan::JointType::PRISMATIC:
     case roboplan::JointType::CONTINUOUS:
-      // These go in the JointTrajectory.
+      // Converted by toJointTrajectory.
       break;
     case roboplan::JointType::PLANAR: {
       ros_traj.joint_names.push_back(joint_name);
@@ -628,7 +608,6 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
               previous_rotation);
           point.transforms.push_back(transform);
         }
-        // RoboPlan's 6 velocities are a twist's linear then angular components.
         if (const auto* velocities = pointValues(roboplan_trajectory.velocities, i)) {
           point.velocities.push_back(
               tf2::toMsg(Eigen::Matrix<double, 6, 1>(velocities->segment<6>(v_idx))));
@@ -648,7 +627,6 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
     v_idx += joint_info.num_velocity_dofs;
   }
 
-  // Without planar or floating joints, the message is empty.
   if (ros_traj.joint_names.empty()) {
     ros_traj.points.clear();
   }
