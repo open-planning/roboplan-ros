@@ -182,8 +182,8 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                                std::to_string(multi_dof_trajectory.points.size()));
   }
 
-  const auto num_single = ros_trajectory.joint_names.size();
-  const auto num_multi_dof = multi_dof_trajectory.joint_names.size();
+  const auto num_single_dof_joints = ros_trajectory.joint_names.size();
+  const auto num_multi_dof_joints = multi_dof_trajectory.joint_names.size();
 
   joint_traj.times.reserve(num_points);
   joint_traj.positions.reserve(num_points);
@@ -200,9 +200,10 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     }
     if (point) {
       for (const auto& ok :
-           {checkPointSize(i, "positions", point->positions.size(), num_single, false),
-            checkPointSize(i, "velocities", point->velocities.size(), num_single, true),
-            checkPointSize(i, "accelerations", point->accelerations.size(), num_single, true)}) {
+           {checkPointSize(i, "positions", point->positions.size(), num_single_dof_joints, false),
+            checkPointSize(i, "velocities", point->velocities.size(), num_single_dof_joints, true),
+            checkPointSize(i, "accelerations", point->accelerations.size(), num_single_dof_joints,
+                           true)}) {
         if (!ok) {
           return tl::make_unexpected(ok.error());
         }
@@ -210,12 +211,12 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     }
     if (multi_dof_point) {
       for (const auto& ok :
-           {checkPointSize(i, "transforms", multi_dof_point->transforms.size(), num_multi_dof,
-                           false),
-            checkPointSize(i, "velocity twists", multi_dof_point->velocities.size(), num_multi_dof,
-                           true),
+           {checkPointSize(i, "transforms", multi_dof_point->transforms.size(),
+                           num_multi_dof_joints, false),
+            checkPointSize(i, "velocity twists", multi_dof_point->velocities.size(),
+                           num_multi_dof_joints, true),
             checkPointSize(i, "acceleration twists", multi_dof_point->accelerations.size(),
-                           num_multi_dof, true)}) {
+                           num_multi_dof_joints, true)}) {
         if (!ok) {
           return tl::make_unexpected(ok.error());
         }
