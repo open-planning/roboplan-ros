@@ -513,6 +513,8 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
     multi_dof_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
   }
 
+  // The values of a point, or no values if the trajectory has none of that kind.
+  const Eigen::VectorXd no_values;
   size_t q_idx = 0;
   size_t v_idx = 0;
   for (const auto& joint_name : roboplan_trajectory.joint_names) {
@@ -525,50 +527,51 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
                                  "' has several degrees of freedom: a JointTrajectory cannot "
                                  "represent it, use toRosTrajectories");
     }
-    switch (joint_info.type) {
-    case JointType::REVOLUTE:
-    case JointType::PRISMATIC:
+    if (isMultiDof(joint_info)) {
+      multi_dof_traj.joint_names.push_back(joint_name);
+    } else {
       joint_traj.joint_names.push_back(joint_name);
-      for (size_t i = 0; i < joint_traj.points.size(); ++i) {
+    }
+    // The previous point's values, to unwrap angles and keep quaternion signs.
+    std::optional<double> previous_angle;
+    std::optional<Eigen::Quaterniond> previous_rotation;
+    for (size_t i = 0; i < roboplan_trajectory.times.size(); ++i) {
+      const auto& q = positions.empty() ? no_values : positions[i];
+      const auto& v = velocities.empty() ? no_values : velocities[i];
+      const auto& a = accelerations.empty() ? no_values : accelerations[i];
+      switch (joint_info.type) {
+      case JointType::REVOLUTE:
+      case JointType::PRISMATIC: {
         auto& point = joint_traj.points[i];
         if (!positions.empty()) {
-          point.positions.push_back(positions[i](q_idx));
+          point.positions.push_back(q(q_idx));
         }
         if (!velocities.empty()) {
-          point.velocities.push_back(velocities[i](v_idx));
+          point.velocities.push_back(v(v_idx));
         }
         if (!accelerations.empty()) {
-          point.accelerations.push_back(accelerations[i](v_idx));
+          point.accelerations.push_back(a(v_idx));
         }
+        break;
       }
-      break;
-    case JointType::CONTINUOUS: {
-      joint_traj.joint_names.push_back(joint_name);
-      std::optional<double> previous_angle;
-      for (size_t i = 0; i < joint_traj.points.size(); ++i) {
+      case JointType::CONTINUOUS: {
         auto& point = joint_traj.points[i];
         if (!positions.empty()) {
-          const auto angle =
-              unwrapAngle(std::atan2(positions[i](q_idx + 1), positions[i](q_idx)), previous_angle);
+          const auto angle = unwrapAngle(std::atan2(q(q_idx + 1), q(q_idx)), previous_angle);
           previous_angle = angle;
           point.positions.push_back(angle);
         }
         if (!velocities.empty()) {
-          point.velocities.push_back(velocities[i](v_idx));
+          point.velocities.push_back(v(v_idx));
         }
         if (!accelerations.empty()) {
-          point.accelerations.push_back(accelerations[i](v_idx));
+          point.accelerations.push_back(a(v_idx));
         }
+        break;
       }
-      break;
-    }
-    case JointType::PLANAR: {
-      multi_dof_traj.joint_names.push_back(joint_name);
-      std::optional<Eigen::Quaterniond> previous_rotation;
-      for (size_t i = 0; i < multi_dof_traj.points.size(); ++i) {
+      case JointType::PLANAR: {
         auto& point = multi_dof_traj.points[i];
         if (!positions.empty()) {
-          const auto& q = positions[i];
           geometry_msgs::msg::Transform transform;
           transform.translation.x = q(q_idx);
           transform.translation.y = q(q_idx + 1);
@@ -579,21 +582,16 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
           point.transforms.push_back(transform);
         }
         if (!velocities.empty()) {
-          point.velocities.push_back(planarTwist(velocities[i], v_idx));
+          point.velocities.push_back(planarTwist(v, v_idx));
         }
         if (!accelerations.empty()) {
-          point.accelerations.push_back(planarTwist(accelerations[i], v_idx));
+          point.accelerations.push_back(planarTwist(a, v_idx));
         }
+        break;
       }
-      break;
-    }
-    case JointType::FLOATING: {
-      multi_dof_traj.joint_names.push_back(joint_name);
-      std::optional<Eigen::Quaterniond> previous_rotation;
-      for (size_t i = 0; i < multi_dof_traj.points.size(); ++i) {
+      case JointType::FLOATING: {
         auto& point = multi_dof_traj.points[i];
         if (!positions.empty()) {
-          const auto& q = positions[i];
           geometry_msgs::msg::Transform transform;
           transform.translation.x = q(q_idx);
           transform.translation.y = q(q_idx + 1);
@@ -604,18 +602,17 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
           point.transforms.push_back(transform);
         }
         if (!velocities.empty()) {
-          point.velocities.push_back(
-              tf2::toMsg(Eigen::Matrix<double, 6, 1>(velocities[i].segment<6>(v_idx))));
+          point.velocities.push_back(tf2::toMsg(Eigen::Matrix<double, 6, 1>(v.segment<6>(v_idx))));
         }
         if (!accelerations.empty()) {
           point.accelerations.push_back(
-              tf2::toMsg(Eigen::Matrix<double, 6, 1>(accelerations[i].segment<6>(v_idx))));
+              tf2::toMsg(Eigen::Matrix<double, 6, 1>(a.segment<6>(v_idx))));
         }
+        break;
       }
-      break;
-    }
-    default:
-      return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
+      default:
+        return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
+      }
     }
     q_idx += joint_info.num_position_dofs;
     v_idx += joint_info.num_velocity_dofs;
