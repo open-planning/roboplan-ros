@@ -345,7 +345,7 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectory) {
 
   // Converting both messages back gives the original trajectory, with the joints of the
   // JointTrajectory first: the wheel, then the base and the drone.
-  const auto new_roboplan_traj = fromJointTrajectory(ros_traj, multi_dof_traj, scene);
+  const auto new_roboplan_traj = fromRosTrajectories(ros_traj, multi_dof_traj, scene);
   ASSERT_TRUE(new_roboplan_traj.has_value()) << new_roboplan_traj.error();
   EXPECT_EQ(new_roboplan_traj->joint_names,
             (std::vector<std::string>{"wheel_joint", "base_joint", "drone_joint"}));
@@ -397,7 +397,7 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectoryErrors) {
     point.transforms.resize(1);
   }
   multi_dof_msg.points[1].time_from_start.sec = 1;
-  ASSERT_TRUE(fromJointTrajectory(joint_msg, multi_dof_msg, scene).has_value());
+  ASSERT_TRUE(fromRosTrajectories(joint_msg, multi_dof_msg, scene).has_value());
 
   // A planar joint cannot be in a JointTrajectory, nor a continuous one in a
   // MultiDOFJointTrajectory.
@@ -405,35 +405,35 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectoryErrors) {
   wrong_joint_msg.joint_names = {"base_joint"};
   EXPECT_EQ(fromJointTrajectory(wrong_joint_msg, scene).error(),
             prefix + "Joint 'base_joint' has several degrees of freedom: a JointTrajectory cannot "
-                     "represent it, use a MultiDOFJointTrajectory");
+                     "represent it, use fromRosTrajectories");
   auto wrong_multi_dof_msg = multi_dof_msg;
   wrong_multi_dof_msg.joint_names = {"wheel_joint"};
-  EXPECT_EQ(fromJointTrajectory(joint_msg, wrong_multi_dof_msg, scene).error(),
+  EXPECT_EQ(fromRosTrajectories(joint_msg, wrong_multi_dof_msg, scene).error(),
             prefix + "Joint 'wheel_joint' has a single degree of freedom: it belongs in the "
                      "JointTrajectory");
 
   // Both messages must have the same points.
   auto short_msg = multi_dof_msg;
   short_msg.points.pop_back();
-  EXPECT_EQ(fromJointTrajectory(joint_msg, short_msg, scene).error(),
+  EXPECT_EQ(fromRosTrajectories(joint_msg, short_msg, scene).error(),
             prefix + "The JointTrajectory has 2 points, the MultiDOFJointTrajectory 1");
   auto late_msg = multi_dof_msg;
   late_msg.points[1].time_from_start.sec = 2;
   EXPECT_EQ(
-      fromJointTrajectory(joint_msg, late_msg, scene).error(),
+      fromRosTrajectories(joint_msg, late_msg, scene).error(),
       prefix +
           "Point 1 has different times in the JointTrajectory and the MultiDOFJointTrajectory");
 
   // Velocities are given for all the joints or for none.
   auto moving_msg = multi_dof_msg;
   moving_msg.points[0].velocities.resize(1);
-  EXPECT_EQ(fromJointTrajectory(joint_msg, moving_msg, scene).error(),
+  EXPECT_EQ(fromRosTrajectories(joint_msg, moving_msg, scene).error(),
             prefix + "Point 0 has velocities for some joints only");
 
   // A quaternion must not be zero.
   auto zero_msg = multi_dof_msg;
   zero_msg.points[0].transforms[0].rotation.w = 0.0;
-  EXPECT_EQ(fromJointTrajectory(joint_msg, zero_msg, scene).error(),
+  EXPECT_EQ(fromRosTrajectories(joint_msg, zero_msg, scene).error(),
             prefix + "Point 0 has a zero quaternion for joint 'base_joint'");
 }
 

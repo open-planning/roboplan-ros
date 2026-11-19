@@ -65,7 +65,6 @@ NB_MODULE(_cpp_ext, m) {
       "tuple: the single degree of freedom joints as in toJointTrajectory, the planar and floating "
       "joints as transforms, with twists in each joint's own frame.");
 
-  // fromJointTrajectory is overloaded as in C++, each overload with its own docstring.
   m.def(
       "fromJointTrajectory",
       [](nb::handle py_ros_traj, const roboplan::Scene& py_scene) {
@@ -75,15 +74,15 @@ NB_MODULE(_cpp_ext, m) {
       "py_ros_traj"_a, "py_scene"_a,
       "Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous "
       "joints become [cos, sin] positions, and the values of mimic joints are ignored. Planar and "
-      "floating joints are an error: use the overload that also takes a MultiDOFJointTrajectory.");
+      "floating joints are an error: use fromRosTrajectories for them.");
 
   m.def(
-      "fromJointTrajectory",
+      "fromRosTrajectories",
       [](nb::handle py_ros_traj, nb::handle py_multi_dof_traj, const roboplan::Scene& py_scene) {
         auto ros_traj = pyToCppMsg<trajectory_msgs::msg::JointTrajectory>(py_ros_traj);
         auto multi_dof_traj =
             pyToCppMsg<trajectory_msgs::msg::MultiDOFJointTrajectory>(py_multi_dof_traj);
-        return handle_expected(fromJointTrajectory(ros_traj, multi_dof_traj, py_scene));
+        return handle_expected(fromRosTrajectories(ros_traj, multi_dof_traj, py_scene));
       },
       "py_ros_traj"_a, "py_multi_dof_traj"_a, "py_scene"_a,
       "Converts a trajectory_msgs::msg::JointTrajectory with the single degree of freedom joints "

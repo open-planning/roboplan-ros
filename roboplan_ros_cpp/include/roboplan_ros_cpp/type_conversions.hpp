@@ -126,7 +126,7 @@ toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
 
 /// @brief Converts a ROS 2 JointTrajectory message to a roboplan::JointTrajectory.
 /// @details The values of mimic joints are ignored. Planar and floating joints are an error: use
-/// the overload that also takes a MultiDOFJointTrajectory.
+/// fromRosTrajectories for them.
 /// @param ros_trajectory The ROS 2 JointTrajectory message to convert.
 /// @param scene The RoboPlan scene containing the model's joint information.
 /// @return An equivalent roboplan::JointTrajectory, or an error.
@@ -145,7 +145,7 @@ fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
 /// @param scene The RoboPlan scene containing the model's joint information.
 /// @return An equivalent roboplan::JointTrajectory, or an error.
 tl::expected<roboplan::JointTrajectory, std::string>
-fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
+fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
                     const roboplan::Scene& scene);
 

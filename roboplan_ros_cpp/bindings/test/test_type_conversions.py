@@ -19,6 +19,7 @@ from roboplan_ros.cpp import (
     toJointTrajectory,
     toRosTrajectories,
     fromJointTrajectory,
+    fromRosTrajectories,
     se3ToPose,
     poseToSE3,
     toTransformStamped,
@@ -237,7 +238,7 @@ def test_convert_multi_dof_joint_trajectory():
     ]
 
     # The joints of the JointTrajectory come first: the wheel, then base and drone.
-    new_roboplan_traj = fromJointTrajectory(ros_traj, multi_dof_traj, scene)
+    new_roboplan_traj = fromRosTrajectories(ros_traj, multi_dof_traj, scene)
     assert new_roboplan_traj.joint_names == ["wheel_joint", "base_joint", "drone_joint"]
     for i in range(len(roboplan_traj.positions)):
         q, v = roboplan_traj.positions[i], roboplan_traj.velocities[i]

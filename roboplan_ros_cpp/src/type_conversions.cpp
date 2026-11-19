@@ -116,11 +116,11 @@ geometry_msgs::msg::Quaternion continuousQuaternion(Eigen::Quaterniond rotation,
   return tf2::toMsg(rotation);
 }
 
-/// @brief Implements both fromJointTrajectory overloads.
+/// @brief Implements fromJointTrajectory and fromRosTrajectories.
 tl::expected<roboplan::JointTrajectory, std::string>
-fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
-                    const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
-                    const roboplan::Scene& scene) {
+fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
+                const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
+                const roboplan::Scene& scene) {
   const auto error = [](const std::string& message) {
     return tl::make_unexpected("Failed to convert the trajectory: " + message);
   };
@@ -151,7 +151,7 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
     if (isMultiDof(*joint_info)) {
       return error("Joint '" + joint_name +
                    "' has several degrees of freedom: a JointTrajectory cannot represent it, "
-                   "use a MultiDOFJointTrajectory");
+                   "use fromRosTrajectories");
     }
     if (auto ok = add_joint(joint_name, *joint_info); !ok) {
       return tl::make_unexpected(ok.error());
@@ -650,15 +650,14 @@ toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
 tl::expected<roboplan::JointTrajectory, std::string>
 fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const roboplan::Scene& scene) {
-  return fromRosTrajectories(ros_trajectory, trajectory_msgs::msg::MultiDOFJointTrajectory(),
-                             scene);
+  return fromRosMessages(ros_trajectory, trajectory_msgs::msg::MultiDOFJointTrajectory(), scene);
 }
 
 tl::expected<roboplan::JointTrajectory, std::string>
-fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
+fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
                     const roboplan::Scene& scene) {
-  return fromRosTrajectories(ros_trajectory, multi_dof_trajectory, scene);
+  return fromRosMessages(ros_trajectory, multi_dof_trajectory, scene);
 }
 
 geometry_msgs::msg::TransformStamped

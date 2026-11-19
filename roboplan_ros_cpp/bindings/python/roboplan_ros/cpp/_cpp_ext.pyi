@@ -1,6 +1,6 @@
 """RoboPlan ROS nanobind wrappers for core C++ ROS tools."""
 
-from typing import Annotated, overload
+from typing import Annotated
 
 import numpy
 from numpy.typing import NDArray
@@ -22,14 +22,12 @@ def toRosTrajectories(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> 
     Converts a roboplan::JointTrajectory with any kind of joint to a (trajectory_msgs::msg::JointTrajectory, trajectory_msgs::msg::MultiDOFJointTrajectory) tuple: the single degree of freedom joints as in toJointTrajectory, the planar and floating joints as transforms, with twists in each joint's own frame.
     """
 
-@overload
 def fromJointTrajectory(py_ros_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
     """
-    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous joints become [cos, sin] positions, and the values of mimic joints are ignored. Planar and floating joints are an error: use the overload that also takes a MultiDOFJointTrajectory.
+    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous joints become [cos, sin] positions, and the values of mimic joints are ignored. Planar and floating joints are an error: use fromRosTrajectories for them.
     """
 
-@overload
-def fromJointTrajectory(py_ros_traj: object, py_multi_dof_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
+def fromRosTrajectories(py_ros_traj: object, py_multi_dof_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
     """
     Converts a trajectory_msgs::msg::JointTrajectory with the single degree of freedom joints and a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints to one roboplan::JointTrajectory, with the joints of the JointTrajectory in their order, then those of the MultiDOFJointTrajectory in theirs.
     """
