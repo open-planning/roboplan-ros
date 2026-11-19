@@ -472,16 +472,23 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
   return config;
 }
 
-tl::expected<trajectory_msgs::msg::JointTrajectory, std::string>
-toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
-                  const roboplan::Scene& scene) {
+namespace {
+
+/// @brief Implements toJointTrajectory and toRosTrajectories. Unless allow_multi_dof, planar and
+/// floating joints are an error.
+tl::expected<RosTrajectories, std::string>
+toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const roboplan::Scene& scene,
+              bool allow_multi_dof) {
   if (auto ok = checkRoboPlanTrajectory(roboplan_trajectory, scene); !ok) {
     return tl::make_unexpected(ok.error());
   }
-  trajectory_msgs::msg::JointTrajectory ros_traj;
-  ros_traj.points.resize(roboplan_trajectory.times.size());
-  for (size_t i = 0; i < ros_traj.points.size(); ++i) {
-    ros_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
+  RosTrajectories ros;
+  auto& [joint_traj, multi_dof_traj] = ros;
+  joint_traj.points.resize(roboplan_trajectory.times.size());
+  multi_dof_traj.points.resize(roboplan_trajectory.times.size());
+  for (size_t i = 0; i < roboplan_trajectory.times.size(); ++i) {
+    joint_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
+    multi_dof_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
   }
 
   size_t q_idx = 0;
@@ -491,12 +498,17 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
     if (joint_info.mimic_info) {
       continue;
     }
+    if (isMultiDof(joint_info) && !allow_multi_dof) {
+      return tl::make_unexpected("Failed to convert the trajectory: Joint '" + joint_name +
+                                 "' has several degrees of freedom: a JointTrajectory cannot "
+                                 "represent it, use toRosTrajectories");
+    }
     switch (joint_info.type) {
     case roboplan::JointType::REVOLUTE:
     case roboplan::JointType::PRISMATIC:
-      ros_traj.joint_names.push_back(joint_name);
-      for (size_t i = 0; i < ros_traj.points.size(); ++i) {
-        auto& point = ros_traj.points[i];
+      joint_traj.joint_names.push_back(joint_name);
+      for (size_t i = 0; i < joint_traj.points.size(); ++i) {
+        auto& point = joint_traj.points[i];
         if (const auto* positions = pointValues(roboplan_trajectory.positions, i)) {
           point.positions.push_back((*positions)(q_idx));
         }
@@ -509,10 +521,10 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
       }
       break;
     case roboplan::JointType::CONTINUOUS: {
-      ros_traj.joint_names.push_back(joint_name);
+      joint_traj.joint_names.push_back(joint_name);
       std::optional<double> previous_angle;
-      for (size_t i = 0; i < ros_traj.points.size(); ++i) {
-        auto& point = ros_traj.points[i];
+      for (size_t i = 0; i < joint_traj.points.size(); ++i) {
+        auto& point = joint_traj.points[i];
         if (const auto* positions = pointValues(roboplan_trajectory.positions, i)) {
           const auto angle =
               unwrapAngle(std::atan2((*positions)(q_idx + 1), (*positions)(q_idx)), previous_angle);
@@ -528,50 +540,11 @@ toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
       }
       break;
     }
-    case roboplan::JointType::PLANAR:
-    case roboplan::JointType::FLOATING:
-      // Converted by toMultiDOFJointTrajectory.
-      break;
-    default:
-      return tl::make_unexpected("Failed to convert the trajectory: Joint '" + joint_name +
-                                 "' has an unknown type");
-    }
-    q_idx += joint_info.num_position_dofs;
-    v_idx += joint_info.num_velocity_dofs;
-  }
-  return ros_traj;
-}
-
-tl::expected<trajectory_msgs::msg::MultiDOFJointTrajectory, std::string>
-toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
-                          const roboplan::Scene& scene) {
-  if (auto ok = checkRoboPlanTrajectory(roboplan_trajectory, scene); !ok) {
-    return tl::make_unexpected(ok.error());
-  }
-  trajectory_msgs::msg::MultiDOFJointTrajectory ros_traj;
-  ros_traj.points.resize(roboplan_trajectory.times.size());
-  for (size_t i = 0; i < ros_traj.points.size(); ++i) {
-    ros_traj.points[i].time_from_start = toDuration(roboplan_trajectory.times[i]);
-  }
-
-  size_t q_idx = 0;
-  size_t v_idx = 0;
-  for (const auto& joint_name : roboplan_trajectory.joint_names) {
-    const auto joint_info = scene.getJointInfo(joint_name).value();
-    if (joint_info.mimic_info) {
-      continue;
-    }
-    switch (joint_info.type) {
-    case roboplan::JointType::REVOLUTE:
-    case roboplan::JointType::PRISMATIC:
-    case roboplan::JointType::CONTINUOUS:
-      // Converted by toJointTrajectory.
-      break;
     case roboplan::JointType::PLANAR: {
-      ros_traj.joint_names.push_back(joint_name);
+      multi_dof_traj.joint_names.push_back(joint_name);
       std::optional<Eigen::Quaterniond> previous_rotation;
-      for (size_t i = 0; i < ros_traj.points.size(); ++i) {
-        auto& point = ros_traj.points[i];
+      for (size_t i = 0; i < multi_dof_traj.points.size(); ++i) {
+        auto& point = multi_dof_traj.points[i];
         if (const auto* positions = pointValues(roboplan_trajectory.positions, i)) {
           const auto& q = *positions;
           geometry_msgs::msg::Transform transform;
@@ -593,10 +566,10 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
       break;
     }
     case roboplan::JointType::FLOATING: {
-      ros_traj.joint_names.push_back(joint_name);
+      multi_dof_traj.joint_names.push_back(joint_name);
       std::optional<Eigen::Quaterniond> previous_rotation;
-      for (size_t i = 0; i < ros_traj.points.size(); ++i) {
-        auto& point = ros_traj.points[i];
+      for (size_t i = 0; i < multi_dof_traj.points.size(); ++i) {
+        auto& point = multi_dof_traj.points[i];
         if (const auto* positions = pointValues(roboplan_trajectory.positions, i)) {
           const auto& q = *positions;
           geometry_msgs::msg::Transform transform;
@@ -627,10 +600,32 @@ toMultiDOFJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
     v_idx += joint_info.num_velocity_dofs;
   }
 
-  if (ros_traj.joint_names.empty()) {
-    ros_traj.points.clear();
+  // A message without joints has no points either.
+  if (joint_traj.joint_names.empty()) {
+    joint_traj.points.clear();
   }
-  return ros_traj;
+  if (multi_dof_traj.joint_names.empty()) {
+    multi_dof_traj.points.clear();
+  }
+  return ros;
+}
+
+}  // namespace
+
+tl::expected<trajectory_msgs::msg::JointTrajectory, std::string>
+toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
+                  const roboplan::Scene& scene) {
+  auto ros = toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/false);
+  if (!ros) {
+    return tl::make_unexpected(ros.error());
+  }
+  return std::move(ros->first);
+}
+
+tl::expected<RosTrajectories, std::string>
+toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
+                  const roboplan::Scene& scene) {
+  return toRosMessages(roboplan_trajectory, scene, /*allow_multi_dof=*/true);
 }
 
 tl::expected<roboplan::JointTrajectory, std::string>

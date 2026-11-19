@@ -14,12 +14,12 @@ def poseToSE3(py_pose: object) -> Annotated[NDArray[numpy.float64], dict(shape=(
 
 def toJointTrajectory(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> object:
     """
-    Converts the single degree of freedom joints of a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. Continuous joints become angles, unwrapped along the trajectory. Mimic joints are left out, and so are planar and floating joints: use toMultiDOFJointTrajectory for them.
+    Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. Continuous joints become angles, unwrapped along the trajectory, and mimic joints are left out. Planar and floating joints are an error: use toRosTrajectories for them.
     """
 
-def toMultiDOFJointTrajectory(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> object:
+def toRosTrajectories(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> tuple:
     """
-    Converts the planar and floating joints of a roboplan::JointTrajectory to a trajectory_msgs::msg::MultiDOFJointTrajectory, with twists in each joint's own frame.
+    Converts a roboplan::JointTrajectory with any kind of joint to a (trajectory_msgs::msg::JointTrajectory, trajectory_msgs::msg::MultiDOFJointTrajectory) tuple: the single degree of freedom joints as in toJointTrajectory, the planar and floating joints as transforms, with twists in each joint's own frame.
     """
 
 @overload

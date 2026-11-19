@@ -17,7 +17,7 @@ from roboplan_ros.cpp import (
     toJointState,
     fromJointState,
     toJointTrajectory,
-    toMultiDOFJointTrajectory,
+    toRosTrajectories,
     fromJointTrajectory,
     se3ToPose,
     poseToSE3,
@@ -222,10 +222,12 @@ def test_convert_multi_dof_joint_trajectory():
     roboplan_traj.positions = [make_q(3.0), make_q(-3.0)]
     roboplan_traj.velocities = [velocities, velocities]
 
-    ros_traj = toJointTrajectory(roboplan_traj, scene)
-    assert ros_traj.joint_names == ["wheel_joint"]
+    # A JointTrajectory alone cannot hold the base and the drone.
+    with pytest.raises(RuntimeError, match="use toRosTrajectories"):
+        toJointTrajectory(roboplan_traj, scene)
 
-    multi_dof_traj = toMultiDOFJointTrajectory(roboplan_traj, scene)
+    ros_traj, multi_dof_traj = toRosTrajectories(roboplan_traj, scene)
+    assert ros_traj.joint_names == ["wheel_joint"]
     assert multi_dof_traj.joint_names == ["base_joint", "drone_joint"]
     base_twist = multi_dof_traj.points[0].velocities[0]
     assert [base_twist.linear.x, base_twist.linear.y, base_twist.angular.z] == [

@@ -46,22 +46,24 @@ NB_MODULE(_cpp_ext, m) {
                           nb::module_::import_("trajectory_msgs.msg").attr("JointTrajectory"));
       },
       "py_roboplan_traj"_a, "py_scene"_a,
-      "Converts the single degree of freedom joints of a roboplan::JointTrajectory to a "
-      "trajectory_msgs::msg::JointTrajectory. Continuous joints become angles, unwrapped along the "
-      "trajectory. Mimic joints are left out, and so are planar and floating joints: use "
-      "toMultiDOFJointTrajectory for them.");
+      "Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. Continuous "
+      "joints become angles, unwrapped along the trajectory, and mimic joints are left out. Planar "
+      "and floating joints are an error: use toRosTrajectories for them.");
 
   m.def(
-      "toMultiDOFJointTrajectory",
+      "toRosTrajectories",
       [](nb::handle py_roboplan_traj, const roboplan::Scene& py_scene) {
-        auto ros_traj = handle_expected(toMultiDOFJointTrajectory(
-            nb::cast<roboplan::JointTrajectory>(py_roboplan_traj), py_scene));
-        return cppToPyMsg(
-            ros_traj, nb::module_::import_("trajectory_msgs.msg").attr("MultiDOFJointTrajectory"));
+        auto [joint_traj, multi_dof_traj] = handle_expected(
+            toRosTrajectories(nb::cast<roboplan::JointTrajectory>(py_roboplan_traj), py_scene));
+        const auto msgs = nb::module_::import_("trajectory_msgs.msg");
+        return nb::make_tuple(cppToPyMsg(joint_traj, msgs.attr("JointTrajectory")),
+                              cppToPyMsg(multi_dof_traj, msgs.attr("MultiDOFJointTrajectory")));
       },
       "py_roboplan_traj"_a, "py_scene"_a,
-      "Converts the planar and floating joints of a roboplan::JointTrajectory to a "
-      "trajectory_msgs::msg::MultiDOFJointTrajectory, with twists in each joint's own frame.");
+      "Converts a roboplan::JointTrajectory with any kind of joint to a "
+      "(trajectory_msgs::msg::JointTrajectory, trajectory_msgs::msg::MultiDOFJointTrajectory) "
+      "tuple: the single degree of freedom joints as in toJointTrajectory, the planar and floating "
+      "joints as transforms, with twists in each joint's own frame.");
 
   // fromJointTrajectory is overloaded as in C++, each overload with its own docstring.
   m.def(

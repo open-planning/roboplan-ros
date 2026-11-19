@@ -286,46 +286,52 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectory) {
   roboplan_traj.velocities = {v, v};
   roboplan_traj.accelerations = {2.0 * v, 2.0 * v};
 
+  // A JointTrajectory alone cannot hold the base and the drone.
+  const auto joint_only = toJointTrajectory(roboplan_traj, scene);
+  ASSERT_FALSE(joint_only.has_value());
+  EXPECT_EQ(joint_only.error(),
+            "Failed to convert the trajectory: Joint 'base_joint' has several degrees of freedom: "
+            "a JointTrajectory cannot represent it, use toRosTrajectories");
+
+  const auto ros_trajs = toRosTrajectories(roboplan_traj, scene);
+  ASSERT_TRUE(ros_trajs.has_value()) << ros_trajs.error();
+  const auto& [ros_traj, multi_dof_traj] = ros_trajs.value();
+
   // The JointTrajectory only has the continuous joint.
-  const auto ros_traj = toJointTrajectory(roboplan_traj, scene);
-  ASSERT_TRUE(ros_traj.has_value()) << ros_traj.error();
-  EXPECT_EQ(ros_traj->joint_names, std::vector<std::string>{"wheel_joint"});
-  EXPECT_NEAR(ros_traj->points[0].positions[0], 0.5, 1e-12);
-  EXPECT_EQ(ros_traj->points[0].velocities, std::vector<double>{0.4});
+  EXPECT_EQ(ros_traj.joint_names, std::vector<std::string>{"wheel_joint"});
+  EXPECT_NEAR(ros_traj.points[0].positions[0], 0.5, 1e-12);
+  EXPECT_EQ(ros_traj.points[0].velocities, std::vector<double>{0.4});
 
   // The MultiDOFJointTrajectory has the planar and floating joints.
-  const auto multi_dof_traj = toMultiDOFJointTrajectory(roboplan_traj, scene);
-  ASSERT_TRUE(multi_dof_traj.has_value()) << multi_dof_traj.error();
-  EXPECT_EQ(multi_dof_traj->joint_names, (std::vector<std::string>{"base_joint", "drone_joint"}));
-  ASSERT_EQ(multi_dof_traj->points.size(), 2u);
-  const auto& base = multi_dof_traj->points[0].transforms[0];
+  EXPECT_EQ(multi_dof_traj.joint_names, (std::vector<std::string>{"base_joint", "drone_joint"}));
+  ASSERT_EQ(multi_dof_traj.points.size(), 2u);
+  const auto& base = multi_dof_traj.points[0].transforms[0];
   EXPECT_DOUBLE_EQ(base.translation.x, 1.0);
   EXPECT_DOUBLE_EQ(base.translation.y, 2.0);
   EXPECT_NEAR(base.rotation.z, std::sin(1.5), 1e-12);
   EXPECT_NEAR(base.rotation.w, std::cos(1.5), 1e-12);
-  const auto& drone = multi_dof_traj->points[1].transforms[1];
+  const auto& drone = multi_dof_traj.points[1].transforms[1];
   EXPECT_DOUBLE_EQ(drone.translation.z, 1.5);
   EXPECT_NEAR(drone.rotation.x, std::sin(0.2), 1e-12);
 
   // At -3 rad the base's quaternion keeps the sign of the previous point: it is the rotation by
   // 2 pi - 3, so interpolating does not turn the base the long way round.
-  const auto& turned_base = multi_dof_traj->points[1].transforms[0];
+  const auto& turned_base = multi_dof_traj.points[1].transforms[0];
   EXPECT_NEAR(turned_base.rotation.z, std::sin((2.0 * std::numbers::pi - 3.0) / 2.0), 1e-12);
   EXPECT_NEAR(turned_base.rotation.w, std::cos((2.0 * std::numbers::pi - 3.0) / 2.0), 1e-12);
 
   // Twists are in the joint's frame, as in RoboPlan.
-  const auto& base_twist = multi_dof_traj->points[0].velocities[0];
+  const auto& base_twist = multi_dof_traj.points[0].velocities[0];
   EXPECT_DOUBLE_EQ(base_twist.linear.x, 0.1);
   EXPECT_DOUBLE_EQ(base_twist.linear.y, 0.2);
   EXPECT_DOUBLE_EQ(base_twist.angular.z, 0.3);
-  const auto& drone_acceleration = multi_dof_traj->points[0].accelerations[1];
+  const auto& drone_acceleration = multi_dof_traj.points[0].accelerations[1];
   EXPECT_DOUBLE_EQ(drone_acceleration.linear.x, 2.0);
   EXPECT_DOUBLE_EQ(drone_acceleration.angular.z, 12.0);
 
   // Converting both messages back gives the original trajectory, with the joints of the
   // JointTrajectory first: the wheel, then the base and the drone.
-  const auto new_roboplan_traj =
-      fromJointTrajectory(ros_traj.value(), multi_dof_traj.value(), scene);
+  const auto new_roboplan_traj = fromJointTrajectory(ros_traj, multi_dof_traj, scene);
   ASSERT_TRUE(new_roboplan_traj.has_value()) << new_roboplan_traj.error();
   EXPECT_EQ(new_roboplan_traj->joint_names,
             (std::vector<std::string>{"wheel_joint", "base_joint", "drone_joint"}));
@@ -351,10 +357,11 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectory) {
   wheel_traj.joint_names = {"wheel_joint"};
   wheel_traj.times = {0.0};
   wheel_traj.positions = {(Eigen::VectorXd(2) << 1.0, 0.0).finished()};
-  const auto empty_multi_dof_traj = toMultiDOFJointTrajectory(wheel_traj, scene);
-  ASSERT_TRUE(empty_multi_dof_traj.has_value()) << empty_multi_dof_traj.error();
-  EXPECT_TRUE(empty_multi_dof_traj->joint_names.empty());
-  EXPECT_TRUE(empty_multi_dof_traj->points.empty());
+  const auto wheel_trajs = toRosTrajectories(wheel_traj, scene);
+  ASSERT_TRUE(wheel_trajs.has_value()) << wheel_trajs.error();
+  EXPECT_EQ(wheel_trajs->first.joint_names, std::vector<std::string>{"wheel_joint"});
+  EXPECT_TRUE(wheel_trajs->second.joint_names.empty());
+  EXPECT_TRUE(wheel_trajs->second.points.empty());
 }
 
 TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectoryErrors) {
