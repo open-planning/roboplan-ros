@@ -191,62 +191,56 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
   joint_traj.accelerations.reserve(num_points);
 
   for (size_t i = 0; i < num_points; ++i) {
-    const auto* point = has_single_dof_joints ? &ros_trajectory.points[i] : nullptr;
-    const auto* multi_dof_point = has_multi_dof_joints ? &multi_dof_trajectory.points[i] : nullptr;
-    if (point && multi_dof_point && point->time_from_start != multi_dof_point->time_from_start) {
-      return tl::make_unexpected(
-          "Point " + std::to_string(i) +
-          " has different times in the JointTrajectory and the MultiDOFJointTrajectory");
-    }
-    if (point) {
+    // Both messages must have the same time, and velocities and accelerations for all the joints
+    // or for none.
+    std::optional<builtin_interfaces::msg::Duration> time;
+    std::optional<bool> has_velocities;
+    std::optional<bool> has_accelerations;
+    if (has_single_dof_joints) {
+      const auto& point = ros_trajectory.points[i];
       for (const auto& ok :
-           {checkPointSize(i, "positions", point->positions.size(), num_single_dof_joints, false),
-            checkPointSize(i, "velocities", point->velocities.size(), num_single_dof_joints, true),
-            checkPointSize(i, "accelerations", point->accelerations.size(), num_single_dof_joints,
+           {checkPointSize(i, "positions", point.positions.size(), num_single_dof_joints, false),
+            checkPointSize(i, "velocities", point.velocities.size(), num_single_dof_joints, true),
+            checkPointSize(i, "accelerations", point.accelerations.size(), num_single_dof_joints,
                            true)}) {
         if (!ok) {
           return tl::make_unexpected(ok.error());
         }
       }
+      time = point.time_from_start;
+      has_velocities = !point.velocities.empty();
+      has_accelerations = !point.accelerations.empty();
     }
-    if (multi_dof_point) {
+    if (has_multi_dof_joints) {
+      const auto& point = multi_dof_trajectory.points[i];
+      if (time && *time != point.time_from_start) {
+        return tl::make_unexpected(
+            "Point " + std::to_string(i) +
+            " has different times in the JointTrajectory and the MultiDOFJointTrajectory");
+      }
       for (const auto& ok :
-           {checkPointSize(i, "transforms", multi_dof_point->transforms.size(),
-                           num_multi_dof_joints, false),
-            checkPointSize(i, "velocity twists", multi_dof_point->velocities.size(),
-                           num_multi_dof_joints, true),
-            checkPointSize(i, "acceleration twists", multi_dof_point->accelerations.size(),
+           {checkPointSize(i, "transforms", point.transforms.size(), num_multi_dof_joints, false),
+            checkPointSize(i, "velocity twists", point.velocities.size(), num_multi_dof_joints,
+                           true),
+            checkPointSize(i, "acceleration twists", point.accelerations.size(),
                            num_multi_dof_joints, true)}) {
         if (!ok) {
           return tl::make_unexpected(ok.error());
         }
       }
-    }
-
-    // Velocities and accelerations must be given for all the joints or for none.
-    const auto all_or_none = [&](bool single_has, bool multi_dof_has,
-                                 const std::string& what) -> tl::expected<bool, std::string> {
-      if (point && multi_dof_point && single_has != multi_dof_has) {
-        return tl::make_unexpected("Point " + std::to_string(i) + " has " + what +
-                                   " for some joints only");
+      if (has_velocities && *has_velocities == point.velocities.empty()) {
+        return tl::make_unexpected("Point " + std::to_string(i) +
+                                   " has velocities for some joints only");
       }
-      return point ? single_has : multi_dof_has;
-    };
-    const auto has_velocities =
-        all_or_none(point && !point->velocities.empty(),
-                    multi_dof_point && !multi_dof_point->velocities.empty(), "velocities");
-    if (!has_velocities) {
-      return tl::make_unexpected(has_velocities.error());
+      if (has_accelerations && *has_accelerations == point.accelerations.empty()) {
+        return tl::make_unexpected("Point " + std::to_string(i) +
+                                   " has accelerations for some joints only");
+      }
+      time = point.time_from_start;
+      has_velocities = !point.velocities.empty();
+      has_accelerations = !point.accelerations.empty();
     }
-    const auto has_accelerations =
-        all_or_none(point && !point->accelerations.empty(),
-                    multi_dof_point && !multi_dof_point->accelerations.empty(), "accelerations");
-    if (!has_accelerations) {
-      return tl::make_unexpected(has_accelerations.error());
-    }
-
-    joint_traj.times.push_back(
-        fromDuration(point ? point->time_from_start : multi_dof_point->time_from_start));
+    joint_traj.times.push_back(fromDuration(*time));
     joint_traj.positions.emplace_back(nq);
     joint_traj.velocities.emplace_back(*has_velocities ? nv : 0);
     joint_traj.accelerations.emplace_back(*has_accelerations ? nv : 0);
@@ -263,35 +257,37 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
       return {};
     }
     for (size_t i = 0; i < num_points; ++i) {
-      const auto* point = has_single_dof_joints ? &ros_trajectory.points[i] : nullptr;
-      const auto* multi_dof_point =
-          has_multi_dof_joints ? &multi_dof_trajectory.points[i] : nullptr;
       auto& positions = joint_traj.positions[i];
       auto& velocities = joint_traj.velocities[i];
       auto& accelerations = joint_traj.accelerations[i];
       switch (joint_info.type) {
       case roboplan::JointType::REVOLUTE:
-      case roboplan::JointType::PRISMATIC:
-        positions(q_idx) = point->positions[j];
+      case roboplan::JointType::PRISMATIC: {
+        const auto& point = ros_trajectory.points[i];
+        positions(q_idx) = point.positions[j];
         if (velocities.size() > 0) {
-          velocities(v_idx) = point->velocities[j];
+          velocities(v_idx) = point.velocities[j];
         }
         if (accelerations.size() > 0) {
-          accelerations(v_idx) = point->accelerations[j];
+          accelerations(v_idx) = point.accelerations[j];
         }
         break;
-      case roboplan::JointType::CONTINUOUS:
-        positions(q_idx) = std::cos(point->positions[j]);
-        positions(q_idx + 1) = std::sin(point->positions[j]);
+      }
+      case roboplan::JointType::CONTINUOUS: {
+        const auto& point = ros_trajectory.points[i];
+        positions(q_idx) = std::cos(point.positions[j]);
+        positions(q_idx + 1) = std::sin(point.positions[j]);
         if (velocities.size() > 0) {
-          velocities(v_idx) = point->velocities[j];
+          velocities(v_idx) = point.velocities[j];
         }
         if (accelerations.size() > 0) {
-          accelerations(v_idx) = point->accelerations[j];
+          accelerations(v_idx) = point.accelerations[j];
         }
         break;
+      }
       case roboplan::JointType::PLANAR: {
-        const auto& transform = multi_dof_point->transforms[j];
+        const auto& point = multi_dof_trajectory.points[i];
+        const auto& transform = point.transforms[j];
         const auto rotation = normalizedRotation(transform.rotation);
         if (!rotation) {
           return tl::make_unexpected("Point " + std::to_string(i) +
@@ -307,17 +303,18 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
         positions.segment<4>(q_idx) << transform.translation.x, transform.translation.y,
             matrix(0, 0) / norm, matrix(1, 0) / norm;
         if (velocities.size() > 0) {
-          const auto& twist = multi_dof_point->velocities[j];
+          const auto& twist = point.velocities[j];
           velocities.segment<3>(v_idx) << twist.linear.x, twist.linear.y, twist.angular.z;
         }
         if (accelerations.size() > 0) {
-          const auto& twist = multi_dof_point->accelerations[j];
+          const auto& twist = point.accelerations[j];
           accelerations.segment<3>(v_idx) << twist.linear.x, twist.linear.y, twist.angular.z;
         }
         break;
       }
       case roboplan::JointType::FLOATING: {
-        const auto& transform = multi_dof_point->transforms[j];
+        const auto& point = multi_dof_trajectory.points[i];
+        const auto& transform = point.transforms[j];
         const auto rotation = normalizedRotation(transform.rotation);
         if (!rotation) {
           return tl::make_unexpected("Point " + std::to_string(i) +
@@ -327,11 +324,11 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
             transform.translation.z, rotation->x(), rotation->y(), rotation->z(), rotation->w();
         Eigen::Matrix<double, 6, 1> twist;
         if (velocities.size() > 0) {
-          tf2::fromMsg(multi_dof_point->velocities[j], twist);
+          tf2::fromMsg(point.velocities[j], twist);
           velocities.segment<6>(v_idx) = twist;
         }
         if (accelerations.size() > 0) {
-          tf2::fromMsg(multi_dof_point->accelerations[j], twist);
+          tf2::fromMsg(point.accelerations[j], twist);
           accelerations.segment<6>(v_idx) = twist;
         }
         break;
