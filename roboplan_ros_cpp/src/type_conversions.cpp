@@ -116,7 +116,7 @@ geometry_msgs::msg::Quaternion continuousQuaternion(Eigen::Quaterniond rotation,
   return tf2::toMsg(rotation);
 }
 
-/// @brief Implements fromJointTrajectory and fromRosTrajectories.
+/// @brief The shared implementation of fromJointTrajectory and fromRosTrajectories.
 tl::expected<roboplan::JointTrajectory, std::string>
 fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                 const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
@@ -492,8 +492,8 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
 
 namespace {
 
-/// @brief Implements toJointTrajectory and toRosTrajectories. Unless allow_multi_dof, planar and
-/// floating joints are an error.
+/// @brief The shared implementation of toJointTrajectory and toRosTrajectories. If
+/// allow_multi_dof is false, as for toJointTrajectory, planar and floating joints are an error.
 tl::expected<RosTrajectories, std::string>
 toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const roboplan::Scene& scene,
               bool allow_multi_dof) {
