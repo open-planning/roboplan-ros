@@ -52,33 +52,29 @@ tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTra
       nv += joint_info->num_velocity_dofs;
     }
   }
-  for (size_t i = 0; i < trajectory.times.size(); ++i) {
-    if (i < trajectory.positions.size()) {
-      if (auto ok = checkPointSize(i, "positions", trajectory.positions[i].size(), nq, false);
-          !ok) {
+  // Positions, velocities and accelerations each have no values, or one per time.
+  const auto check_field = [&](const std::string& what, const std::vector<Eigen::VectorXd>& values,
+                               size_t expected) -> tl::expected<void, std::string> {
+    if (!values.empty() && values.size() != trajectory.times.size()) {
+      return tl::make_unexpected("Failed to convert the trajectory: It has " +
+                                 std::to_string(trajectory.times.size()) + " times but " +
+                                 std::to_string(values.size()) + " " + what +
+                                 ", expected one per time or none");
+    }
+    for (size_t i = 0; i < values.size(); ++i) {
+      if (auto ok = checkPointSize(i, what, values[i].size(), expected, false); !ok) {
         return ok;
       }
     }
-    if (i < trajectory.velocities.size()) {
-      if (auto ok = checkPointSize(i, "velocities", trajectory.velocities[i].size(), nv, true);
-          !ok) {
-        return ok;
-      }
-    }
-    if (i < trajectory.accelerations.size()) {
-      if (auto ok =
-              checkPointSize(i, "accelerations", trajectory.accelerations[i].size(), nv, true);
-          !ok) {
-        return ok;
-      }
-    }
+    return {};
+  };
+  if (auto ok = check_field("positions", trajectory.positions, nq); !ok) {
+    return ok;
   }
-  return {};
-}
-
-/// @brief Point i's values, or nullptr if it has none.
-const Eigen::VectorXd* pointValues(const std::vector<Eigen::VectorXd>& values, size_t i) {
-  return i < values.size() && values[i].size() > 0 ? &values[i] : nullptr;
+  if (auto ok = check_field("velocities", trajectory.velocities, nv); !ok) {
+    return ok;
+  }
+  return check_field("accelerations", trajectory.accelerations, nv);
 }
 
 /// @brief Returns angle plus the multiple of 2 pi that brings it closest to previous, if any.
@@ -501,6 +497,10 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
   if (auto ok = checkRoboPlanTrajectory(roboplan_trajectory, scene); !ok) {
     return tl::make_unexpected(ok.error());
   }
+  // checkRoboPlanTrajectory made sure each of these has no values, or one per time.
+  const auto& positions = roboplan_trajectory.positions;
+  const auto& velocities = roboplan_trajectory.velocities;
+  const auto& accelerations = roboplan_trajectory.accelerations;
   RosTrajectories ros;
   auto& [joint_traj, multi_dof_traj] = ros;
   joint_traj.points.resize(roboplan_trajectory.times.size());
@@ -528,14 +528,14 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
       joint_traj.joint_names.push_back(joint_name);
       for (size_t i = 0; i < joint_traj.points.size(); ++i) {
         auto& point = joint_traj.points[i];
-        if (const auto* positions = pointValues(roboplan_trajectory.positions, i)) {
-          point.positions.push_back((*positions)(q_idx));
+        if (!positions.empty()) {
+          point.positions.push_back(positions[i](q_idx));
         }
-        if (const auto* velocities = pointValues(roboplan_trajectory.velocities, i)) {
-          point.velocities.push_back((*velocities)(v_idx));
+        if (!velocities.empty()) {
+          point.velocities.push_back(velocities[i](v_idx));
         }
-        if (const auto* accelerations = pointValues(roboplan_trajectory.accelerations, i)) {
-          point.accelerations.push_back((*accelerations)(v_idx));
+        if (!accelerations.empty()) {
+          point.accelerations.push_back(accelerations[i](v_idx));
         }
       }
       break;
@@ -544,17 +544,17 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
       std::optional<double> previous_angle;
       for (size_t i = 0; i < joint_traj.points.size(); ++i) {
         auto& point = joint_traj.points[i];
-        if (const auto* positions = pointValues(roboplan_trajectory.positions, i)) {
+        if (!positions.empty()) {
           const auto angle =
-              unwrapAngle(std::atan2((*positions)(q_idx + 1), (*positions)(q_idx)), previous_angle);
+              unwrapAngle(std::atan2(positions[i](q_idx + 1), positions[i](q_idx)), previous_angle);
           previous_angle = angle;
           point.positions.push_back(angle);
         }
-        if (const auto* velocities = pointValues(roboplan_trajectory.velocities, i)) {
-          point.velocities.push_back((*velocities)(v_idx));
+        if (!velocities.empty()) {
+          point.velocities.push_back(velocities[i](v_idx));
         }
-        if (const auto* accelerations = pointValues(roboplan_trajectory.accelerations, i)) {
-          point.accelerations.push_back((*accelerations)(v_idx));
+        if (!accelerations.empty()) {
+          point.accelerations.push_back(accelerations[i](v_idx));
         }
       }
       break;
@@ -564,8 +564,8 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
       std::optional<Eigen::Quaterniond> previous_rotation;
       for (size_t i = 0; i < multi_dof_traj.points.size(); ++i) {
         auto& point = multi_dof_traj.points[i];
-        if (const auto* positions = pointValues(roboplan_trajectory.positions, i)) {
-          const auto& q = *positions;
+        if (!positions.empty()) {
+          const auto& q = positions[i];
           geometry_msgs::msg::Transform transform;
           transform.translation.x = q(q_idx);
           transform.translation.y = q(q_idx + 1);
@@ -575,11 +575,11 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
               previous_rotation);
           point.transforms.push_back(transform);
         }
-        if (const auto* velocities = pointValues(roboplan_trajectory.velocities, i)) {
-          point.velocities.push_back(planarTwist(*velocities, v_idx));
+        if (!velocities.empty()) {
+          point.velocities.push_back(planarTwist(velocities[i], v_idx));
         }
-        if (const auto* accelerations = pointValues(roboplan_trajectory.accelerations, i)) {
-          point.accelerations.push_back(planarTwist(*accelerations, v_idx));
+        if (!accelerations.empty()) {
+          point.accelerations.push_back(planarTwist(accelerations[i], v_idx));
         }
       }
       break;
@@ -589,8 +589,8 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
       std::optional<Eigen::Quaterniond> previous_rotation;
       for (size_t i = 0; i < multi_dof_traj.points.size(); ++i) {
         auto& point = multi_dof_traj.points[i];
-        if (const auto* positions = pointValues(roboplan_trajectory.positions, i)) {
-          const auto& q = *positions;
+        if (!positions.empty()) {
+          const auto& q = positions[i];
           geometry_msgs::msg::Transform transform;
           transform.translation.x = q(q_idx);
           transform.translation.y = q(q_idx + 1);
@@ -600,13 +600,13 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
               previous_rotation);
           point.transforms.push_back(transform);
         }
-        if (const auto* velocities = pointValues(roboplan_trajectory.velocities, i)) {
+        if (!velocities.empty()) {
           point.velocities.push_back(
-              tf2::toMsg(Eigen::Matrix<double, 6, 1>(velocities->segment<6>(v_idx))));
+              tf2::toMsg(Eigen::Matrix<double, 6, 1>(velocities[i].segment<6>(v_idx))));
         }
-        if (const auto* accelerations = pointValues(roboplan_trajectory.accelerations, i)) {
+        if (!accelerations.empty()) {
           point.accelerations.push_back(
-              tf2::toMsg(Eigen::Matrix<double, 6, 1>(accelerations->segment<6>(v_idx))));
+              tf2::toMsg(Eigen::Matrix<double, 6, 1>(accelerations[i].segment<6>(v_idx))));
         }
       }
       break;

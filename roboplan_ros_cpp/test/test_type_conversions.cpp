@@ -232,6 +232,20 @@ TEST_F(TypeConversionsTest, TestConvertJointTrajectoryErrors) {
   ASSERT_FALSE(collapsed.has_value());
   EXPECT_EQ(collapsed.error(),
             "Failed to convert the trajectory: Point 0 has 1 positions, expected 2");
+
+  // Velocities, like positions and accelerations, are given for every point or for none.
+  roboplan_traj.times = {0.0, 1.0};
+  roboplan_traj.positions = {Eigen::Vector2d(1.0, 0.0), Eigen::Vector2d(0.0, 1.0)};
+  roboplan_traj.velocities = {Eigen::VectorXd::Constant(1, 0.5)};
+  const auto too_few = toJointTrajectory(roboplan_traj, scene);
+  ASSERT_FALSE(too_few.has_value());
+  EXPECT_EQ(too_few.error(), "Failed to convert the trajectory: It has 2 times but 1 velocities, "
+                             "expected one per time or none");
+  roboplan_traj.velocities = {Eigen::VectorXd::Constant(1, 0.5), Eigen::VectorXd()};
+  const auto empty_point = toJointTrajectory(roboplan_traj, scene);
+  ASSERT_FALSE(empty_point.has_value());
+  EXPECT_EQ(empty_point.error(),
+            "Failed to convert the trajectory: Point 1 has 0 velocities, expected 1");
 }
 
 TEST_F(TypeConversionsTest, TestJointTrajectoryUnwrapsContinuousJoints) {
