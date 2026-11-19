@@ -118,6 +118,11 @@ LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
 [target.linux.activation.env]
 CXXFLAGS = "-fuse-ld=mold"
 
+# Match the x86-64 baseline of conda-forge binaries, regardless of the compiler default.
+# Eigen's memory layout and allocator depend on this, so a mismatch crashes at runtime.
+[target.linux-64.activation.env]
+CXXFLAGS = "-fuse-ld=mold -march=x86-64"
+
 # Windows activation scripts expand %VAR% instead of $VAR.
 [target.win.activation]
 scripts = ['install\setup.bat']
