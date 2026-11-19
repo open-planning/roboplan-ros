@@ -13,6 +13,8 @@ namespace roboplan_ros_cpp {
 
 namespace {
 
+using roboplan::JointType;
+
 /// @brief Below this norm, a quaternion is taken to be zero, which is no rotation.
 constexpr double kMinQuaternionNorm = 1e-9;
 
@@ -22,7 +24,7 @@ constexpr double kMinPlanarAxisNorm = 1e-9;
 
 /// @brief Whether a joint has several degrees of freedom: planar and floating joints.
 bool isMultiDof(const roboplan::JointInfo& info) {
-  return info.type == roboplan::JointType::PLANAR || info.type == roboplan::JointType::FLOATING;
+  return info.type == JointType::PLANAR || info.type == JointType::FLOATING;
 }
 
 /// @brief Checks that point i has `expected` values for a field, or none if it is optional.
@@ -261,8 +263,8 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
       auto& velocities = joint_traj.velocities[i];
       auto& accelerations = joint_traj.accelerations[i];
       switch (joint_info.type) {
-      case roboplan::JointType::REVOLUTE:
-      case roboplan::JointType::PRISMATIC: {
+      case JointType::REVOLUTE:
+      case JointType::PRISMATIC: {
         const auto& point = ros_trajectory.points[i];
         positions(q_idx) = point.positions[j];
         if (velocities.size() > 0) {
@@ -273,7 +275,7 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
         }
         break;
       }
-      case roboplan::JointType::CONTINUOUS: {
+      case JointType::CONTINUOUS: {
         const auto& point = ros_trajectory.points[i];
         positions(q_idx) = std::cos(point.positions[j]);
         positions(q_idx + 1) = std::sin(point.positions[j]);
@@ -285,7 +287,7 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
         }
         break;
       }
-      case roboplan::JointType::PLANAR: {
+      case JointType::PLANAR: {
         const auto& point = multi_dof_trajectory.points[i];
         const auto& transform = point.transforms[j];
         const auto rotation = normalizedRotation(transform.rotation);
@@ -312,7 +314,7 @@ fromRosMessages(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
         }
         break;
       }
-      case roboplan::JointType::FLOATING: {
+      case JointType::FLOATING: {
         const auto& point = multi_dof_trajectory.points[i];
         const auto& transform = point.transforms[j];
         const auto rotation = normalizedRotation(transform.rotation);
@@ -425,7 +427,7 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
     const auto v_idx = model.idx_vs.at(joint_id);
 
     msg.name.push_back(joint_name);
-    if (info.type == roboplan::JointType::CONTINUOUS) {
+    if (info.type == JointType::CONTINUOUS) {
       const auto theta = std::atan2(config.positions(q_idx + 1), config.positions(q_idx));
       msg.position.push_back(theta);
     } else {
@@ -463,7 +465,7 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
       return tl::make_unexpected("Missing position data for joint '" + mapping.joint_name + "'");
     }
 
-    if (mapping.type == roboplan::JointType::CONTINUOUS) {
+    if (mapping.type == JointType::CONTINUOUS) {
       const double theta = joint_state.position.at(ros_idx);
       config.positions(mapping.q_start) = std::cos(theta);
       config.positions(mapping.q_start + 1) = std::sin(theta);
@@ -524,8 +526,8 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
                                  "represent it, use toRosTrajectories");
     }
     switch (joint_info.type) {
-    case roboplan::JointType::REVOLUTE:
-    case roboplan::JointType::PRISMATIC:
+    case JointType::REVOLUTE:
+    case JointType::PRISMATIC:
       joint_traj.joint_names.push_back(joint_name);
       for (size_t i = 0; i < joint_traj.points.size(); ++i) {
         auto& point = joint_traj.points[i];
@@ -540,7 +542,7 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
         }
       }
       break;
-    case roboplan::JointType::CONTINUOUS: {
+    case JointType::CONTINUOUS: {
       joint_traj.joint_names.push_back(joint_name);
       std::optional<double> previous_angle;
       for (size_t i = 0; i < joint_traj.points.size(); ++i) {
@@ -560,7 +562,7 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
       }
       break;
     }
-    case roboplan::JointType::PLANAR: {
+    case JointType::PLANAR: {
       multi_dof_traj.joint_names.push_back(joint_name);
       std::optional<Eigen::Quaterniond> previous_rotation;
       for (size_t i = 0; i < multi_dof_traj.points.size(); ++i) {
@@ -585,7 +587,7 @@ toRosMessages(const roboplan::JointTrajectory& roboplan_trajectory, const robopl
       }
       break;
     }
-    case roboplan::JointType::FLOATING: {
+    case JointType::FLOATING: {
       multi_dof_traj.joint_names.push_back(joint_name);
       std::optional<Eigen::Quaterniond> previous_rotation;
       for (size_t i = 0; i < multi_dof_traj.points.size(); ++i) {
