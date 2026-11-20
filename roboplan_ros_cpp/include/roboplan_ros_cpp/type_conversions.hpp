@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <utility>
 
 #include <Eigen/Dense>
 #include <geometry_msgs/msg/pose.hpp>
@@ -12,6 +13,7 @@
 #include <tl/expected.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
+#include <trajectory_msgs/msg/multi_dof_joint_trajectory.hpp>
 
 namespace roboplan_ros_cpp {
 
@@ -95,20 +97,57 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
                const JointStateConverterMap& joint_conversion_map,
                const std::optional<Eigen::VectorXd>& q_reference = std::nullopt);
 
-/// @brief Converts a roboplan::JointTrajectory object to a ROS 2 JointTrajectory message.
-/// @details This function will convert joint names and joint trajectory points. The caller
-/// is responsible for any additional configuration that is required in the message.
-/// @param roboplan_trajectory The roboplan JointTrajectory to convert
-/// @return An equivalent ROS 2 JointTrajectory message.
-trajectory_msgs::msg::JointTrajectory
-toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory);
+/// @brief A trajectory as ROS 2 messages: the single degree of freedom joints in the
+/// JointTrajectory, the planar and floating joints in the MultiDOFJointTrajectory.
+using RosTrajectories =
+    std::pair<trajectory_msgs::msg::JointTrajectory, trajectory_msgs::msg::MultiDOFJointTrajectory>;
 
-/// @brief Convert the provided ROS 2 JointTrajectory message to an equivalent
-/// roboplan::JointTrajectory.
+/// @brief Converts a roboplan::JointTrajectory to a ROS 2 JointTrajectory message.
+/// @details Continuous joints become angles, unwrapped along the trajectory. Mimic joints are left
+/// out. Planar and floating joints are an error: use toRosTrajectories for them.
+/// @param roboplan_trajectory The roboplan JointTrajectory to convert.
+/// @param scene The RoboPlan scene containing the model's joint information.
+/// @return An equivalent ROS 2 JointTrajectory message, or an error.
+tl::expected<trajectory_msgs::msg::JointTrajectory, std::string>
+toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
+                  const roboplan::Scene& scene);
+
+/// @brief Converts a roboplan::JointTrajectory with any kind of joint to a ROS 2 JointTrajectory
+/// and MultiDOFJointTrajectory.
+/// @details The JointTrajectory is as in toJointTrajectory. The MultiDOFJointTrajectory has one
+/// transform per joint and point, and twists in the joint's own frame, as in RoboPlan. A message
+/// without joints has no points.
+/// @param roboplan_trajectory The roboplan JointTrajectory to convert.
+/// @param scene The RoboPlan scene containing the model's joint information.
+/// @return The JointTrajectory and MultiDOFJointTrajectory, or an error.
+tl::expected<RosTrajectories, std::string>
+toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
+                  const roboplan::Scene& scene);
+
+/// @brief Converts a ROS 2 JointTrajectory message to a roboplan::JointTrajectory.
+/// @details Mimic joints are left out. Planar and floating joints are an error: use
+/// fromRosTrajectories for them.
 /// @param ros_trajectory The ROS 2 JointTrajectory message to convert.
-/// @return An equivalent roboplan::JointTrajectory.
-roboplan::JointTrajectory
-fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory);
+/// @param scene The RoboPlan scene containing the model's joint information.
+/// @return An equivalent roboplan::JointTrajectory, or an error.
+tl::expected<roboplan::JointTrajectory, std::string>
+fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
+                    const roboplan::Scene& scene);
+
+/// @brief Converts a ROS 2 JointTrajectory and MultiDOFJointTrajectory pair, as made by
+/// toRosTrajectories, to one roboplan::JointTrajectory.
+/// @details Either message may have no joints; otherwise both must have the same points at the
+/// same times. The joints of the JointTrajectory come first, then those of the
+/// MultiDOFJointTrajectory, each in their message's order.
+/// @param ros_trajectory The ROS 2 JointTrajectory message with the single DOF joints.
+/// @param multi_dof_trajectory The ROS 2 MultiDOFJointTrajectory with the planar and floating
+/// joints.
+/// @param scene The RoboPlan scene containing the model's joint information.
+/// @return An equivalent roboplan::JointTrajectory, or an error.
+tl::expected<roboplan::JointTrajectory, std::string>
+fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
+                    const trajectory_msgs::msg::MultiDOFJointTrajectory& multi_dof_trajectory,
+                    const roboplan::Scene& scene);
 
 /// @brief Converts a roboplan::CartesianConfiguration to a ROS 2 TransformStamped message.
 /// @param cartesian_configuration The roboplan CartesianConfiguration to convert.

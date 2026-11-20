@@ -12,14 +12,24 @@ def se3ToPose(transform: Annotated[NDArray[numpy.float64], dict(shape=(4, 4), or
 def poseToSE3(py_pose: object) -> Annotated[NDArray[numpy.float64], dict(shape=(4, 4), order='F')]:
     """Converts the provided geometry_msgs::msg::Pose to an SE3 Matrix."""
 
-def toJointTrajectory(py_roboplan_traj: object) -> object:
+def toJointTrajectory(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> object:
     """
-    Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory.
+    Converts a roboplan::JointTrajectory to a trajectory_msgs::msg::JointTrajectory. Continuous joints become angles, unwrapped along the trajectory, and mimic joints are left out. Planar and floating joints are an error: use toRosTrajectories for them.
     """
 
-def fromJointTrajectory(py_ros_traj: object) -> object:
+def toRosTrajectories(py_roboplan_traj: object, py_scene: "roboplan::Scene") -> tuple:
     """
-    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory.
+    Converts a roboplan::JointTrajectory with any kind of joint to a (trajectory_msgs::msg::JointTrajectory, trajectory_msgs::msg::MultiDOFJointTrajectory) tuple: the single degree of freedom joints as in toJointTrajectory, the planar and floating joints as transforms, with twists in each joint's own frame.
+    """
+
+def fromJointTrajectory(py_ros_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
+    """
+    Converts a trajectory_msgs::msg::JointTrajectory to a roboplan::JointTrajectory. Continuous joints become [cos, sin] positions, and mimic joints are left out. Planar and floating joints are an error: use fromRosTrajectories for them.
+    """
+
+def fromRosTrajectories(py_ros_traj: object, py_multi_dof_traj: object, py_scene: "roboplan::Scene") -> "roboplan::JointTrajectory":
+    """
+    Converts a trajectory_msgs::msg::JointTrajectory with the single degree of freedom joints and a trajectory_msgs::msg::MultiDOFJointTrajectory with the planar and floating joints to one roboplan::JointTrajectory, with the joints of the JointTrajectory in their order, then those of the MultiDOFJointTrajectory in theirs.
     """
 
 def toTransformStamped(cartesian_config: "roboplan::CartesianConfiguration") -> object:

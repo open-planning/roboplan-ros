@@ -491,7 +491,7 @@ class PlanAndExecuteNode(Node):
             return False, "Action server not available."
 
         goal = FollowJointTrajectory.Goal()
-        goal.trajectory = toJointTrajectory(traj)
+        goal.trajectory = toJointTrajectory(traj, self._scene)
 
         self.get_logger().info("Sending trajectory for execution...")
         future = self._execute_client.send_goal_async(

@@ -17,11 +17,13 @@ from ._cpp_ext import (  # noqa: F401
     buildConversionMap,
     fromJointState,
     fromJointTrajectory,
+    fromRosTrajectories,
     fromTransformStamped,
     poseToSE3,
     se3ToPose,
     toJointState,
     toJointTrajectory,
+    toRosTrajectories,
     toTransformStamped,
 )
 
@@ -31,10 +33,12 @@ __all__ = [
     "buildConversionMap",
     "fromJointState",
     "fromJointTrajectory",
+    "fromRosTrajectories",
     "fromTransformStamped",
     "poseToSE3",
     "se3ToPose",
     "toJointState",
     "toJointTrajectory",
+    "toRosTrajectories",
     "toTransformStamped",
 ]
