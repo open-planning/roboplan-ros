@@ -186,7 +186,8 @@ appendJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajector
     }
   }
 
-  // Make room for the values.
+  // Make room for the values. The first message appended adds the points and their times; a
+  // later one has the same points (fromRosTrajectories checks it), so it only grows each point.
   if (trajectory.times.empty()) {
     for (const auto& point : ros_trajectory.points) {
       trajectory.times.push_back(fromDuration(point.time_from_start));
@@ -306,7 +307,8 @@ appendMultiDOFJointTrajectory(const trajectory_msgs::msg::MultiDOFJointTrajector
     }
   }
 
-  // Make room for the values.
+  // Make room for the values. The first message appended adds the points and their times; a
+  // later one has the same points (fromRosTrajectories checks it), so it only grows each point.
   if (trajectory.times.empty()) {
     for (const auto& point : ros_trajectory.points) {
       trajectory.times.push_back(fromDuration(point.time_from_start));
