@@ -197,9 +197,7 @@ def test_convert_joint_trajectory_with_continuous_joint():
     ros_traj.points[0].positions = [0.5]
     with pytest.raises(RuntimeError) as exc_info:
         fromJointTrajectory(ros_traj, scene)
-    expected_error = (
-        "Failed to convert the trajectory: Point 0 has 1 positions, expected 2"
-    )
+    expected_error = "Point 0 has 1 positions, expected 2"
     assert str(exc_info.value) == expected_error
 
 

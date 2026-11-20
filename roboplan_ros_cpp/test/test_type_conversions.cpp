@@ -216,8 +216,7 @@ TEST_F(TypeConversionsTest, TestConvertJointTrajectoryErrors) {
   msg.points[0].positions = {0.5};
   const auto wrong_size = fromJointTrajectory(msg, scene);
   ASSERT_FALSE(wrong_size.has_value());
-  EXPECT_EQ(wrong_size.error(),
-            "Failed to convert the trajectory: Point 0 has 1 positions, expected 2");
+  EXPECT_EQ(wrong_size.error(), "Point 0 has 1 positions, expected 2");
 
   msg.joint_names = {"continuous_joint", "no_such_joint"};
   msg.points[0].positions = {0.5, 0.1};
@@ -230,8 +229,7 @@ TEST_F(TypeConversionsTest, TestConvertJointTrajectoryErrors) {
   roboplan_traj.positions = {Eigen::VectorXd::Constant(1, 0.5)};
   const auto collapsed = toJointTrajectory(roboplan_traj, scene);
   ASSERT_FALSE(collapsed.has_value());
-  EXPECT_EQ(collapsed.error(),
-            "Failed to convert the trajectory: Point 0 has 1 positions, expected 2");
+  EXPECT_EQ(collapsed.error(), "Point 0 has 1 positions, expected 2");
 
   // Velocities, like positions and accelerations, are given for every point or for none.
   roboplan_traj.times = {0.0, 1.0};
@@ -239,13 +237,12 @@ TEST_F(TypeConversionsTest, TestConvertJointTrajectoryErrors) {
   roboplan_traj.velocities = {Eigen::VectorXd::Constant(1, 0.5)};
   const auto too_few = toJointTrajectory(roboplan_traj, scene);
   ASSERT_FALSE(too_few.has_value());
-  EXPECT_EQ(too_few.error(), "Failed to convert the trajectory: It has 2 times but 1 velocities, "
+  EXPECT_EQ(too_few.error(), "The trajectory has 2 times but 1 velocities, "
                              "expected one per time or none");
   roboplan_traj.velocities = {Eigen::VectorXd::Constant(1, 0.5), Eigen::VectorXd()};
   const auto empty_point = toJointTrajectory(roboplan_traj, scene);
   ASSERT_FALSE(empty_point.has_value());
-  EXPECT_EQ(empty_point.error(),
-            "Failed to convert the trajectory: Point 1 has 0 velocities, expected 1");
+  EXPECT_EQ(empty_point.error(), "Point 1 has 0 velocities, expected 1");
 }
 
 TEST_F(TypeConversionsTest, TestJointTrajectoryUnwrapsContinuousJoints) {
@@ -303,9 +300,8 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectory) {
   // A JointTrajectory alone cannot hold the base and the drone.
   const auto joint_only = toJointTrajectory(roboplan_traj, scene);
   ASSERT_FALSE(joint_only.has_value());
-  EXPECT_EQ(joint_only.error(),
-            "Failed to convert the trajectory: Joint 'base_joint' has several degrees of freedom: "
-            "a JointTrajectory cannot represent it, use toRosTrajectories");
+  EXPECT_EQ(joint_only.error(), "Joint 'base_joint' has several degrees of freedom: "
+                                "a JointTrajectory cannot represent it, use toRosTrajectories");
 
   const auto ros_trajs = toRosTrajectories(roboplan_traj, scene);
   ASSERT_TRUE(ros_trajs.has_value()) << ros_trajs.error();
@@ -381,7 +377,6 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectory) {
 TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectoryErrors) {
   const auto scene =
       roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(mobile_urdf_path));
-  const auto prefix = std::string("Failed to convert the trajectory: ");
 
   trajectory_msgs::msg::JointTrajectory joint_msg;
   joint_msg.joint_names = {"wheel_joint"};
@@ -404,37 +399,35 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectoryErrors) {
   auto wrong_joint_msg = joint_msg;
   wrong_joint_msg.joint_names = {"base_joint"};
   EXPECT_EQ(fromJointTrajectory(wrong_joint_msg, scene).error(),
-            prefix + "Joint 'base_joint' has several degrees of freedom: a JointTrajectory cannot "
-                     "represent it, use fromRosTrajectories");
+            "Joint 'base_joint' has several degrees of freedom: a JointTrajectory cannot "
+            "represent it, use fromRosTrajectories");
   auto wrong_multi_dof_msg = multi_dof_msg;
   wrong_multi_dof_msg.joint_names = {"wheel_joint"};
   EXPECT_EQ(fromRosTrajectories(joint_msg, wrong_multi_dof_msg, scene).error(),
-            prefix + "Joint 'wheel_joint' has a single degree of freedom: it belongs in the "
-                     "JointTrajectory");
+            "Joint 'wheel_joint' has a single degree of freedom: it belongs in the "
+            "JointTrajectory");
 
   // Both messages must have the same points.
   auto short_msg = multi_dof_msg;
   short_msg.points.pop_back();
   EXPECT_EQ(fromRosTrajectories(joint_msg, short_msg, scene).error(),
-            prefix + "The JointTrajectory has 2 points, the MultiDOFJointTrajectory 1");
+            "The JointTrajectory has 2 points, the MultiDOFJointTrajectory 1");
   auto late_msg = multi_dof_msg;
   late_msg.points[1].time_from_start.sec = 2;
-  EXPECT_EQ(
-      fromRosTrajectories(joint_msg, late_msg, scene).error(),
-      prefix +
-          "Point 1 has different times in the JointTrajectory and the MultiDOFJointTrajectory");
+  EXPECT_EQ(fromRosTrajectories(joint_msg, late_msg, scene).error(),
+            "Point 1 has different times in the JointTrajectory and the MultiDOFJointTrajectory");
 
   // Velocities are given for all the joints or for none.
   auto moving_msg = multi_dof_msg;
   moving_msg.points[0].velocities.resize(1);
   EXPECT_EQ(fromRosTrajectories(joint_msg, moving_msg, scene).error(),
-            prefix + "Point 0 has velocities for some joints only");
+            "Point 0 has velocities for some joints only");
 
   // A quaternion must not be zero.
   auto zero_msg = multi_dof_msg;
   zero_msg.points[0].transforms[0].rotation.w = 0.0;
   EXPECT_EQ(fromRosTrajectories(joint_msg, zero_msg, scene).error(),
-            prefix + "Point 0 has a zero quaternion for joint 'base_joint'");
+            "Point 0 has a zero quaternion for joint 'base_joint'");
 }
 
 TEST_F(TypeConversionsTest, TestEmptyConversions) {

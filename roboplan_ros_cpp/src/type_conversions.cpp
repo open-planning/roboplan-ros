@@ -22,9 +22,6 @@ constexpr double kMinQuaternionNorm = 1e-9;
 /// in the xy plane, so the rotation has no angle about z.
 constexpr double kMinPlanarAxisNorm = 1e-9;
 
-/// @brief The start of the errors of the trajectory conversions.
-const std::string kConversionFailed = "Failed to convert the trajectory: ";
-
 /// @brief Whether a joint has several degrees of freedom: planar and floating joints.
 bool isMultiDof(const roboplan::JointInfo& info) {
   return info.type == JointType::PLANAR || info.type == JointType::FLOATING;
@@ -59,17 +56,17 @@ tl::expected<void, std::string> checkRoboPlanTrajectory(const roboplan::JointTra
   // Positions, velocities and accelerations each have no values, or one per time.
   const auto num_times = trajectory.times.size();
   if (!trajectory.positions.empty() && trajectory.positions.size() != num_times) {
-    return tl::make_unexpected("It has " + std::to_string(num_times) + " times but " +
+    return tl::make_unexpected("The trajectory has " + std::to_string(num_times) + " times but " +
                                std::to_string(trajectory.positions.size()) +
                                " positions, expected one per time or none");
   }
   if (!trajectory.velocities.empty() && trajectory.velocities.size() != num_times) {
-    return tl::make_unexpected("It has " + std::to_string(num_times) + " times but " +
+    return tl::make_unexpected("The trajectory has " + std::to_string(num_times) + " times but " +
                                std::to_string(trajectory.velocities.size()) +
                                " velocities, expected one per time or none");
   }
   if (!trajectory.accelerations.empty() && trajectory.accelerations.size() != num_times) {
-    return tl::make_unexpected("It has " + std::to_string(num_times) + " times but " +
+    return tl::make_unexpected("The trajectory has " + std::to_string(num_times) + " times but " +
                                std::to_string(trajectory.accelerations.size()) +
                                " accelerations, expected one per time or none");
   }
@@ -695,35 +692,31 @@ tl::expected<trajectory_msgs::msg::JointTrajectory, std::string>
 toJointTrajectory(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene) {
   if (auto ok = checkRoboPlanTrajectory(roboplan_trajectory, scene); !ok) {
-    return tl::make_unexpected(kConversionFailed + ok.error());
+    return tl::make_unexpected(ok.error());
   }
   for (const auto& joint_name : roboplan_trajectory.joint_names) {
     if (isMultiDof(scene.getJointInfo(joint_name).value())) {
-      return tl::make_unexpected(kConversionFailed + "Joint '" + joint_name +
+      return tl::make_unexpected("Joint '" + joint_name +
                                  "' has several degrees of freedom: a JointTrajectory cannot "
                                  "represent it, use toRosTrajectories");
     }
   }
-  auto ros_trajectory = toJointTrajectoryMessage(roboplan_trajectory, scene);
-  if (!ros_trajectory) {
-    return tl::make_unexpected(kConversionFailed + ros_trajectory.error());
-  }
-  return ros_trajectory;
+  return toJointTrajectoryMessage(roboplan_trajectory, scene);
 }
 
 tl::expected<RosTrajectories, std::string>
 toRosTrajectories(const roboplan::JointTrajectory& roboplan_trajectory,
                   const roboplan::Scene& scene) {
   if (auto ok = checkRoboPlanTrajectory(roboplan_trajectory, scene); !ok) {
-    return tl::make_unexpected(kConversionFailed + ok.error());
+    return tl::make_unexpected(ok.error());
   }
   auto ros_trajectory = toJointTrajectoryMessage(roboplan_trajectory, scene);
   if (!ros_trajectory) {
-    return tl::make_unexpected(kConversionFailed + ros_trajectory.error());
+    return tl::make_unexpected(ros_trajectory.error());
   }
   auto multi_dof_trajectory = toMultiDOFJointTrajectoryMessage(roboplan_trajectory, scene);
   if (!multi_dof_trajectory) {
-    return tl::make_unexpected(kConversionFailed + multi_dof_trajectory.error());
+    return tl::make_unexpected(multi_dof_trajectory.error());
   }
   return RosTrajectories{std::move(*ros_trajectory), std::move(*multi_dof_trajectory)};
 }
@@ -733,7 +726,7 @@ fromJointTrajectory(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
                     const roboplan::Scene& scene) {
   roboplan::JointTrajectory trajectory;
   if (auto ok = appendJointTrajectory(ros_trajectory, scene, trajectory); !ok) {
-    return tl::make_unexpected(kConversionFailed + ok.error());
+    return tl::make_unexpected(ok.error());
   }
   return trajectory;
 }
@@ -749,8 +742,7 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
   if (has_single_dof_joints && has_multi_dof_joints) {
     const auto num_points = ros_trajectory.points.size();
     if (multi_dof_trajectory.points.size() != num_points) {
-      return tl::make_unexpected(kConversionFailed + "The JointTrajectory has " +
-                                 std::to_string(num_points) +
+      return tl::make_unexpected("The JointTrajectory has " + std::to_string(num_points) +
                                  " points, the MultiDOFJointTrajectory " +
                                  std::to_string(multi_dof_trajectory.points.size()));
     }
@@ -759,15 +751,15 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
       const auto& multi_dof_point = multi_dof_trajectory.points[i];
       if (point.time_from_start != multi_dof_point.time_from_start) {
         return tl::make_unexpected(
-            kConversionFailed + "Point " + std::to_string(i) +
+            "Point " + std::to_string(i) +
             " has different times in the JointTrajectory and the MultiDOFJointTrajectory");
       }
       if (point.velocities.empty() != multi_dof_point.velocities.empty()) {
-        return tl::make_unexpected(kConversionFailed + "Point " + std::to_string(i) +
+        return tl::make_unexpected("Point " + std::to_string(i) +
                                    " has velocities for some joints only");
       }
       if (point.accelerations.empty() != multi_dof_point.accelerations.empty()) {
-        return tl::make_unexpected(kConversionFailed + "Point " + std::to_string(i) +
+        return tl::make_unexpected("Point " + std::to_string(i) +
                                    " has accelerations for some joints only");
       }
     }
@@ -775,10 +767,10 @@ fromRosTrajectories(const trajectory_msgs::msg::JointTrajectory& ros_trajectory,
 
   roboplan::JointTrajectory trajectory;
   if (auto ok = appendJointTrajectory(ros_trajectory, scene, trajectory); !ok) {
-    return tl::make_unexpected(kConversionFailed + ok.error());
+    return tl::make_unexpected(ok.error());
   }
   if (auto ok = appendMultiDOFJointTrajectory(multi_dof_trajectory, scene, trajectory); !ok) {
-    return tl::make_unexpected(kConversionFailed + ok.error());
+    return tl::make_unexpected(ok.error());
   }
   return trajectory;
 }
