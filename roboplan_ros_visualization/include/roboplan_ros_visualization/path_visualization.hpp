@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <tl/expected.hpp>
+
 #include <roboplan/core/scene.hpp>
 #include <roboplan/core/types.hpp>
 #include <std_msgs/msg/color_rgba.hpp>
@@ -26,11 +28,15 @@ namespace roboplan_ros_visualization {
 /// @param ns The marker namespace.
 /// @param color Optional line color. Defaults to opaque white when not provided.
 /// @param line_width The rendered line width, in meters (Marker::scale.x).
-/// @return A LINE_LIST marker containing the traced segments for every requested frame.
-visualization_msgs::msg::Marker markerFromJointTrajectory(
+/// @param q_reference The full configuration supplying the joints that are not in the joint
+/// trajectory. If not specified, the scene's current state is used.
+/// @return A LINE_LIST marker containing the traced segments for every requested frame, or a string
+/// describing the error if not successful.
+tl::expected<visualization_msgs::msg::Marker, std::string> markerFromJointTrajectory(
     const roboplan::Scene& scene, const roboplan::JointTrajectory& trajectory,
     const std::vector<std::string>& frame_names, const std::string& frame_id = "world",
     const std::string& ns = "/roboplan_path",
-    const std::optional<std_msgs::msg::ColorRGBA>& color = std::nullopt, double line_width = 0.01);
+    const std::optional<std_msgs::msg::ColorRGBA>& color = std::nullopt, double line_width = 0.01,
+    const std::optional<Eigen::VectorXd>& q_reference = std::nullopt);
 
 }  // namespace roboplan_ros_visualization

@@ -5,6 +5,7 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
+#include <roboplan_bindings/expected.hpp>
 #include <roboplan_ros_cpp/type_conversions.hpp>
 #include <roboplan_ros_cpp_bindings/roboplan_ros_cpp_bindings.hpp>
 
@@ -142,17 +143,20 @@ NB_MODULE(_visualization_ext, m) {
       "markerFromJointTrajectory",
       [Marker](const roboplan::Scene& scene, const roboplan::JointTrajectory& trajectory,
                const std::vector<std::string>& frame_names, const std::string& frame_id,
-               const std::string& ns, nb::handle py_color, double line_width) {
+               const std::string& ns, nb::handle py_color, double line_width,
+               const std::optional<Eigen::VectorXd>& q_reference) {
         std::optional<std_msgs::msg::ColorRGBA> color = std::nullopt;
         if (!py_color.is_none()) {
           color = pyToCppMsg<std_msgs::msg::ColorRGBA>(py_color);
         }
-        return cppToPyMsg(roboplan_ros_visualization::markerFromJointTrajectory(
-                              scene, trajectory, frame_names, frame_id, ns, color, line_width),
-                          Marker);
+        return cppToPyMsg(
+            handle_expected(roboplan_ros_visualization::markerFromJointTrajectory(
+                scene, trajectory, frame_names, frame_id, ns, color, line_width, q_reference)),
+            Marker);
       },
       "scene"_a, "trajectory"_a, "frame_names"_a, "frame_id"_a = "world", "ns"_a = "/roboplan_path",
-      "color"_a = nb::none(), "line_width"_a = 0.01,
+      "color"_a = nb::none(), "line_width"_a = 0.01, "q_reference"_a = nb::none(),
       "Build a LINE_LIST Marker tracing the Cartesian path of the given frames along a joint "
-      "trajectory via forward kinematics.");
+      "trajectory via forward kinematics. Joints that are not in the trajectory take their "
+      "positions from q_reference, or from the scene's current state if it is not given.");
 }
