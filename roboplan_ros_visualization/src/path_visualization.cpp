@@ -19,11 +19,17 @@ geometry_msgs::msg::Point rosPointFromTransform(const Eigen::Matrix4d& tform) {
 
 }  // namespace
 
-visualization_msgs::msg::Marker
+tl::expected<visualization_msgs::msg::Marker, std::string>
 markerFromJointTrajectory(const roboplan::Scene& scene, const roboplan::JointTrajectory& trajectory,
                           const std::vector<std::string>& frame_names, const std::string& frame_id,
                           const std::string& ns,
-                          const std::optional<std_msgs::msg::ColorRGBA>& color, double line_width) {
+                          const std::optional<std_msgs::msg::ColorRGBA>& color, double line_width,
+                          const std::optional<Eigen::VectorXd>& q_reference) {
+  if (q_reference && q_reference->size() != scene.getModel().nq) {
+    return tl::make_unexpected("q_reference has " + std::to_string(q_reference->size()) +
+                               " positions, the scene has " + std::to_string(scene.getModel().nq));
+  }
+
   visualization_msgs::msg::Marker marker;
   marker.header.frame_id = frame_id;
   marker.ns = ns;
@@ -46,11 +52,11 @@ markerFromJointTrajectory(const roboplan::Scene& scene, const roboplan::JointTra
   }
 
   // The trajectory stores group positions in the order of trajectory.joint_names.
-  // Embed each waypoint into a full configuration vector, seeded from the scene's current state,
-  // before running forward kinematics.
+  // Embed each waypoint into a full configuration vector, seeded from q_reference (or the scene's
+  // current state if not given), before running forward kinematics.
   const Eigen::VectorXi q_indices = scene.getJointPositionIndices(trajectory.joint_names);
-  Eigen::VectorXd q = scene.getCurrentJointPositions();
   std::vector<Eigen::VectorXd> q_vec;
+  Eigen::VectorXd q = q_reference.value_or(scene.getCurrentJointPositions());
   q_vec.reserve(trajectory.positions.size());
   for (const auto& positions : trajectory.positions) {
     q(q_indices) = positions;
