@@ -24,11 +24,15 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(builtin_interfaces REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(interactive_markers REQUIRED)
+find_package(pinocchio REQUIRED)
 find_package(roboplan_core REQUIRED)
 find_package(roboplan_ros_cpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(tf2_eigen REQUIRED)
 find_package(visualization_msgs REQUIRED)
 
 add_library(roboplan_ros_visualization SHARED
@@ -49,18 +53,25 @@ target_link_libraries(roboplan_ros_visualization
     ${tf2_eigen_TARGETS}
     ${geometry_msgs_TARGETS}
     ${sensor_msgs_TARGETS}
+    ${std_msgs_TARGETS}
     ${visualization_msgs_TARGETS}
     ${builtin_interfaces_TARGETS}
     ${interactive_markers_TARGETS}
 )
 set_property(TARGET roboplan_ros_visualization PROPERTY CXX_STANDARD 20)
 ament_export_dependencies(
-  roboplan_core
+  builtin_interfaces
   Eigen3
+  geometry_msgs
+  interactive_markers
   pinocchio
+  roboplan_core
+  roboplan_ros_cpp
+  sensor_msgs
+  std_msgs
   tf2_eigen
   trajectory_msgs
-  geometry_msgs
+  visualization_msgs
 )
 install(
   TARGETS
@@ -70,6 +81,7 @@ install(
   INCLUDES DESTINATION include
 )
 install(DIRECTORY include/ DESTINATION include)
+ament_export_targets(roboplan_ros_visualization-targets HAS_LIBRARY_TARGET)
 
 # Optionally build the roboplan_ros_visualization bindings.
 # Override with -DBUILD_PYTHON_BINDINGS=OFF for a pure C++ build.
