@@ -5,17 +5,11 @@
 #include <vector>
 
 #include <Eigen/Core>
+#include <coal/shape/geometric_shapes.h>
 
 #include <roboplan/core/scene.hpp>
 #include <roboplan_ros_visualization/geometry_visualization.hpp>
 #include <roboplan_ros_visualization/roboplan_visualizer.hpp>
-
-#if defined(__has_include) && __has_include(<coal/fwd.hh>)
-#include <coal/shape/geometric_shapes.h>
-#else
-#include <hpp/fcl/shape/geometric_shapes.h>
-namespace coal = hpp::fcl;
-#endif
 
 namespace roboplan_ros_visualization {
 
