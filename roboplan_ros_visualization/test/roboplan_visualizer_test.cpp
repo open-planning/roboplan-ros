@@ -7,7 +7,15 @@
 #include <Eigen/Core>
 
 #include <roboplan/core/scene.hpp>
+#include <roboplan_ros_visualization/geometry_visualization.hpp>
 #include <roboplan_ros_visualization/roboplan_visualizer.hpp>
+
+#if defined(__has_include) && __has_include(<coal/fwd.hh>)
+#include <coal/shape/geometric_shapes.h>
+#else
+#include <hpp/fcl/shape/geometric_shapes.h>
+namespace coal = hpp::fcl;
+#endif
 
 namespace roboplan_ros_visualization {
 
@@ -269,6 +277,25 @@ TEST_F(RoboplanVisualizerTest, UnknownGroupThrows) {
 
   RoboplanVisualizer viz(scene, TWO_LINK_URDF);
   EXPECT_THROW(viz.set_group("does_not_exist"), std::runtime_error);
+}
+
+TEST(GeometryVisualization, CreateGeometryMarker) {
+  const pinocchio::GeometryObject sphere("ball", 0, 0, pinocchio::SE3::Identity(),
+                                         std::make_shared<coal::Sphere>(0.1));
+  std_msgs::msg::ColorRGBA red;
+  red.r = red.a = 1.0;
+
+  const auto marker =
+      create_geometry_marker(7, "world", "viz", sphere, pinocchio::SE3::Identity(), red);
+  ASSERT_TRUE(marker) << marker.error();
+  EXPECT_EQ(marker->type, visualization_msgs::msg::Marker::SPHERE);
+  EXPECT_EQ(marker->header.frame_id, "world");
+  EXPECT_EQ(marker->ns, "viz/ball");
+  EXPECT_EQ(marker->color, red);
+
+  const pinocchio::GeometryObject cone("cone", 0, 0, pinocchio::SE3::Identity(),
+                                       std::make_shared<coal::Cone>(0.1, 0.2));
+  EXPECT_FALSE(create_geometry_marker(0, "world", "viz", cone, pinocchio::SE3::Identity()));
 }
 
 }  // namespace roboplan_ros_visualization

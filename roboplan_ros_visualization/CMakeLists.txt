@@ -35,6 +35,7 @@ add_library(roboplan_ros_visualization SHARED
     src/roboplan_visualizer.cpp
     src/roboplan_ik_marker.cpp
     src/path_visualization.cpp
+    src/geometry_visualization.cpp
 )
 target_include_directories(roboplan_ros_visualization PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
