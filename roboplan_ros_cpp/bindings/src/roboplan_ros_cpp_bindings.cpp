@@ -6,6 +6,7 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
+#include <sensor_msgs/msg/multi_dof_joint_state.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/multi_dof_joint_trajectory.hpp>
 
@@ -124,13 +125,19 @@ NB_MODULE(_cpp_ext, m) {
 
   m.def(
       "buildConversionMap",
-      [](nb::handle py_scene, nb::handle py_joint_state) {
+      [](nb::handle py_scene, nb::handle py_joint_state, nb::handle py_multi_dof_joint_state) {
         const auto& scene = nb::cast<roboplan::Scene&>(py_scene);
         auto joint_state = pyToCppMsg<sensor_msgs::msg::JointState>(py_joint_state);
-        return handle_expected(buildConversionMap(scene, joint_state));
+        if (py_multi_dof_joint_state.is_none()) {
+          return handle_expected(buildConversionMap(scene, joint_state));
+        }
+        auto multi_dof_joint_state =
+            pyToCppMsg<sensor_msgs::msg::MultiDOFJointState>(py_multi_dof_joint_state);
+        return handle_expected(buildConversionMap(scene, joint_state, multi_dof_joint_state));
       },
-      "py_scene"_a, "py_joint_state"_a,
-      "Constructs a JointState conversion map given a RoboPlan Scene and JointState message.");
+      "py_scene"_a, "py_joint_state"_a, "py_multi_dof_joint_state"_a = nb::none(),
+      "Constructs a JointState conversion map given a RoboPlan Scene, JointState message and "
+      "optionally a MultiDOFJointState message.");
 
   m.def(
       "toJointState",
@@ -142,6 +149,21 @@ NB_MODULE(_cpp_ext, m) {
       },
       "py_config"_a, "py_scene"_a,
       "Converts a roboplan::JointConfiguration to a ROS 2 sensor_msgs::msg::JointState message.");
+
+  m.def(
+      "toRosJointStates",
+      [](nb::handle py_config, nb::handle py_scene) {
+        auto config = nb::cast<roboplan::JointConfiguration>(py_config);
+        const auto& scene = nb::cast<roboplan::Scene&>(py_scene);
+        auto [joint_state, multi_dof_joint_state] =
+            handle_expected(toRosJointStates(config, scene));
+        const auto msgs = nb::module_::import_("sensor_msgs.msg");
+        return nb::make_tuple(cppToPyMsg(joint_state, msgs.attr("JointState")),
+                              cppToPyMsg(multi_dof_joint_state, msgs.attr("MultiDOFJointState")));
+      },
+      "py_config"_a, "py_scene"_a,
+      "Converts a roboplan::JointConfiguration to a "
+      "(sensor_msgs::msg::JointState, sensor_msgs::msg::MultiDOFJointState) tuple.");
 
   m.def(
       "fromJointState",
@@ -156,4 +178,23 @@ NB_MODULE(_cpp_ext, m) {
       "Converts a ROS 2 sensor_msgs::msg::JointState message to a roboplan::JointConfiguration. "
       "Joints that are not in the message keep their positions from q_reference, or from the "
       "scene's current state if it is not given.");
+
+  m.def(
+      "fromRosJointStates",
+      [](nb::handle py_joint_state, nb::handle py_multi_dof_joint_state, nb::handle py_scene,
+         const JointStateConverterMap& conversion_map,
+         const std::optional<Eigen::VectorXd>& q_reference) {
+        auto joint_state = pyToCppMsg<sensor_msgs::msg::JointState>(py_joint_state);
+        auto multi_dof_joint_state =
+            pyToCppMsg<sensor_msgs::msg::MultiDOFJointState>(py_multi_dof_joint_state);
+        const auto& scene = nb::cast<roboplan::Scene&>(py_scene);
+        return handle_expected(fromRosJointStates(joint_state, multi_dof_joint_state, scene,
+                                                  conversion_map, q_reference));
+      },
+      "py_joint_state"_a, "py_multi_dof_joint_state"_a, "py_scene"_a, "conversion_map"_a,
+      "q_reference"_a = nb::none(),
+      "Converts a ROS 2 sensor_msgs::msg::JointState message and a "
+      "sensor_msgs::msg::MultiDOFJointState message to one roboplan::JointConfiguration. Joints "
+      "that are in neither message keep their positions from q_reference, or from the scene's "
+      "current state if it is not given.");
 }

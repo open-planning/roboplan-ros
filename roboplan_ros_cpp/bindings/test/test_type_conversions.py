@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 
 from ament_index_python.packages import get_package_share_path
-from sensor_msgs.msg import JointState
+from sensor_msgs.msg import JointState, MultiDOFJointState
 from geometry_msgs.msg import Pose, TransformStamped
 
 from roboplan.core import (
@@ -16,6 +16,8 @@ from roboplan_ros.cpp import (
     buildConversionMap,
     toJointState,
     fromJointState,
+    toRosJointStates,
+    fromRosJointStates,
     toJointTrajectory,
     toRosTrajectories,
     fromJointTrajectory,
@@ -246,6 +248,67 @@ def test_convert_multi_dof_joint_trajectory():
         assert new_roboplan_traj.velocities[i] == pytest.approx(
             np.concatenate([v[3:4], v[0:3], v[4:]])
         )
+
+
+def test_convert_multi_dof_joint_state():
+    """Test that planar and floating joints go in a MultiDOFJointState."""
+    scene = Scene("test_scene", loadUrdfSceneDescription(mobile_urdf_path))
+
+    # Planar [x, y, cos, sin], continuous [cos, sin],
+    # floating [x, y, z, qx, qy, qz, qw].
+    joint_configuration = JointConfiguration()
+    joint_configuration.joint_names = scene.getJointNames()
+    joint_configuration.positions = np.array(
+        [1.0, 2.0, np.cos(3.0), np.sin(3.0)]
+        + [np.cos(0.5), np.sin(0.5)]
+        + [0.1, 0.2, 1.0, 0.0, 0.0, 0.0, 1.0]
+    )
+    joint_configuration.velocities = np.array(
+        [0.1, 0.2, 0.3, 0.4, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+    )
+    joint_configuration.accelerations = 2.0 * joint_configuration.velocities
+
+    # A JointState alone cannot hold the base and the drone.
+    with pytest.raises(RuntimeError, match="use toRosJointStates"):
+        toJointState(joint_configuration, scene)
+
+    joint_state, multi_dof_joint_state = toRosJointStates(joint_configuration, scene)
+    assert isinstance(multi_dof_joint_state, MultiDOFJointState)
+    assert joint_state.name == ["wheel_joint"]
+    assert multi_dof_joint_state.joint_names == ["base_joint", "drone_joint"]
+    base_twist = multi_dof_joint_state.twist[0]
+    assert [base_twist.linear.x, base_twist.linear.y, base_twist.angular.z] == [
+        0.1,
+        0.2,
+        0.3,
+    ]
+
+    # A planar joint cannot be in a JointState.
+    with pytest.raises(RuntimeError, match="a JointState cannot represent it"):
+        buildConversionMap(scene, JointState(name=["base_joint"]))
+
+    conversion_map = buildConversionMap(scene, joint_state, multi_dof_joint_state)
+    assert [mapping.joint_name for mapping in conversion_map.mappings] == [
+        "wheel_joint",
+        "base_joint",
+        "drone_joint",
+    ]
+    assert [mapping.ros_index for mapping in conversion_map.mappings] == [0, 0, 1]
+
+    # Converting both messages back gives the original configuration.
+    check_joint_configuration = fromRosJointStates(
+        joint_state, multi_dof_joint_state, scene, conversion_map
+    )
+    assert check_joint_configuration.joint_names == joint_configuration.joint_names
+    assert np.allclose(
+        check_joint_configuration.positions, joint_configuration.positions
+    )
+    assert np.allclose(
+        check_joint_configuration.velocities, joint_configuration.velocities
+    )
+    assert np.allclose(
+        check_joint_configuration.accelerations, joint_configuration.accelerations
+    )
 
 
 def test_transform_stamped_conversion():
