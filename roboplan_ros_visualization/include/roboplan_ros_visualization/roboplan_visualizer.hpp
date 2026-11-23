@@ -69,15 +69,6 @@ private:
   /// For an empty group name, every geometry index in the model is returned.
   std::vector<std::size_t> geometry_indices_for_group(const std::string& group_name) const;
 
-  /// @brief Create a visualization marker for a single geometry object.
-  /// @param marker_id Unique marker ID.
-  /// @param geom_obj The Pinocchio geometry object to visualize.
-  /// @param placement The SE3 placement of the geometry in world frame.
-  /// @return A marker if the geometry type is supported, std::nullopt otherwise.
-  std::optional<visualization_msgs::msg::Marker>
-  create_geometry_marker(int marker_id, const pinocchio::GeometryObject& geom_obj,
-                         const pinocchio::SE3& placement) const;
-
   /// @brief Shared ptr to avoid ownership issues between C++ and Python
   std::shared_ptr<const roboplan::Scene> scene_;
 
