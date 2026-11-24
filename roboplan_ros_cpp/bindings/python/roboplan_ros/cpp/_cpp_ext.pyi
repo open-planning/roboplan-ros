@@ -68,9 +68,9 @@ class JointStateConverterMap:
     @property
     def nv(self) -> int: ...
 
-def buildConversionMap(py_scene: object, py_joint_state: object) -> JointStateConverterMap:
+def buildConversionMap(py_scene: object, py_joint_state: object, py_multi_dof_joint_state: object | None = None) -> JointStateConverterMap:
     """
-    Constructs a JointState conversion map given a RoboPlan Scene and JointState message.
+    Constructs a JointState conversion map given a RoboPlan Scene, JointState message and optionally a MultiDOFJointState message.
     """
 
 def toJointState(py_config: object, py_scene: object) -> object:
@@ -78,7 +78,17 @@ def toJointState(py_config: object, py_scene: object) -> object:
     Converts a roboplan::JointConfiguration to a ROS 2 sensor_msgs::msg::JointState message.
     """
 
+def toRosJointStates(py_config: object, py_scene: object) -> tuple:
+    """
+    Converts a roboplan::JointConfiguration to a (sensor_msgs::msg::JointState, sensor_msgs::msg::MultiDOFJointState) tuple.
+    """
+
 def fromJointState(py_joint_state: object, py_scene: object, conversion_map: JointStateConverterMap, q_reference: Annotated[NDArray[numpy.float64], dict(shape=(None,), order='C')] | None = None) -> "roboplan::JointConfiguration":
     """
     Converts a ROS 2 sensor_msgs::msg::JointState message to a roboplan::JointConfiguration. Joints that are not in the message keep their positions from q_reference, or from the scene's current state if it is not given.
+    """
+
+def fromRosJointStates(py_joint_state: object, py_multi_dof_joint_state: object, py_scene: object, conversion_map: JointStateConverterMap, q_reference: Annotated[NDArray[numpy.float64], dict(shape=(None,), order='C')] | None = None) -> "roboplan::JointConfiguration":
+    """
+    Converts a ROS 2 sensor_msgs::msg::JointState message and a sensor_msgs::msg::MultiDOFJointState message to one roboplan::JointConfiguration. Joints that are in neither message keep their positions from q_reference, or from the scene's current state if it is not given.
     """

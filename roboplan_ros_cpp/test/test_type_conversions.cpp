@@ -430,6 +430,148 @@ TEST_F(TypeConversionsTest, TestConvertMultiDOFJointTrajectoryErrors) {
             "Point 0 has a zero quaternion for joint 'base_joint'");
 }
 
+TEST_F(TypeConversionsTest, TestConvertMultiDOFJointState) {
+  const auto scene =
+      roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(mobile_urdf_path));
+  const std::vector<std::string> joint_names = {"base_joint", "wheel_joint", "drone_joint"};
+  ASSERT_EQ(scene.getJointNames(), joint_names);
+
+  // Planar [x, y, cos, sin], continuous [cos, sin], floating [x, y, z, qx, qy, qz, qw].
+  const Eigen::Quaterniond drone_rotation(Eigen::AngleAxisd(0.4, Eigen::Vector3d::UnitX()));
+  roboplan::JointConfiguration config;
+  config.joint_names = joint_names;
+  config.positions.resize(13);
+  config.positions << 1.0, 2.0, std::cos(3.0), std::sin(3.0), std::cos(0.5), std::sin(0.5), 0.1,
+      0.2, 1.5, drone_rotation.x(), drone_rotation.y(), drone_rotation.z(), drone_rotation.w();
+  config.velocities.resize(10);
+  config.velocities << 0.1, 0.2, 0.3, 0.4, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
+  config.accelerations = 2.0 * config.velocities;
+
+  // A JointState alone cannot hold the base and the drone.
+  const auto joint_only = toJointState(config, scene);
+  ASSERT_FALSE(joint_only.has_value());
+  EXPECT_EQ(joint_only.error(), "Joint 'base_joint' has several degrees of freedom: a JointState "
+                                "cannot represent it, use toRosJointStates");
+
+  const auto ros_joint_states = toRosJointStates(config, scene);
+  ASSERT_TRUE(ros_joint_states.has_value()) << ros_joint_states.error();
+  const auto& [joint_state, multi_dof_joint_state] = ros_joint_states.value();
+
+  // The JointState only has the continuous joint.
+  EXPECT_EQ(joint_state.name, std::vector<std::string>{"wheel_joint"});
+  EXPECT_NEAR(joint_state.position[0], 0.5, 1e-12);
+  EXPECT_EQ(joint_state.velocity, std::vector<double>{0.4});
+  EXPECT_EQ(joint_state.effort, std::vector<double>{0.8});
+
+  // The MultiDOFJointState has the planar and floating joints.
+  EXPECT_EQ(multi_dof_joint_state.joint_names,
+            (std::vector<std::string>{"base_joint", "drone_joint"}));
+  ASSERT_EQ(multi_dof_joint_state.transforms.size(), 2u);
+  const auto& base = multi_dof_joint_state.transforms[0];
+  EXPECT_DOUBLE_EQ(base.translation.x, 1.0);
+  EXPECT_DOUBLE_EQ(base.translation.y, 2.0);
+  EXPECT_DOUBLE_EQ(base.translation.z, 0.0);
+  EXPECT_NEAR(base.rotation.z, std::sin(1.5), 1e-12);
+  EXPECT_NEAR(base.rotation.w, std::cos(1.5), 1e-12);
+  const auto& drone = multi_dof_joint_state.transforms[1];
+  EXPECT_DOUBLE_EQ(drone.translation.z, 1.5);
+  EXPECT_NEAR(drone.rotation.x, std::sin(0.2), 1e-12);
+
+  // Twists are in the joint's frame, as in RoboPlan, and the wrench holds the accelerations.
+  ASSERT_EQ(multi_dof_joint_state.twist.size(), 2u);
+  const auto& base_twist = multi_dof_joint_state.twist[0];
+  EXPECT_DOUBLE_EQ(base_twist.linear.x, 0.1);
+  EXPECT_DOUBLE_EQ(base_twist.linear.y, 0.2);
+  EXPECT_DOUBLE_EQ(base_twist.angular.z, 0.3);
+  ASSERT_EQ(multi_dof_joint_state.wrench.size(), 2u);
+  const auto& drone_wrench = multi_dof_joint_state.wrench[1];
+  EXPECT_DOUBLE_EQ(drone_wrench.force.x, 2.0);
+  EXPECT_DOUBLE_EQ(drone_wrench.torque.z, 12.0);
+
+  // The map points each joint at its message: the wheel in the JointState, the base and the drone
+  // in the MultiDOFJointState.
+  const auto conversion_map = buildConversionMap(scene, joint_state, multi_dof_joint_state);
+  ASSERT_TRUE(conversion_map.has_value()) << conversion_map.error();
+  ASSERT_EQ(conversion_map->mappings.size(), 3u);
+  const auto& model = scene.getModel();
+  const std::vector<std::string> mapped_names = {"wheel_joint", "base_joint", "drone_joint"};
+  const std::vector<size_t> ros_indices = {0, 0, 1};
+  for (size_t i = 0; i < mapped_names.size(); ++i) {
+    const auto& mapping = conversion_map->mappings[i];
+    EXPECT_EQ(mapping.joint_name, mapped_names[i]);
+    EXPECT_EQ(mapping.ros_index, ros_indices[i]);
+    const auto joint_id = model.getJointId(mapping.joint_name);
+    EXPECT_EQ(mapping.q_start, model.idx_qs[joint_id]);
+    EXPECT_EQ(mapping.v_start, model.idx_vs[joint_id]);
+  }
+  EXPECT_EQ(conversion_map->mappings[1].type, roboplan::JointType::PLANAR);
+  EXPECT_EQ(conversion_map->mappings[2].type, roboplan::JointType::FLOATING);
+
+  // Converting both messages back gives the original configuration.
+  const auto new_config =
+      fromRosJointStates(joint_state, multi_dof_joint_state, scene, *conversion_map);
+  ASSERT_TRUE(new_config.has_value()) << new_config.error();
+  EXPECT_EQ(new_config->joint_names, joint_names);
+  EXPECT_TRUE(new_config->positions.isApprox(config.positions));
+  EXPECT_TRUE(new_config->velocities.isApprox(config.velocities));
+  EXPECT_TRUE(new_config->accelerations.isApprox(config.accelerations));
+}
+
+TEST_F(TypeConversionsTest, TestConvertMultiDOFJointStateErrors) {
+  const auto scene =
+      roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(mobile_urdf_path));
+
+  sensor_msgs::msg::JointState joint_state;
+  joint_state.name = {"wheel_joint"};
+  joint_state.position = {0.5};
+  sensor_msgs::msg::MultiDOFJointState multi_dof_joint_state;
+  multi_dof_joint_state.joint_names = {"base_joint"};
+  multi_dof_joint_state.transforms.resize(1);
+  multi_dof_joint_state.transforms[0].translation.x = 1.0;
+  const auto conversion_map = buildConversionMap(scene, joint_state, multi_dof_joint_state);
+  ASSERT_TRUE(conversion_map.has_value()) << conversion_map.error();
+
+  // A planar joint cannot be in a JointState, nor a continuous one in a MultiDOFJointState.
+  auto wrong_joint_state = joint_state;
+  wrong_joint_state.name = {"base_joint"};
+  EXPECT_EQ(buildConversionMap(scene, wrong_joint_state).error(),
+            "Joint 'base_joint' has several degrees of freedom: a JointState cannot represent it.");
+  auto wrong_multi_dof_joint_state = multi_dof_joint_state;
+  wrong_multi_dof_joint_state.joint_names = {"wheel_joint"};
+  EXPECT_EQ(buildConversionMap(scene, joint_state, wrong_multi_dof_joint_state).error(),
+            "Joint 'wheel_joint' has a single degree of freedom: it belongs in the JointState");
+
+  // The drone is in neither message: it keeps the reference's position. Without a twist or a
+  // wrench, the base's velocities and accelerations are zero.
+  const auto base_idx = scene.getJointPositionIndices({"base_joint"});
+  const auto drone_idx = scene.getJointPositionIndices({"drone_joint"});
+  Eigen::VectorXd q_reference = scene.getCurrentJointPositions();
+  q_reference(drone_idx(2)) = 3.0;
+  const auto config =
+      fromRosJointStates(joint_state, multi_dof_joint_state, scene, *conversion_map, q_reference);
+  ASSERT_TRUE(config.has_value()) << config.error();
+  EXPECT_TRUE(config->positions(base_idx).isApprox(Eigen::Vector4d(1.0, 0.0, 1.0, 0.0)));
+  EXPECT_TRUE(config->positions(drone_idx).isApprox(q_reference(drone_idx)));
+  EXPECT_TRUE(config->velocities.isZero());
+  EXPECT_TRUE(config->accelerations.isZero());
+
+  // A map with a planar joint needs its transform.
+  EXPECT_EQ(fromJointState(joint_state, scene, *conversion_map).error(),
+            "Missing transform for joint 'base_joint'");
+
+  // A quaternion must not be zero, and a planar joint's must turn about z.
+  auto zero_msg = multi_dof_joint_state;
+  zero_msg.transforms[0].rotation.w = 0.0;
+  EXPECT_EQ(fromRosJointStates(joint_state, zero_msg, scene, *conversion_map).error(),
+            "The transform of joint 'base_joint' has a zero quaternion");
+  // A quarter turn about y points the x axis along -z.
+  auto pitched_msg = multi_dof_joint_state;
+  pitched_msg.transforms[0].rotation.y = std::sin(std::numbers::pi / 4.0);
+  pitched_msg.transforms[0].rotation.w = std::cos(std::numbers::pi / 4.0);
+  EXPECT_EQ(fromRosJointStates(joint_state, pitched_msg, scene, *conversion_map).error(),
+            "The transform of joint 'base_joint' has no rotation about z");
+}
+
 TEST_F(TypeConversionsTest, TestEmptyConversions) {
   const auto scene = roboplan::Scene("test_scene", roboplan::loadUrdfSceneDescription(urdf_path));
 

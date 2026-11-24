@@ -129,6 +129,38 @@ geometry_msgs::msg::Quaternion continuousQuaternion(Eigen::Quaterniond rotation,
   return tf2::toMsg(rotation);
 }
 
+/// @brief A planar joint's positions [x, y, cos, sin] from a transform: the x and y of its
+/// translation and its rotation about z.
+/// @return The positions, or what is wrong with the transform, such as "a zero quaternion".
+tl::expected<Eigen::Vector4d, std::string>
+planarPositionsFromTransform(const geometry_msgs::msg::Transform& transform) {
+  const auto rotation = normalizedRotation(transform.rotation);
+  if (!rotation) {
+    return tl::make_unexpected("a zero quaternion");
+  }
+  const Eigen::Matrix3d matrix = rotation->toRotationMatrix();
+  const double norm = std::hypot(matrix(0, 0), matrix(1, 0));
+  if (norm < kMinPlanarAxisNorm) {
+    return tl::make_unexpected("no rotation about z");
+  }
+  return Eigen::Vector4d(transform.translation.x, transform.translation.y, matrix(0, 0) / norm,
+                         matrix(1, 0) / norm);
+}
+
+/// @brief A floating joint's positions [x, y, z, qx, qy, qz, qw] from a transform.
+/// @return The positions, or what is wrong with the transform: "a zero quaternion".
+tl::expected<Eigen::Matrix<double, 7, 1>, std::string>
+floatingPositionsFromTransform(const geometry_msgs::msg::Transform& transform) {
+  const auto rotation = normalizedRotation(transform.rotation);
+  if (!rotation) {
+    return tl::make_unexpected("a zero quaternion");
+  }
+  Eigen::Matrix<double, 7, 1> positions;
+  positions << transform.translation.x, transform.translation.y, transform.translation.z,
+      rotation->x(), rotation->y(), rotation->z(), rotation->w();
+  return positions;
+}
+
 /// @brief Appends the joints of a JointTrajectory to trajectory, after the joints it already has.
 /// Planar and floating joints are an error. If trajectory has no times yet, they are the
 /// message's. A message without joints adds nothing.
@@ -340,22 +372,14 @@ appendMultiDOFJointTrajectory(const trajectory_msgs::msg::MultiDOFJointTrajector
       auto& positions = trajectory.positions[i];
       auto& velocities = trajectory.velocities[i];
       auto& accelerations = trajectory.accelerations[i];
-      const auto rotation = normalizedRotation(transform.rotation);
-      if (!rotation) {
-        return tl::make_unexpected("Point " + std::to_string(i) +
-                                   " has a zero quaternion for joint '" + joint_name + "'");
-      }
       switch (joint_info.type) {
       case JointType::PLANAR: {
-        // Keep only the rotation about z.
-        const Eigen::Matrix3d matrix = rotation->toRotationMatrix();
-        const double norm = std::hypot(matrix(0, 0), matrix(1, 0));
-        if (norm < kMinPlanarAxisNorm) {
-          return tl::make_unexpected("Point " + std::to_string(i) +
-                                     " has no rotation about z for joint '" + joint_name + "'");
+        const auto planar_positions = planarPositionsFromTransform(transform);
+        if (!planar_positions) {
+          return tl::make_unexpected("Point " + std::to_string(i) + " has " +
+                                     planar_positions.error() + " for joint '" + joint_name + "'");
         }
-        positions.segment<4>(q_idx) << transform.translation.x, transform.translation.y,
-            matrix(0, 0) / norm, matrix(1, 0) / norm;
+        positions.segment<4>(q_idx) = *planar_positions;
         if (!point.velocities.empty()) {
           const auto& twist = point.velocities[j];
           velocities.segment<3>(v_idx) << twist.linear.x, twist.linear.y, twist.angular.z;
@@ -367,8 +391,13 @@ appendMultiDOFJointTrajectory(const trajectory_msgs::msg::MultiDOFJointTrajector
         break;
       }
       case JointType::FLOATING: {
-        positions.segment<7>(q_idx) << transform.translation.x, transform.translation.y,
-            transform.translation.z, rotation->x(), rotation->y(), rotation->z(), rotation->w();
+        const auto floating_positions = floatingPositionsFromTransform(transform);
+        if (!floating_positions) {
+          return tl::make_unexpected("Point " + std::to_string(i) + " has " +
+                                     floating_positions.error() + " for joint '" + joint_name +
+                                     "'");
+        }
+        positions.segment<7>(q_idx) = *floating_positions;
         Eigen::Matrix<double, 6, 1> twist;
         if (!point.velocities.empty()) {
           tf2::fromMsg(point.velocities[j], twist);
@@ -556,57 +585,10 @@ toMultiDOFJointTrajectoryMessage(const roboplan::JointTrajectory& trajectory,
   return ros_trajectory;
 }
 
-}  // namespace
-
-tl::expected<JointStateConverterMap, std::string>
-buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointState& joint_state) {
-  // Setup a mapping joint names to their index in the joint state
-  const auto& ros_joint_names = joint_state.name;
-  std::unordered_map<std::string, size_t> ros_map;
-  ros_map.reserve(ros_joint_names.size());
-  for (size_t i = 0; i < ros_joint_names.size(); ++i) {
-    ros_map[ros_joint_names[i]] = i;
-  }
-
-  // Pull out actuated joint state sizes
-  const auto& model = scene.getModel();
-  JointStateConverterMap conversion_map;
-  conversion_map.nq = model.nq;
-  conversion_map.nv = model.nv;
-  conversion_map.mappings.reserve(joint_state.name.size());
-
-  // For each actuated joint name, determine type and its location in the Scene's configuration,
-  // and put it into the mapping.
-  for (const auto& joint_name : joint_state.name) {
-    const auto joint_info = scene.getJointInfo(joint_name);
-    if (!joint_info) {
-      return tl::make_unexpected("Failed to get joint info for: " + joint_name);
-    }
-    const auto& info = joint_info.value();
-
-    // TODO: This might not actually be worth failing for
-    auto it = ros_map.find(joint_name);
-    if (it == ros_map.end()) {
-      return tl::make_unexpected("Actuated joint: " + joint_name + ", not in the ROS message!");
-    }
-
-    // Grab the joint info and store the relevant information
-    const auto joint_id = model.getJointId(joint_name);
-    const auto q_idx = model.idx_qs.at(joint_id);
-    const auto v_idx = model.idx_vs.at(joint_id);
-    JointStateConverterMap::JointMapping mapping{.joint_name = joint_name,
-                                                 .ros_index = it->second,
-                                                 .q_start = static_cast<size_t>(q_idx),
-                                                 .v_start = static_cast<size_t>(v_idx),
-                                                 .type = info.type};
-    conversion_map.mappings.push_back(mapping);
-  }
-
-  return conversion_map;
-}
-
+/// @brief The single degree of freedom joints of a configuration as a JointState. Its other
+/// joints are skipped.
 tl::expected<sensor_msgs::msg::JointState, std::string>
-toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& scene) {
+toJointStateMessage(const roboplan::JointConfiguration& config, const roboplan::Scene& scene) {
   const auto& model = scene.getModel();
 
   sensor_msgs::msg::JointState msg;
@@ -621,6 +603,9 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
       return tl::make_unexpected("Failed to get joint info: " + joint_name);
     }
     const auto& info = joint_info.value();
+    if (isMultiDof(info)) {
+      continue;
+    }
 
     const auto joint_id = model.getJointId(joint_name);
     const auto q_idx = model.idx_qs.at(joint_id);
@@ -641,10 +626,261 @@ toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& 
   return msg;
 }
 
+/// @brief The planar and floating joints of a configuration as a MultiDOFJointState. Its other
+/// joints are skipped.
+tl::expected<sensor_msgs::msg::MultiDOFJointState, std::string>
+toMultiDOFJointStateMessage(const roboplan::JointConfiguration& config,
+                            const roboplan::Scene& scene) {
+  const auto& model = scene.getModel();
+
+  sensor_msgs::msg::MultiDOFJointState msg;
+  for (const auto& joint_name : scene.getJointNames()) {
+    const auto joint_info = scene.getJointInfo(joint_name);
+    if (!joint_info) {
+      return tl::make_unexpected("Failed to get joint info: " + joint_name);
+    }
+    const auto& info = joint_info.value();
+    if (!isMultiDof(info)) {
+      continue;
+    }
+
+    const auto joint_id = model.getJointId(joint_name);
+    const auto q_idx = model.idx_qs.at(joint_id);
+    const auto v_idx = model.idx_vs.at(joint_id);
+
+    const auto& q = config.positions;
+    const auto v_end = static_cast<Eigen::Index>(v_idx + info.num_velocity_dofs);
+    const bool has_velocities = v_end <= config.velocities.size();
+    const bool has_accelerations = v_end <= config.accelerations.size();
+    geometry_msgs::msg::Transform transform;
+    geometry_msgs::msg::Twist twist;
+    geometry_msgs::msg::Twist acceleration;
+    switch (info.type) {
+    case JointType::PLANAR: {
+      transform.translation.x = q(q_idx);
+      transform.translation.y = q(q_idx + 1);
+      const auto angle = std::atan2(q(q_idx + 3), q(q_idx + 2));
+      transform.rotation =
+          tf2::toMsg(Eigen::Quaterniond(Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ())));
+      if (has_velocities) {
+        twist = planarTwist(config.velocities, v_idx);
+      }
+      if (has_accelerations) {
+        acceleration = planarTwist(config.accelerations, v_idx);
+      }
+      break;
+    }
+    case JointType::FLOATING:
+      transform.translation.x = q(q_idx);
+      transform.translation.y = q(q_idx + 1);
+      transform.translation.z = q(q_idx + 2);
+      transform.rotation =
+          tf2::toMsg(Eigen::Quaterniond(q(q_idx + 6), q(q_idx + 3), q(q_idx + 4), q(q_idx + 5)));
+      if (has_velocities) {
+        twist = tf2::toMsg(Eigen::Matrix<double, 6, 1>(config.velocities.segment<6>(v_idx)));
+      }
+      if (has_accelerations) {
+        acceleration =
+            tf2::toMsg(Eigen::Matrix<double, 6, 1>(config.accelerations.segment<6>(v_idx)));
+      }
+      break;
+    default:
+      return tl::make_unexpected("Joint '" + joint_name + "' has an unknown type");
+    }
+    geometry_msgs::msg::Wrench wrench;
+    wrench.force = acceleration.linear;
+    wrench.torque = acceleration.angular;
+    msg.joint_names.push_back(joint_name);
+    msg.transforms.push_back(transform);
+    msg.twist.push_back(twist);
+    msg.wrench.push_back(wrench);
+  }
+
+  return msg;
+}
+
+/// @brief Writes the single degree of freedom joints of a JointState into config. The planar and
+/// floating joints of the map are skipped.
+tl::expected<void, std::string> applyJointState(const sensor_msgs::msg::JointState& joint_state,
+                                                const JointStateConverterMap& conversion_map,
+                                                roboplan::JointConfiguration& config) {
+  for (const auto& mapping : conversion_map.mappings) {
+    if (mapping.type == JointType::PLANAR || mapping.type == JointType::FLOATING) {
+      continue;
+    }
+    const size_t ros_idx = mapping.ros_index;
+    if (ros_idx >= joint_state.position.size()) {
+      return tl::make_unexpected("Missing position data for joint '" + mapping.joint_name + "'");
+    }
+
+    const double position = joint_state.position[ros_idx];
+    if (mapping.type == JointType::CONTINUOUS) {
+      config.positions(mapping.q_start) = std::cos(position);
+      config.positions(mapping.q_start + 1) = std::sin(position);
+    } else {
+      config.positions(mapping.q_start) = position;
+    }
+    if (ros_idx < joint_state.velocity.size()) {
+      config.velocities(mapping.v_start) = joint_state.velocity[ros_idx];
+    }
+    if (ros_idx < joint_state.effort.size()) {
+      config.accelerations(mapping.v_start) = joint_state.effort[ros_idx];
+    }
+  }
+  return {};
+}
+
+/// @brief Writes the planar and floating joints of a MultiDOFJointState into config. The other
+/// joints of the map are skipped.
+tl::expected<void, std::string>
+applyMultiDOFJointState(const sensor_msgs::msg::MultiDOFJointState& multi_dof_joint_state,
+                        const JointStateConverterMap& conversion_map,
+                        roboplan::JointConfiguration& config) {
+  for (const auto& mapping : conversion_map.mappings) {
+    if (mapping.type != JointType::PLANAR && mapping.type != JointType::FLOATING) {
+      continue;
+    }
+    const size_t ros_idx = mapping.ros_index;
+    if (ros_idx >= multi_dof_joint_state.transforms.size()) {
+      return tl::make_unexpected("Missing transform for joint '" + mapping.joint_name + "'");
+    }
+    const auto& transform = multi_dof_joint_state.transforms[ros_idx];
+    const auto* twist = ros_idx < multi_dof_joint_state.twist.size()
+                            ? &multi_dof_joint_state.twist[ros_idx]
+                            : nullptr;
+    const auto* wrench = ros_idx < multi_dof_joint_state.wrench.size()
+                             ? &multi_dof_joint_state.wrench[ros_idx]
+                             : nullptr;
+
+    if (mapping.type == JointType::PLANAR) {
+      const auto positions = planarPositionsFromTransform(transform);
+      if (!positions) {
+        return tl::make_unexpected("The transform of joint '" + mapping.joint_name + "' has " +
+                                   positions.error());
+      }
+      config.positions.segment<4>(mapping.q_start) = *positions;
+      if (twist) {
+        config.velocities.segment<3>(mapping.v_start) << twist->linear.x, twist->linear.y,
+            twist->angular.z;
+      }
+      if (wrench) {
+        config.accelerations.segment<3>(mapping.v_start) << wrench->force.x, wrench->force.y,
+            wrench->torque.z;
+      }
+    } else {
+      const auto positions = floatingPositionsFromTransform(transform);
+      if (!positions) {
+        return tl::make_unexpected("The transform of joint '" + mapping.joint_name + "' has " +
+                                   positions.error());
+      }
+      config.positions.segment<7>(mapping.q_start) = *positions;
+      if (twist) {
+        Eigen::Matrix<double, 6, 1> velocity;
+        tf2::fromMsg(*twist, velocity);
+        config.velocities.segment<6>(mapping.v_start) = velocity;
+      }
+      if (wrench) {
+        config.accelerations.segment<6>(mapping.v_start) << wrench->force.x, wrench->force.y,
+            wrench->force.z, wrench->torque.x, wrench->torque.y, wrench->torque.z;
+      }
+    }
+  }
+  return {};
+}
+
+}  // namespace
+
+tl::expected<JointStateConverterMap, std::string>
+buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointState& joint_state) {
+  return buildConversionMap(scene, joint_state, sensor_msgs::msg::MultiDOFJointState{});
+}
+
+tl::expected<JointStateConverterMap, std::string>
+buildConversionMap(const roboplan::Scene& scene, const sensor_msgs::msg::JointState& joint_state,
+                   const sensor_msgs::msg::MultiDOFJointState& multi_dof_joint_state) {
+  const auto& model = scene.getModel();
+  JointStateConverterMap conversion_map;
+  conversion_map.nq = model.nq;
+  conversion_map.nv = model.nv;
+  conversion_map.mappings.reserve(joint_state.name.size() +
+                                  multi_dof_joint_state.joint_names.size());
+
+  // The single degree of freedom joints, in the JointState.
+  for (size_t i = 0; i < joint_state.name.size(); ++i) {
+    const auto& joint_name = joint_state.name[i];
+    const auto joint_info = scene.getJointInfo(joint_name);
+    if (!joint_info) {
+      return tl::make_unexpected("Failed to get joint info for: " + joint_name);
+    }
+    if (isMultiDof(*joint_info)) {
+      return tl::make_unexpected("Joint '" + joint_name +
+                                 "' has several degrees of freedom: a JointState cannot "
+                                 "represent it.");
+    }
+    const auto joint_id = model.getJointId(joint_name);
+    conversion_map.mappings.push_back({.joint_name = joint_name,
+                                       .ros_index = i,
+                                       .q_start = static_cast<size_t>(model.idx_qs.at(joint_id)),
+                                       .v_start = static_cast<size_t>(model.idx_vs.at(joint_id)),
+                                       .type = joint_info->type});
+  }
+
+  // The planar and floating joints, in the MultiDOFJointState.
+  for (size_t i = 0; i < multi_dof_joint_state.joint_names.size(); ++i) {
+    const auto& joint_name = multi_dof_joint_state.joint_names[i];
+    const auto joint_info = scene.getJointInfo(joint_name);
+    if (!joint_info) {
+      return tl::make_unexpected("Failed to get joint info for: " + joint_name);
+    }
+    if (!isMultiDof(*joint_info)) {
+      return tl::make_unexpected("Joint '" + joint_name +
+                                 "' has a single degree of freedom: it belongs in the JointState");
+    }
+    const auto joint_id = model.getJointId(joint_name);
+    conversion_map.mappings.push_back({.joint_name = joint_name,
+                                       .ros_index = i,
+                                       .q_start = static_cast<size_t>(model.idx_qs.at(joint_id)),
+                                       .v_start = static_cast<size_t>(model.idx_vs.at(joint_id)),
+                                       .type = joint_info->type});
+  }
+  return conversion_map;
+}
+
+tl::expected<sensor_msgs::msg::JointState, std::string>
+toJointState(const roboplan::JointConfiguration& config, const roboplan::Scene& scene) {
+  for (const auto& joint_name : scene.getJointNames()) {
+    const auto joint_info = scene.getJointInfo(joint_name);
+    if (joint_info && isMultiDof(*joint_info)) {
+      return tl::make_unexpected("Joint '" + joint_name +
+                                 "' has several degrees of freedom: a JointState cannot represent "
+                                 "it, use toRosJointStates");
+    }
+  }
+  return toJointStateMessage(config, scene);
+}
+
+tl::expected<RosJointStates, std::string>
+toRosJointStates(const roboplan::JointConfiguration& config, const roboplan::Scene& scene) {
+  auto msg = toJointStateMessage(config, scene);
+  if (!msg) {
+    return tl::make_unexpected(msg.error());
+  }
+  auto multi_dof_msg = toMultiDOFJointStateMessage(config, scene);
+  if (!multi_dof_msg) {
+    return tl::make_unexpected(multi_dof_msg.error());
+  }
+  return RosJointStates{std::move(*msg), std::move(*multi_dof_msg)};
+}
+
 tl::expected<roboplan::JointConfiguration, std::string>
 fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::Scene& scene,
                const JointStateConverterMap& conversion_map,
                const std::optional<Eigen::VectorXd>& q_reference) {
+  for (const auto& mapping : conversion_map.mappings) {
+    if (mapping.type == JointType::PLANAR || mapping.type == JointType::FLOATING) {
+      return tl::make_unexpected("Missing transform for joint '" + mapping.joint_name + "'");
+    }
+  }
   if (q_reference && static_cast<size_t>(q_reference->size()) != conversion_map.nq) {
     return tl::make_unexpected("q_reference has " + std::to_string(q_reference->size()) +
                                " positions, the scene has " + std::to_string(conversion_map.nq));
@@ -657,36 +893,35 @@ fromJointState(const sensor_msgs::msg::JointState& joint_state, const roboplan::
   config.velocities = Eigen::VectorXd::Zero(conversion_map.nv);
   config.accelerations = Eigen::VectorXd::Zero(conversion_map.nv);
 
-  // Process actuated joints using pre-computed indices
-  for (const auto& mapping : conversion_map.mappings) {
-    const size_t ros_idx = mapping.ros_index;
+  if (auto ok = applyJointState(joint_state, conversion_map, config); !ok) {
+    return tl::make_unexpected(ok.error());
+  }
+  return config;
+}
 
-    if (ros_idx >= joint_state.position.size()) {
-      return tl::make_unexpected("Missing position data for joint '" + mapping.joint_name + "'");
-    }
-
-    if (mapping.type == JointType::CONTINUOUS) {
-      const double theta = joint_state.position.at(ros_idx);
-      config.positions(mapping.q_start) = std::cos(theta);
-      config.positions(mapping.q_start + 1) = std::sin(theta);
-      if (ros_idx < joint_state.velocity.size()) {
-        config.velocities(mapping.v_start) = joint_state.velocity.at(ros_idx);
-      }
-      if (ros_idx < joint_state.effort.size()) {
-        config.accelerations(mapping.v_start) = joint_state.effort.at(ros_idx);
-      }
-    } else {
-      config.positions(mapping.q_start) = joint_state.position.at(ros_idx);
-
-      if (ros_idx < joint_state.velocity.size()) {
-        config.velocities(mapping.v_start) = joint_state.velocity.at(ros_idx);
-      }
-      if (ros_idx < joint_state.effort.size()) {
-        config.accelerations(mapping.v_start) = joint_state.effort.at(ros_idx);
-      }
-    }
+tl::expected<roboplan::JointConfiguration, std::string>
+fromRosJointStates(const sensor_msgs::msg::JointState& joint_state,
+                   const sensor_msgs::msg::MultiDOFJointState& multi_dof_joint_state,
+                   const roboplan::Scene& scene, const JointStateConverterMap& conversion_map,
+                   const std::optional<Eigen::VectorXd>& q_reference) {
+  if (q_reference && static_cast<size_t>(q_reference->size()) != conversion_map.nq) {
+    return tl::make_unexpected("q_reference has " + std::to_string(q_reference->size()) +
+                               " positions, the scene has " + std::to_string(conversion_map.nq));
   }
 
+  roboplan::JointConfiguration config;
+  config.joint_names = scene.getJointNames();
+  // Joints that are not in the messages keep their reference positions.
+  config.positions = q_reference ? *q_reference : scene.getCurrentJointPositions();
+  config.velocities = Eigen::VectorXd::Zero(conversion_map.nv);
+  config.accelerations = Eigen::VectorXd::Zero(conversion_map.nv);
+
+  if (auto ok = applyJointState(joint_state, conversion_map, config); !ok) {
+    return tl::make_unexpected(ok.error());
+  }
+  if (auto ok = applyMultiDOFJointState(multi_dof_joint_state, conversion_map, config); !ok) {
+    return tl::make_unexpected(ok.error());
+  }
   return config;
 }
 
